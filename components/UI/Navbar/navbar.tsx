@@ -41,10 +41,10 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="hidden lg:flex items-center justify-center flex-1">
-        <Link href="/" className="text-cream hover:text-white px-4 text-xl">
+        <Link href="/" className="text-black hover:text-white px-4 text-xl">
           Home
         </Link>
-        <Link href="/explore" className="text-cream hover:text-white px-4 text-xl">
+        <Link href="/explore" className="text-black hover:text-white px-4 text-xl">
           Explore
         </Link>
        

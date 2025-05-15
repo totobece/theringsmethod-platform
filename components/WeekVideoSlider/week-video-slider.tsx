@@ -7,8 +7,6 @@ import 'slick-carousel/slick/slick-theme.css';
 import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 import WeekVideoSliderSkeleton from '../Skeletons/WeekVideoSliderSkeleton';
-import 'matchmedia-polyfill';
-import 'matchmedia-polyfill/matchMedia.addListener';
 import Link from 'next/link';
 
 
