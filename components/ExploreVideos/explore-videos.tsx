@@ -1,16 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import MyLoader from '../Skeletons/CardSkeletons';
 import Link from 'next/link';
-
-const supabase = createClient(
-  "https://shrswzchkqiobcikdfrn.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNocnN3emNoa3Fpb2JjaWtkZnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5NjU3MDYsImV4cCI6MjA1MjU0MTcwNn0.3w5scY6pFfv2_CmuJX2PR8UB7Ib-YZXZa8Gq5WPuWx8"
-);
 
 export interface ExploreVideosData {
   id: string;
@@ -23,7 +17,7 @@ export default function ExploreVideoSlider() {
   const [data, setData] = useState<ExploreVideosData[]>([]);
   const [isLoading, setIsLoading] = useState(true); 
   const [error, setError] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<{ title: string; url: string; }[]>([]);
+  const [previewData, setPreviewData] = useState<{ name: string; url: string; }[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize: number = 8;
   const searchParams = useSearchParams();
@@ -33,65 +27,34 @@ export default function ExploreVideoSlider() {
     const fetchData = async () => {
       setIsLoading(true); 
       try {
-        const response = await fetch(`/api/explore-data?page=${currentPage}&pageSize=${pageSize}&search=${searchTerm}`);
-        const responseData = await response.json();
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Fetch posts y previews en paralelo
+        const [postsRes, previewsRes] = await Promise.all([
+          fetch('/api/supabase/posts'),
+          fetch('/api/supabase/previews')
+        ]);
+        const postsJson = await postsRes.json();
+        const previewsJson = await previewsRes.json();
 
+        if (!postsRes.ok) throw new Error(postsJson.error || 'Error fetching posts');
+        if (!previewsRes.ok) throw new Error(previewsJson.error || 'Error fetching previews');
 
-        if (!response.ok) {
-          throw new Error('Error fetching data');
-        }
-
-        setData(responseData.data as ExploreVideosData[]);
+        // postsJson.posts es un array de posts
+        setData(postsJson.posts || []);
+        // previewsJson es un array de { name, url }
+        setPreviewData(previewsJson || []);
       } catch (error: unknown) {
         setError((error as Error).message || 'Error fetching data');
       } finally {
         setIsLoading(false); 
       }
     };
-
     fetchData();
   }, [searchTerm, currentPage]); 
 
-  useEffect(() => {
-    const fetchPreviews = async () => {
-      try {
-        const previews: { title: string; url: string; }[] = [];
-
-        const { data: images, error } = await supabase.storage.from('previews').list('');
-
-        if (error) {
-          console.error('Error fetching previews:', error);
-          setError('Ups! An error ocurred. Please try again later')
-          throw new Error('Error fetching previews from Supabase storage');
-        }
-
-        images.forEach(image => {
-          const publicUrl = supabase.storage.from('previews').getPublicUrl(image.name);
-          if (publicUrl) {
-            previews.push({
-              title: image.name.split('.')[0],
-              url: publicUrl.data.publicUrl
-            });
-          }
-        });
-
-        setPreviewData(previews);
-      } catch (error) {
-        console.error('Error fetching previews:', error);
-        setError('Ups! An error ocurred. Please try again later')
-
-
-      }
-    };
-
-    fetchPreviews();
-  }, []);
-
+  // Filtrado y paginación
   const filteredData = data.filter(video =>
     video.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const totalPages = Math.ceil(filteredData.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, filteredData.length);
@@ -111,38 +74,46 @@ export default function ExploreVideoSlider() {
         </div>
       )}
 
-      {!isLoading && !error && currentData.map(dataItem => (
-        <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6">
-          <div className='items-center px-4 bg-none flex flex-col'>
-          {error && <p className='text-red'>Ups! An error ocurred. Please try again later</p>}
-          <Link href={`/routine/${dataItem.id}`}>
-            {previewData.find(preview => preview.title === dataItem.id) && (
-              <Image
-                src={previewData.find(preview => preview.title === dataItem.id)?.url || ''}
-                alt={`Preview for ${dataItem.title}`}
-                sizes="100vw"
-                style={{
-                  width: '100%',
-                  height: 'auto',
-                }}
-                width={16}
-                height={9}
-                className='boxshadow rounded-lg'
-                loading="lazy"
-              />
-            )}
-            </Link>
-            <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-[400] text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title || <MyLoader />}</blockquote>
-            <div className='relative w-full h-10 flex flex-row items-center ' >
-              <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-[300]  text-black tracking-[0.05em] justify-start">{dataItem.duration || <MyLoader />}</blockquote> 
-              </div >
-              <a href={`/routine/${dataItem.id}`} className="flex ml-auto place-content-center rounded-[20px] w-[100px] group bg-[#3f3e3b]  text-xl text-white"> 
-                <span>View</span> 
-              </a>
+      {!isLoading && !error && currentData.map(dataItem => {
+        // Buscar preview por id (filename sin extensión)
+        let preview = previewData.find(preview => preview.name?.split('.')[0] === dataItem.id);
+        // Si no hay preview asociada, usar la primera imagen como fallback (igual que MainPlayRoutine)
+        if (!preview && previewData.length > 0) {
+          preview = previewData[0];
+        }
+        return (
+          <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6">
+            <div className='items-center px-4 bg-none flex flex-col'>
+            {error && <p className='text-red'>Ups! An error ocurred. Please try again later</p>}
+            <Link href={`/routine/${dataItem.id}`}>
+              {preview && preview.url && (
+                <Image
+                  src={preview.url}
+                  alt={`Preview for ${dataItem.title}`}
+                  sizes="100vw"
+                  style={{
+                    width: '100%',
+                    height: 'auto',
+                  }}
+                  width={16}
+                  height={9}
+                  className='boxshadow rounded-lg'
+                  loading="lazy"
+                />
+              )}
+              </Link>
+              <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-[400] text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title || <MyLoader />}</blockquote>
+              <div className='relative w-full h-10 flex flex-row items-center ' >
+                <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-[300]  text-black tracking-[0.05em] justify-start">{dataItem.duration || <MyLoader />}</blockquote> 
+                </div >
+                <a href={`/routine/${dataItem.id}`} className="flex ml-auto place-content-center rounded-[20px] w-[100px] group bg-[#3f3e3b]  text-xl text-white"> 
+                  <span>View</span> 
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
         
       {!isLoading && currentData.length === 0 && (
         <div>
