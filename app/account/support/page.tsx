@@ -5,12 +5,12 @@ import Support from "@/components/SupportForm/support";
 
 export default async function SupportPage() {
   return (
-    <section className="bg-cream max-w-full h-full min-h-[100vh] flex flex-col overflow-y-auto">
+    <section className="bg-cream max-w-full h-full min-h-screen flex flex-col overflow-y-auto">
       <Navbar />
 
       <div className="flex flex-1">
         <Sidebar />
-        <div className="flex flex-1 items-center justify-center"> 
+        <div className="flex flex-1 md:ml-[12.5%] items-center justify-center pt-16"> 
           <Support /> 
         </div>
       </div>

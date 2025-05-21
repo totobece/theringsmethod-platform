@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+:root { 
+    --color-wine: #58011D;
+}

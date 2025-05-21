@@ -6,8 +6,8 @@ const Sidebar = () => {
   const pathname = usePathname(); // Obtener la ruta actual
 
   return (
-    <div style={{ width: "12.5%" }} className="h-full bg-gray-700 p-0 text-white hidden md:flex flex-col"> {/* Sin padding para que cada link ocupe todo el ancho */}
-      <h2 className="text-lg font-[500] p-6">Settings</h2>
+    <div style={{ width: "12.5%" }} className="fixed left-0 top-24 bottom-0 bg-gray-700 p-0 text-white hidden md:flex flex-col h-[calc(100vh-4rem)]"> {/* Fijo en el lateral y altura completa */}
+      <h2 className="text-lg font-medium p-6">Settings</h2>
       <ul className="flex-1 space-y-0"> {/* Sin espacio vertical para separar cada link con un borde */}
         <li > 
           <Link 

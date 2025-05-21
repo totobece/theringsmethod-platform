@@ -1,12 +1,9 @@
 'use client'
 import React, { useEffect, useState } from 'react'; 
-import { createClient } from '@supabase/supabase-js'; 
 import Navbar from '@/components/UI/Navbar/navbar'; 
 import MoreVideos from '@/components/MoreVideosRecommendation/more-videos-recommendation';
 import Footer from '@/components/UI/Footer/footer';
 
-// Creación del cliente Supabase con la URL y la clave de API proporcionadas
-const supabase = createClient("https://shrswzchkqiobcikdfrn.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNocnN3emNoa3Fpb2JjaWtkZnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5NjU3MDYsImV4cCI6MjA1MjU0MTcwNn0.3w5scY6pFfv2_CmuJX2PR8UB7Ib-YZXZa8Gq5WPuWx8");
 
 export interface ExploreVideosData {
   id: string;
@@ -20,45 +17,32 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
   const [videoUrl, setVideoUrl] = useState<string | null>(null); // Estado para almacenar la URL del video
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
-    async function fetchVideoUrl() {
-      const matchingVideoName = `${id}.mp4`; // Nombre del video a buscar
-
-      // Consulta a Supabase para obtener la lista de videos
-      const { data: videos, error } = await supabase.storage.from('videos').list('');
-
-      if (error) {
-        console.error('Error fetching videos from Supabase storage:', error); // Manejo de errores en caso de falla en la consulta
-        return;
-      }
-
-      // Buscar el video correspondiente en la lista obtenida
-      const matchingVideo = videos.find(video => video.name === matchingVideoName);
-      if (matchingVideo) {
-        // Se construye la URL del video utilizando la URL base y el nombre del video encontrado
-        const url = `https://shrswzchkqiobcikdfrn.supabase.co/storage/v1/object/public/videos/${matchingVideo.name}`;
-        setVideoUrl(url); // Establecer la URL del video si se encuentra
-      } else {
-        console.error('No se encontró el video correspondiente.');
-        setError('Ups! An error ocurred. Please try again later')
-
-        
+    async function fetchVideoFromApi() {
+      try {
+        const response = await fetch('/api/supabase/videos');
+        if (!response.ok) throw new Error('No se pudo obtener el video');
+        const { videos } = await response.json();
+        if (videos && videos.length > 0) {
+          setVideoUrl(videos[0].url);
+        } else {
+          setError('No se encontró ningún video.');
+        }
+      } catch {
+        setError('Ups! Ocurrió un error. Intenta nuevamente.');
       }
     }
-
-    fetchVideoUrl(); // Llamada a la función de obtención de URL del video al montar el componente
-  }, [id]); // Dependencia 'id' para volver a ejecutar el efecto cuando cambia
-
+    fetchVideoFromApi();
+  }, []);
 
   return (
-    <section className="relative bg-gradient-to-b from-cream from-90%  to-gray-500 to-99%">
+    <section className="relative bg-linear-to-b from-cream from-90%  to-gray-500 to-99%">
       <Navbar/> 
 
       {/* Reproductor de video */}
       {videoUrl && (
-        <div className="max-w-full mx-auto flex justify-center items-center h-[100%]">
-          <video controls autoPlay className=' h-[100%] w-[100%]'   data-testid="video-player">
+        <div className="max-w-full mx-auto flex justify-center items-center h-full">
+          <video controls autoPlay className=' h-full w-full'   data-testid="video-player">
             <source src={videoUrl} type="video/mp4" />
           </video>
         </div>
@@ -81,7 +65,7 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
 
       <div className='justify-center items-center flex flex-col'>
           
-        <h1 className='mt-20 text-pretty text-center px-12 lg:px-20 font-[500] text-3xl  md:text-5xl'>Discover more routines to try!</h1>
+        <h1 className='mt-20 text-pretty text-center px-12 lg:px-20 font-medium text-3xl  md:text-5xl'>Discover more routines to try!</h1>
       
       
 

@@ -8,44 +8,37 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
-      keyframes:{
+      keyframes: {
         slidein: {
-          from: {
-            opacity : "0",
-            transform: "translateY(-10px)",
-          },
-          to : {
-            opacity : "1",
-            transform : "translateY(0)",
-          },
+          from: { opacity: "0", transform: "translateY(-10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
         },
       },
-      animation:{
+      animation: {
         slidein: "slidein 1s ease 300ms",
       },
       colors: {
-				white: "#ffffff",
+        white: "#ffffff",
         darkgrad: "rgba(0, 0, 0, 0.7)",
         cream: "#EFEEE7",
         wine: "#58011D",
+        winedark: "#320013", // Cambiado a camelCase sin guion
         darkwine: "#3F1723",
         darkerwine: "#38101B",
-				"gray": {
-					100: "#ffffff",
-					200: "#B3B3B3",
-					300: "#61605e",
-					400: "#ffffff",
-					500: "#63625D",
-					600: "#434343",
-					700: "#202020",
-				},
-			},
+        gray: {
+          100: "#ffffff",
+          200: "#B3B3B3",
+          300: "#61605e",
+          400: "#ffffff",
+          500: "#63625D",
+          600: "#434343",
+          700: "#202020",
+        },
+      },
     },
   },
   plugins: [],

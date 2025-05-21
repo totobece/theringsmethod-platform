@@ -13,33 +13,34 @@ export interface ExploreVideosData {
 
 export default function VideoPlayer({ params: { id } = { id: undefined } }: { params?: { id?: string | undefined } }) {
   const [data, setData] = useState<ExploreVideosData[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<{ name: string; url: string; }[]>([]);
 
   useEffect(() => {
-    const fetchDataAndPreviews = async () => {
+    const fetchDataAndPreview = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const [postsRes, previewsRes] = await Promise.all([
-          fetch('/api/supabase/posts'),
-          fetch('/api/supabase/previews')
-        ]);
-
+        // Fetch posts
+        const postsRes = await fetch('/api/supabase/posts');
         const postsJson = await postsRes.json();
-        const previewsJson = await previewsRes.json();
-
         if (!postsRes.ok) throw new Error(postsJson.error || 'Error fetching posts');
-        if (!previewsRes.ok) throw new Error(previewsJson.error || 'Error fetching previews');
-
         const filteredPosts = id 
           ? (postsJson.posts || []).filter((video: ExploreVideosData) => video.id !== id)
           : (postsJson.posts || []);
-        
         setData(filteredPosts);
-        setPreviewData(previewsJson || []);
 
+        // Fetch preview (solo una imagen)
+        const previewsRes = await fetch('/api/supabase/previews');
+        const previewsJson = await previewsRes.json();
+        let url: string | null = null;
+        if (Array.isArray(previewsJson) && previewsJson.length > 0) {
+          url = previewsJson[0].url;
+        } else if (previewsJson.images && Array.isArray(previewsJson.images) && previewsJson.images.length > 0) {
+          url = previewsJson.images[0].url;
+        }
+        setPreviewUrl(url);
       } catch (error: unknown) {
         setError((error as Error).message || 'Error fetching data');
         console.error("Error fetching data:", error);
@@ -48,7 +49,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
       }
     };
 
-    fetchDataAndPreviews();
+    fetchDataAndPreview();
   }, [id]);
 
   return (
@@ -62,39 +63,36 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
           </div>
         )}
 
-        {!isLoading && !error && data.map(dataItem => {
-          const preview = previewData.find(p => p.name?.split('.')[0] === dataItem.id);
-          return (
-            <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6">
-              <div className='items-center px-4 bg-none flex flex-col'>
-                <Link href={`/routine/${dataItem.id}`} >
-                  {preview && preview.url && (
-                    <Image
-                      src={preview.url}
-                      alt={`Preview for ${dataItem.title}`}
-                      sizes="100vw"
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                      }}
-                      width={1600}
-                      height={900}
-                      className='boxshadow rounded-lg'
-                      loading="lazy"
-                    />
-                  )}
-                </Link>
-                <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-[400] text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title}</blockquote>
-                <div className='relative w-full h-10 flex flex-row items-center ' >
-                  <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-[300]  text-black tracking-[0.05em] justify-start">{dataItem.duration}</blockquote></div>
-                  <a href={`/routine/${dataItem.id}`} className="flex ml-auto place-content-center rounded-[20px] w-[100px] group bg-[#3f3e3b]  text-xl text-white">
-                    <span className='text-base'>View</span>
-                  </a>
-                </div>
+        {!isLoading && !error && data.map(dataItem => (
+          <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6">
+            <div className='items-center px-4 bg-none flex flex-col'>
+              <Link href={`/routine/${dataItem.id}`} >
+                {previewUrl && (
+                  <Image
+                    src={previewUrl}
+                    alt={`Preview`}
+                    sizes="100vw"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                    }}
+                    width={1600}
+                    height={900}
+                    className='boxshadow rounded-lg'
+                    loading="lazy"
+                  />
+                )}
+              </Link>
+              <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-normal text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title}</blockquote>
+              <div className='relative w-full h-10 flex flex-row items-center ' >
+                <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-light  text-black tracking-[0.05em] justify-start">{dataItem.duration}</blockquote></div>
+                <a href={`/routine/${dataItem.id}`} className="flex ml-auto place-content-center rounded-[20px] w-[100px] group bg-wine  text-xl text-white">
+                  <span className='text-base'>View</span>
+                </a>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
         {error && <p className='text-red-500 p-4'>Error: {error}</p>}
       </div>
     </section>

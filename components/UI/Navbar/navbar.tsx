@@ -41,10 +41,10 @@ export default function Navbar() {
         </Link>
       </div>
       <div className="hidden lg:flex items-center justify-center flex-1">
-        <Link href="/" className="text-black hover:text-white px-4 text-xl">
+        <Link href="/" className="text-white hover:text-gray-300 px-4 text-xl">
           Home
         </Link>
-        <Link href="/explore" className="text-black hover:text-white px-4 text-xl">
+        <Link href="/explore" className="text-white hover:text-gray-200 px-4 text-xl">
           Explore
         </Link>
        
@@ -100,7 +100,7 @@ export default function Navbar() {
               <label>
                 <input className="peer hidden" type="checkbox" id="mobile-menu" />
                 <div
-                  className="relative z-50 block h-[1px] w-7 bg-white  content-[''] before:absolute before:top-[-0.35rem] before:z-50 before:block before:h-full before:w-full before:bg-white before:transition-all before:duration-200 before:ease-out before:content-[''] after:absolute after:right-0 after:bottom-[-0.35rem] after:block after:h-full after:w-full after:bg-white after:transition-all after:duration-200 after:ease-out after:content-[''] peer-checked:bg-transparent before:peer-checked:top-0 before:peer-checked:w-full before:peer-checked:rotate-45 before:peer-checked:transform after:peer-checked:bottom-0 after:peer-checked:w-full after:peer-checked:-rotate-45 after:peer-checked:transform"
+                  className="relative z-50 block h-px w-7 bg-white  content-[''] before:absolute before:top-[-0.35rem] before:z-50 before:block before:h-full before:w-full before:bg-white before:transition-all before:duration-200 before:ease-out before:content-[''] after:absolute after:right-0 after:bottom-[-0.35rem] after:block after:h-full after:w-full after:bg-white after:transition-all after:duration-200 after:ease-out after:content-[''] peer-checked:bg-transparent before:peer-checked:top-0 before:peer-checked:w-full before:peer-checked:rotate-45 before:peer-checked:transform after:peer-checked:bottom-0 after:peer-checked:w-full after:peer-checked:-rotate-45 after:peer-checked:transform"
                 >
                 </div>
                 <div

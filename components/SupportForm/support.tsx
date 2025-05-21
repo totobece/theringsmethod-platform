@@ -37,7 +37,7 @@ function ContactForm() {
           <form className="mt-6 text-left p-4 lg:p-6" onSubmit={handleSubmit}>
             <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-[500]">*Full Name</span>
+                      <span className="text-gray-600 text-xl font-medium">*Full Name</span>
                       <input
                         type="text"
                         name="name"
@@ -64,7 +64,7 @@ function ContactForm() {
                   </div>
                   <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-[500]" >*Email</span>
+                      <span className="text-gray-600 text-xl font-medium" >*Email</span>
                       <input
                         name="email"
                         type="email"
@@ -92,7 +92,7 @@ function ContactForm() {
                   </div>
                   <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-[500]" >*Phone number</span>
+                      <span className="text-gray-600 text-xl font-medium" >*Phone number</span>
                       <input
                         name="Numero"
                         type="text"
@@ -120,7 +120,7 @@ function ContactForm() {
                   </div>
                     <div className="mb-2 ">
                       <label>
-                        <span className="text-gray-600 text-xl font-[500] " >Your message</span>
+                        <span className="text-gray-600 text-xl font-medium " >Your message</span>
                         <textarea
                           name="message"
                 

@@ -14,7 +14,7 @@ const scrollToContact = () => {
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gradient-to-b from-gray-700 via-black to-darkerwine"> 
+    <footer className="relative bg-linear-to-b from-gray-700 via-black to-darkerwine"> 
     <div className="absolute inset-0 z-[-1]"> 
       
     </div>
@@ -40,7 +40,7 @@ export default function Footer() {
      
         <div className="flex items-center md:justify-between flex-col mb-4 md:mb-0">
 
-          <div className="mb-6 py-2 flex flex-col lg:flex-row  md:order-2 font-[200]">
+          <div className="mb-6 py-2 flex flex-col lg:flex-row  md:order-2 font-extralight">
               <a className='text-white px-2 text-xl mx-auto'
               href="https://theringsmethod.com/"
               target='_blank'>About Us</a>
@@ -49,7 +49,7 @@ export default function Footer() {
               target='_blank'>Help & Support</a>
           </div>
 
-          <div className="text-white md:text-xl font-[200] mr-2 md:mr-0 md:order-1">
+          <div className="text-white md:text-xl font-extralight mr-2 md:mr-0 md:order-1">
             &copy; TheRingsMethod.com. All rights reserved.
           </div>
 

@@ -118,6 +118,7 @@ export default function WeekVideoSlider() {
     }
   };
 
+  // Multiplicar las rutinas x7 para simular scroll infinito
   const multipliedData = Array(7).fill(data).flat();
 
   return (

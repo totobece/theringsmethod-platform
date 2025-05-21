@@ -63,7 +63,7 @@ export default function ExploreVideoSlider() {
   return (
     <section style={{ minHeight: '100vh' }} className='relative bg-none' >
     <div className={`max-w-full sm:px-6 relative lg:text-start md:text-start text-center`}>
-      <h1 className='pt-16 mx-3 md:mx-0 text-white font-[400] text-3xl md:text-6xl'>Explore the Rings Method experience</h1>
+      <h1 className='pt-16 mx-3 md:mx-0 text-white font-normal text-3xl md:text-6xl'>Explore the Rings Method experience</h1>
     </div>
     <div className="w-full flex mt-16 flex-wrap items-center justify-center">
       {isLoading && (
@@ -102,9 +102,9 @@ export default function ExploreVideoSlider() {
                 />
               )}
               </Link>
-              <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-[400] text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title || <MyLoader />}</blockquote>
+              <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-normal text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title || <MyLoader />}</blockquote>
               <div className='relative w-full h-10 flex flex-row items-center ' >
-                <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-[300]  text-black tracking-[0.05em] justify-start">{dataItem.duration || <MyLoader />}</blockquote> 
+                <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-light  text-black tracking-[0.05em] justify-start">{dataItem.duration || <MyLoader />}</blockquote> 
                 </div >
                 <a href={`/routine/${dataItem.id}`} className="flex ml-auto place-content-center rounded-[20px] w-[100px] group bg-[#3f3e3b]  text-xl text-white"> 
                   <span>View</span> 
@@ -117,7 +117,7 @@ export default function ExploreVideoSlider() {
         
       {!isLoading && currentData.length === 0 && (
         <div>
-        <h1 className='text-2xl text-center text-gray-700'>Couldn't find: <span className='font-[500] text-2xl text-gray-700'>&quot;{searchTerm}&quot; 
+        <h1 className='text-2xl text-center text-gray-700'>Couldn't find: <span className='font-medium text-2xl text-gray-700'>&quot;{searchTerm}&quot; 
         </span> </h1>
         <h1 className='text-xl text-center text-gray-700'>Try searching again using a different spelling or keyword.</h1>
         </div>

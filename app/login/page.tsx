@@ -45,11 +45,11 @@ export default function LoginPage() {
   }
 
   return (
-    <section className="bg-[#EFEEE7] min-h-screen w-full flex animate-slidein full-height">
+    <section className="bg-cream min-h-screen w-full flex animate-slidein full-height">
       <div className={`w-full max-w-xl m-auto px-2 pt-6 pb-12 ${isModalOpen ? 'blur-md' : ''}`}>
-        <div className="w-full space-y-10 p-8 rounded-2xl bg-cream border-[2px] border-gray-600 ">
+        <div className="w-full space-y-10 p-8 rounded-2xl bg-cream border-2 border-gray-600 ">
           <div>
-            <h1 className="text-black w/full font-[500] text-3xl lg:text-5xl">
+            <h1 className="text-black w/full font-medium text-3xl lg:text-5xl">
               Welcome to <br /> the Rings Method!
             </h1>
           </div>
@@ -59,7 +59,7 @@ export default function LoginPage() {
             ref={formRef}
           >
             <div className="flex flex-col">
-              <label className="text-gray-600 text-xl font-[500]" htmlFor="email">Email:</label>
+              <label className="text-gray-600 text-xl font-medium" htmlFor="email">Email:</label>
               <input
                 id="email"
                 name="email"
@@ -69,7 +69,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="text-gray-600 text-xl font-[500]" htmlFor="password">Password:</label>
+              <label className="text-gray-600 text-xl font-medium" htmlFor="password">Password:</label>
               <input
                 id="password"
                 name="password"

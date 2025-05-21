@@ -15,7 +15,7 @@ export default async function Explore() {
 
 
   return(
-    <main className="relative bg-gradient-to-b from-gray-500 from-15%  to-cream to-50%">
+    <main className="relative bg-linear-to-b from-gray-500 from-15%  to-cream to-50%">
       <Navbar/>
     {user ?(
     <>

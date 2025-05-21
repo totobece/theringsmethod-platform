@@ -10,6 +10,7 @@ interface RoutineData {
   title: string;
   content: string;
   duration: string;
+  episode: string;
 }
 
 const MainPlayRoutine = () => {
@@ -54,7 +55,7 @@ const MainPlayRoutine = () => {
   }, []);
 
   return (
-    <section id="service-presentation" className='w-full relative animate-slidein'>
+    <section id="service-presentation" className='w-full relative animate-slidein '>
       <div className='mx-auto w-full items-start'>
         {isLoading ? (
           <MainPlayRoutineSkeleton />
@@ -64,15 +65,15 @@ const MainPlayRoutine = () => {
           posts.map((post) => (
             <div key={post.id} className="relative w-full h-auto flex flex-col md:flex-row p-6 border-[3px] border-gray-600 bg-gray-700 rounded-2xl md:rounded-3xl pt-4 mb-8" data-aos="fade-up" data-aos-delay="400">
               <div className='relative w-[70%] md:pt-0 pt-3 pl-3 md:pl-6'>
-                <div className='bg-gray-500 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-10'>
-                  <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-[300] text-cream text-center mx-auto place-content-center">
-                    {post.id}
+                <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-10'>
+                  <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-light text-cream text-center mx-auto place-content-center">
+                    {post.episode}
                   </blockquote>
                 </div>
-                <blockquote className="text-2xl md:text-4xl lg:text-5xl font-[400] text-cream text-left mx-auto pt-4 md:mt-4">
+                <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left mx-auto pt-4 md:mt-4">
                   {post.title}
                 </blockquote>
-                <blockquote className="text-2xl md:text-3xl lg:text-4xl font-[200] text-cream text-left mx-auto py-4 ">
+                <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mx-auto py-4 ">
                   {post.duration}
                 </blockquote>
                 <div className='relative h-[95%] md:h-[30%] lg:h-[60%] place-content-center'>
@@ -91,14 +92,14 @@ const MainPlayRoutine = () => {
                 </div>
               </div>
               {imageUrl && (
-                <div className="w-full flex justify-center items-center mt-4">
+                <div className="w-full flex justify-end mr-4 items-center mt-4">
                   <Image
                     src={imageUrl}
                     alt="Preview"
                     width={500}
-                    height={300}
+                    height={500}
                     className="rounded-lg"
-                    style={{ width: '500px', height: 'auto' }}
+                    style={{ width: '800px', height: '500px' }}
                   />
                 </div>
               )}

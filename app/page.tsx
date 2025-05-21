@@ -19,14 +19,14 @@ export default async function Home() {
   return (
     <section>
     <Navbar />
-    <main className='bg-gradient-to-b from-gray-700 to-gray-200 to-90% '>
+    <main className='bg-linear-to-b from-gray-500 to-gray-200 to-90% '>
       
       {user ? (
         <>
           <div className='md:pt-6 md:px-6'>
           <MainPlayRoutine />
           <div className={`max-w-full relative md:text-start text-start`}>
-      <h1 className='mt-28 mb-10 md:px-0 px-4 text-white font-[300] text-2xl md:text-3xl'>Featuring this week:</h1>
+      <h1 className='mt-28 mb-10 md:px-0 px-4 text-white font-light text-2xl md:text-3xl'>Featuring this week:</h1>
 
       </div>
           </div>

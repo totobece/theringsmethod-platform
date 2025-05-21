@@ -4,22 +4,22 @@ import Sidebar from "@/components/UI/Sidebar/sidebar";
 
 export default async function TermsPage() {
   return (
-    <section className="bg-cream max-w-full h-full min-h-[100vh] flex flex-col ">
+    <section className="bg-cream max-w-full h-full min-h-screen flex flex-col ">
       <Navbar />
 
       <div className="flex bg-cream flex-1"> 
           <Sidebar/>
 
-        <div className="flex-1  max-w-[70%] mx-auto px-2 pt-4 pb-12">
-          <div className="space-y-8 py-8 rounded-2xl  ">
+        <div className="flex-1 md:ml-[12.5%] mx-auto px-8 pt-24 pb-12">
+          <div className="space-y-8">
             <div>
-              <h1 className="text-black text-2xl font-[400] lg:text-4xl">Terms & Conditions</h1>
+              <h1 className="text-black text-2xl font-normal lg:text-4xl">Terms & Conditions</h1>
             </div>
            
             
           </div>
           <div className="">
-              <p className="text-gray-700 text-xl font-[200]">
+              <p className="text-gray-700 text-xl font-extralight">
               TERMS OF SERVICE
 PLEASE READ THIS LEGAL DOCUMENT CAREFULLY.  IT GOVERNS YOUR USE OF THE PLIABILITY WEBSITE AND THE PLIABILITY APP.
 To make these Terms of Service (the "Terms") easier to read, the pliability website, apps, the pliability streaming interfaces, and pliability-controlled social media pages and fora are collectively called the "pliability Service" or "the Services".  We provide videos on demand, and you can stream them to any screen, or download them for offline use.  In addition, we offer personalized content and fitness guidance to improve your experience, including showing you recommendations that might be of interest to you. By visiting, browsing, or using the pliability Service in any way, you (as a "user") accept and agree to be bound by these Terms, which form a binding agreement between you and pliability.
