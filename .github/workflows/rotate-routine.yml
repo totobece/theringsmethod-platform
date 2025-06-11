@@ -18,7 +18,7 @@ jobs:
           response=$(curl -s -X POST \
             -H "Content-Type: application/json" \
             -H "User-Agent: GitHub-Actions-Cron" \
-            "http://localhost:3000/api/supabase/daily-routine")
+            "https://1dc8-2800-810-495-105c-6db7-6589-c7a5-3f42.ngrok-free.app/api/supabase/daily-routine")
           
           echo "📝 API Response: $response"
           
