@@ -1,25 +1,32 @@
 import Navbar from '@/components/UI/Navbar/navbar';
 import MainPlayRoutine from '@/components/MainPlayRoutine/main-play-routine';
 import WeekVideoSlider from '@/components/WeekVideoSlider/week-video-slider';
-import { createClient } from "@/utils/supabase/server";
+import { checkUserTrialStatus } from "@/utils/trial-check";
 import { redirect } from 'next/navigation'
 import Footer from '@/components/UI/Footer/footer';
 import ExploreVideoSlider from "@/components/ExploreVideos/explore-videos"
+import TrialBanner from '@/components/TrialBanner/trial-banner'
 
 export default async function Home() {
-  const supabase = await createClient();
-  const session = await supabase.auth.getSession();
-  const user = session.data?.session?.user;
-
-  console.log('user session data', session)
-
+  const trialStatus = await checkUserTrialStatus()
   
+  if (!trialStatus.isValid) {
+    redirect(trialStatus.redirect || '/login')
+  }
+  
+  const user = trialStatus.user
+  console.log('Trial status:', {
+    user: user?.email,
+    daysRemaining: trialStatus.daysRemaining,
+    trialEndDate: trialStatus.trialEndDate
+  })
 
 
   return (
     <section>
+    <TrialBanner daysRemaining={trialStatus.daysRemaining} />
     <Navbar />
-    <main className='bg-linear-to-b from-gray-500 to-gray-200 to-90% '>
+    <main className='bg-gray-700 to-99% '>
       
       {user ? (
         <>

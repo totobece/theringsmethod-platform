@@ -1,17 +1,24 @@
 import SignOut from "@/components/SignOut/sign-out";
-import { createClient } from "@/utils/supabase/server";
+import { checkUserTrialStatus } from "@/utils/trial-check";
 import Link from "next/link";
 import Navbar from "@/components/UI/Navbar/navbar";
 import Sidebar from "@/components/UI/Sidebar/sidebar";
+import TrialBanner from '@/components/TrialBanner/trial-banner'
+import { redirect } from 'next/navigation'
 
 export default async function AccountPage() {
-  const supabase = await createClient();
-  const session = await supabase.auth.getSession();
-  const user = session.data?.session?.user;
+  const trialStatus = await checkUserTrialStatus()
+  
+  if (!trialStatus.isValid) {
+    redirect(trialStatus.redirect || '/login')
+  }
+  
+  const user = trialStatus.user
 
   return (
     
     <section className="bg-cream max-w-full h-full min-h-screen flex flex-col overflow-y-auto">
+      <TrialBanner daysRemaining={trialStatus.daysRemaining} />
       <Navbar />
 
       <div className="flex flex-1"> 
@@ -27,6 +34,11 @@ export default async function AccountPage() {
             <div>
               <p className="text-gray-700 text-xl font-light">Email: {user?.email ?? "Guest"}</p>
               <p className="text-gray-700 text-xl font-light mt-4">Joined on: {user?.created_at ?? "Guest"}</p>
+              {trialStatus.daysRemaining && (
+                <p className="text-gray-700 text-xl font-light mt-4">
+                  Trial days remaining: <span className="font-medium">{trialStatus.daysRemaining}</span>
+                </p>
+              )}
               <p className="text-gray-700 text-xl font-light mt-4">Account status: {user?.aud ?? "Guest"}</p>
             </div>
             <div className="flex justify-start">

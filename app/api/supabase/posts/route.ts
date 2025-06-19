@@ -7,7 +7,7 @@ const getAllPosts = async () => {
   const { data, error } = await supabase
     .from("posts")
     .select("*")
-    .order("id", { ascending: true })
+    .order("day", { ascending: true })
 
   if (error) {
     throw new Error(error.message)
