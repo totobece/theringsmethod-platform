@@ -11,6 +11,8 @@ export interface ExploreVideosData {
   title: string;
   content: string;
   duration: string;
+  episode: string;
+  day: string;
 }
 
 export default function ExploreVideoSlider() {
@@ -82,33 +84,55 @@ export default function ExploreVideoSlider() {
           preview = previewData[0];
         }
         return (
-          <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6">
-            <div className='items-center px-4 bg-none flex flex-col'>
-            {error && <p className='text-red'>Ups! An error ocurred. Please try again later</p>}
-            <Link href={`/routine/${dataItem.id}`}>
-              {preview && preview.url && (
+          <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
+            <div className='card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden'>
+              {/* Imagen de fondo */}
+              <div className="absolute inset-0 z-0">
                 <Image
-                  src={preview.url}
-                  alt={`Preview for ${dataItem.title}`}
-                  sizes="100vw"
-                  style={{
-                    width: '100%',
-                    height: 'auto',
-                  }}
-                  width={16}
-                  height={9}
-                  className='boxshadow rounded-lg'
-                  loading="lazy"
+                  src="/images/smaller rectangle.png"
+                  alt="Card Background"
+                  fill
+                  className="object-cover rounded-xl"
+                  priority
                 />
-              )}
-              </Link>
-              <blockquote className="text-left w-full leading-10 text-lg lg:text-2xl font-normal text-nowrap text-black tracking-[0.05em] pt-2">{dataItem.title || <MyLoader />}</blockquote>
-              <div className='relative w-full h-10 flex flex-row items-center ' >
-                <div className=''><blockquote className="leading-10 text-lg lg:text-xl font-light  text-black tracking-[0.05em] justify-start">{dataItem.duration || <MyLoader />}</blockquote> 
-                </div >
-                <a href={`/routine/${dataItem.id}`} className="flex ml-auto place-content-center rounded-[20px] w-[100px] group bg-[#3f3e3b]  text-xl text-white"> 
-                  <span>View</span> 
-                </a>
+              </div>
+              {/* Contenido por encima del fondo */}
+              <div className="relative z-10 h-full flex flex-col">
+                {/* Duración en la parte superior */}
+                <div className='flex justify-start mb-4'>
+                  <div className='bg-gray-600 bg-opacity-80 w-fit px-3 py-1 flex items-center rounded-full'>
+                    <blockquote className="text-sm font-light text-cream text-center">{dataItem.duration}</blockquote>
+                  </div>
+                </div>
+                
+                {/* Imagen de preview en el centro */}
+                <div className='flex-1 flex justify-center items-center mb-4'>
+                  <Link href={`/routine/${dataItem.id}`}>
+                    {preview && preview.url && (
+                      <Image
+                        className='rounded-md'
+                        src={preview.url}
+                        alt={`Preview for ${dataItem.title}`}
+                        sizes="100vw"
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          maxHeight: '280px',
+                          objectFit: 'cover'
+                        }}
+                        width={16}
+                        height={9}
+                        loading="lazy"
+                      />
+                    )}
+                  </Link>
+                </div>
+                
+                {/* Título y día en la parte inferior */}
+                <div className='mt-auto text-right'>
+                  <blockquote className="text-lg lg:text-xl font-medium text-cream mb-1">{dataItem.title}</blockquote>
+                  <blockquote className="text-base font-light text-cream opacity-80">{dataItem.day}</blockquote>
+                </div>
               </div>
             </div>
           </div>
