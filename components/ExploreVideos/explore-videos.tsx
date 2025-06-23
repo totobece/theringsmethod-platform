@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import MyLoader from '../Skeletons/CardSkeletons';
 import Link from 'next/link';
+import { useRoutineAccess } from '@/hooks/useRoutineAccess';
+import { extractDayNumberFromString } from '@/utils/progress-logic';
 
 export interface ExploreVideosData {
   id: string;
@@ -24,6 +26,9 @@ export default function ExploreVideoSlider() {
   const pageSize: number = 8;
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get('search') || ''; 
+  
+  // Hook para acceso a rutinas
+  const { progressData, isLoading: isAccessLoading } = useRoutineAccess(); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +73,7 @@ export default function ExploreVideoSlider() {
       <h1 className='pt-16 mx-3 md:mx-0 text-white font-normal text-3xl md:text-6xl'>Explore the Rings Method experience</h1>
     </div>
     <div className="w-full flex mt-16 flex-wrap items-center justify-center">
-      {isLoading && (
+      {(isLoading || isAccessLoading) && (
         <div className='w-full flex flex-wrap'>
           {Array.from({ length: pageSize }).map((_, i) => (
             <MyLoader key={i} />
@@ -76,7 +81,12 @@ export default function ExploreVideoSlider() {
         </div>
       )}
 
-      {!isLoading && !error && currentData.map(dataItem => {
+      {!isLoading && !isAccessLoading && !error && currentData.map(dataItem => {
+        // Verificar si la rutina está desbloqueada
+        const routineDay = extractDayNumberFromString(dataItem.day);
+        const isUnlocked = progressData ? routineDay <= progressData.maxUnlockedDay : false;
+        const daysUntilUnlock = progressData ? Math.max(0, routineDay - progressData.maxUnlockedDay) : 999;
+        
         // Buscar preview por id (filename sin extensión)
         let preview = previewData.find(preview => preview.name?.split('.')[0] === dataItem.id);
         // Si no hay preview asociada, usar la primera imagen como fallback (igual que MainPlayRoutine)
@@ -85,7 +95,7 @@ export default function ExploreVideoSlider() {
         }
         return (
           <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
-            <div className='card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden'>
+            <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
               {/* Imagen de fondo */}
               <div className="absolute inset-0 z-0">
                 <Image
@@ -95,6 +105,10 @@ export default function ExploreVideoSlider() {
                   className="object-cover rounded-xl"
                   priority
                 />
+                {/* Overlay para rutinas bloqueadas */}
+                {!isUnlocked && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+                )}
               </div>
               {/* Contenido por encima del fondo */}
               <div className="relative z-10 h-full flex flex-col">
@@ -105,33 +119,61 @@ export default function ExploreVideoSlider() {
                   </div>
                 </div>
                 
-                {/* Imagen de preview en el centro */}
+                {/* Imagen de preview en el centro O icono de candado */}
                 <div className='flex-1 flex justify-center items-center mb-4'>
-                  <Link href={`/routine/${dataItem.id}`}>
-                    {preview && preview.url && (
-                      <Image
-                        className='rounded-md'
-                        src={preview.url}
-                        alt={`Preview for ${dataItem.title}`}
-                        sizes="100vw"
-                        style={{
-                          width: '100%',
-                          height: 'auto',
-                          maxHeight: '280px',
-                          objectFit: 'cover'
-                        }}
-                        width={16}
-                        height={9}
-                        loading="lazy"
-                      />
-                    )}
-                  </Link>
+                  {isUnlocked ? (
+                    <Link href={`/routine/${dataItem.id}`}>
+                      {preview && preview.url && (
+                        <Image
+                          className='rounded-md'
+                          src={preview.url}
+                          alt={`Preview for ${dataItem.title}`}
+                          sizes="100vw"
+                          style={{
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: '280px',
+                            objectFit: 'cover'
+                          }}
+                          width={16}
+                          height={9}
+                          loading="lazy"
+                        />
+                      )}
+                    </Link>
+                  ) : (
+                    <div className="flex flex-col items-center text-white">
+                      {/* Icono de candado */}
+                      <svg 
+                        className="w-12 h-12 mb-3" 
+                        fill="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M12,3A3,3 0 0,1 15,6V8H9V6A3,3 0 0,1 12,3M18,20H6V10H18V20Z" />
+                      </svg>
+                      
+                      {/* Texto de bloqueo */}
+                      <div className="text-center">
+                        <p className="text-sm font-medium mb-1">Bloqueada</p>
+                        <p className="text-xs opacity-80">
+                          {daysUntilUnlock === 0 
+                            ? 'Se desbloquea mañana' 
+                            : `Se desbloquea en ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Título y día en la parte inferior */}
                 <div className='mt-auto text-right'>
-                  <blockquote className="text-lg lg:text-xl font-medium text-cream mb-1">{dataItem.title}</blockquote>
-                  <blockquote className="text-base font-light text-cream opacity-80">{dataItem.day}</blockquote>
+                  <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
+                    {dataItem.title}
+                  </blockquote>
+                  <blockquote className={`text-base font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
+                    {dataItem.day}
+                  </blockquote>
                 </div>
               </div>
             </div>

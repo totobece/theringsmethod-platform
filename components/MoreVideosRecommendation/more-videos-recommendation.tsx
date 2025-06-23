@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import MoreVideosSkeleton from '../Skeletons/MoreVideosSkeleton';
 import Link from 'next/link';
+import { useRoutineAccess } from '@/hooks/useRoutineAccess';
+import { extractDayNumberFromString } from '@/utils/progress-logic';
 
 export interface ExploreVideosData {
   id: string;
@@ -18,6 +20,9 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Hook para acceso a rutinas
+  const { progressData, isLoading: isAccessLoading } = useRoutineAccess();
 
   useEffect(() => {
     const fetchDataAndPreview = async () => {
@@ -65,60 +70,99 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
           </div>
         )}
 
-        {!isLoading && !error && data.map(dataItem => (
-          <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
-            <div className='card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden'>
-              {/* Imagen de fondo */}
-              <div className="absolute inset-0 z-0">
-                <Image
-                  src="/images/smaller rectangle.png"
-                  alt="Card Background"
-                  fill
-                  className="object-cover rounded-xl"
-                  priority
-                />
-              </div>
-              {/* Contenido por encima del fondo */}
-              <div className="relative z-10 h-full flex flex-col">
-                {/* Duración en la parte superior */}
-                <div className='flex justify-start mb-4'>
-                  <div className='bg-gray-600 bg-opacity-80 w-fit px-3 py-1 flex items-center rounded-full'>
-                    <blockquote className="text-sm font-light text-cream text-center">{dataItem.duration}</blockquote>
+        {!isLoading && !isAccessLoading && !error && data.map(dataItem => {
+          // Verificar si la rutina está desbloqueada
+          const routineDay = extractDayNumberFromString(dataItem.day);
+          const isUnlocked = progressData ? routineDay <= progressData.maxUnlockedDay : false;
+          const daysUntilUnlock = progressData ? Math.max(0, routineDay - progressData.maxUnlockedDay) : 999;
+          
+          return (
+            <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
+              <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
+                {/* Imagen de fondo */}
+                <div className="absolute inset-0 z-0">
+                  <Image
+                    src="/images/smaller rectangle.png"
+                    alt="Card Background"
+                    fill
+                    className="object-cover rounded-xl"
+                    priority
+                  />
+                  {/* Overlay para rutinas bloqueadas */}
+                  {!isUnlocked && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
+                  )}
+                </div>
+                {/* Contenido por encima del fondo */}
+                <div className="relative z-10 h-full flex flex-col">
+                  {/* Duración en la parte superior */}
+                  <div className='flex justify-start mb-4'>
+                    <div className='bg-gray-600 bg-opacity-80 w-fit px-3 py-1 flex items-center rounded-full'>
+                      <blockquote className="text-sm font-light text-cream text-center">{dataItem.duration}</blockquote>
+                    </div>
                   </div>
-                </div>
-                
-                {/* Imagen de preview en el centro */}
-                <div className='flex-1 flex justify-center items-center mb-4'>
-                  <Link href={`/routine/${dataItem.id}`}>
-                    {previewUrl && (
-                      <Image
-                        className='rounded-md'
-                        src={previewUrl}
-                        alt={`Preview for ${dataItem.title}`}
-                        sizes="100vw"
-                        style={{
-                          width: '100%',
-                          height: 'auto',
-                          maxHeight: '280px',
-                          objectFit: 'cover'
-                        }}
-                        width={16}
-                        height={9}
-                        loading="lazy"
-                      />
+                  
+                  {/* Imagen de preview en el centro O icono de candado */}
+                  <div className='flex-1 flex justify-center items-center mb-4'>
+                    {isUnlocked ? (
+                      <Link href={`/routine/${dataItem.id}`}>
+                        {previewUrl && (
+                          <Image
+                            className='rounded-md'
+                            src={previewUrl}
+                            alt={`Preview for ${dataItem.title}`}
+                            sizes="100vw"
+                            style={{
+                              width: '100%',
+                              height: 'auto',
+                              maxHeight: '280px',
+                              objectFit: 'cover'
+                            }}
+                            width={16}
+                            height={9}
+                            loading="lazy"
+                          />
+                        )}
+                      </Link>
+                    ) : (
+                      <div className="flex flex-col items-center text-white">
+                        {/* Icono de candado */}
+                        <svg 
+                          className="w-12 h-12 mb-3" 
+                          fill="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M12,3A3,3 0 0,1 15,6V8H9V6A3,3 0 0,1 12,3M18,20H6V10H18V20Z" />
+                        </svg>
+                        
+                        {/* Texto de bloqueo */}
+                        <div className="text-center">
+                          <p className="text-sm font-medium mb-1">Bloqueada</p>
+                          <p className="text-xs opacity-80">
+                            {daysUntilUnlock === 0 
+                              ? 'Se desbloquea mañana' 
+                              : `Se desbloquea en ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
+                            }
+                          </p>
+                        </div>
+                      </div>
                     )}
-                  </Link>
-                </div>
-                
-                {/* Título y día en la parte inferior */}
-                <div className='mt-auto text-right'>
-                  <blockquote className="text-lg lg:text-xl font-medium text-cream mb-1">{dataItem.title}</blockquote>
-                  <blockquote className="text-base font-light text-cream opacity-80">{dataItem.day}</blockquote>
+                  </div>
+                  
+                  {/* Título y día en la parte inferior */}
+                  <div className='mt-auto text-right'>
+                    <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
+                      {dataItem.title}
+                    </blockquote>
+                    <blockquote className={`text-base font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
+                      {dataItem.day}
+                    </blockquote>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
         {error && <p className='text-red-500 p-4'>Error: {error}</p>}
       </div>
     </section>

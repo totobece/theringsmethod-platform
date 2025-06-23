@@ -57,25 +57,61 @@ export async function POST(request: Request) {
     const supabase = await createClient()
     
     // Intenta enviar magic link; si no existe usuario, primero registrarlo y reenviar
-    const sendMagicLink = () => supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: 'https://d596-2800-810-495-599a-1cb2-f1aa-b11-b17d.ngrok-free.app/create-password',
-        data: {
-          source: 'gohighlevel_30day_challenge',
-          challenge_type: '30_day_challenge',
-          created_via: 'magic_link'
+    const sendMagicLink = () => {
+      console.log('🔵 Ejecutando sendMagicLink...')
+      return supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: 'https://8a86-2802-8010-9545-a100-fb0d-e8e9-3d82-3922.ngrok-free.app/create-password',
+          data: {
+            source: 'gohighlevel_30day_challenge',
+            challenge_type: '30_day_challenge',
+            created_via: 'magic_link',
+            trial_start_date: new Date().toISOString(),
+            trial_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 días
+          }
         }
-      }
-    })
-    // primer intento
-    let { data, error } = await sendMagicLink()
-    if (error?.message?.includes('User not found')) {
-      // crear usuario para luego usar plantilla de Magic Link
-      await supabase.auth.signUp({ 
-        email, 
-        password: crypto.randomUUID() // temporary password that won't be used
       })
+    }
+    
+    // primer intento
+    console.log('🔵 Primer intento de envío...')
+    let { data, error } = await sendMagicLink()
+    
+    if (error?.message?.includes('User not found') || error?.code === 'user_not_found') {
+      console.log('🔵 Usuario no encontrado, creando nuevo usuario...')
+      // crear usuario para luego usar plantilla de Magic Link
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ 
+        email, 
+        password: crypto.randomUUID(), // temporary password that won't be used
+        options: {
+          data: {
+            source: 'gohighlevel_30day_challenge',
+            challenge_type: '30_day_challenge',
+            created_via: 'magic_link',
+            trial_start_date: new Date().toISOString(),
+            trial_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        }
+      })
+      
+      console.log('🔵 Resultado de signUp:', signUpData)
+      console.log('🔵 Error de signUp:', signUpError)
+      
+      if (signUpError) {
+        console.error('❌ Error creando usuario:', signUpError)
+        return new Response(JSON.stringify({ 
+          error: `Error creating user: ${signUpError.message}`,
+          code: signUpError.code 
+        }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+      
+      // Esperar un poco antes del segundo intento
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      console.log('🔵 Segundo intento de envío...')
       ;({ data, error } = await sendMagicLink())
     }
     

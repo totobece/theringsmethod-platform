@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/UI/Navbar/navbar';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,6 +8,8 @@ import MoreVideos from '@/components/MoreVideosRecommendation/more-videos-recomm
 import Footer from '@/components/UI/Footer/footer';       
 import PostDetailsSkeleton from '@/components/Skeletons/PostDetailsSkeleton';
 import MainPlayRoutineSkeleton from '@/components/Skeletons/MainPlayRoutineSkeleton';
+import { useSpecificRoutineAccess } from '@/hooks/useRoutineAccess';
+import { extractDayNumberFromString } from '@/utils/progress-logic';
 
 export interface WeekVideosData {
   id: string;
@@ -29,6 +32,10 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
   const [error, setError] = useState<string | null>(null);
   const [isExerciseOpen, setIsExerciseOpen] = useState(false);
   const [isProTipOpen, setIsProTipOpen] = useState(false);
+  const [routineDay, setRoutineDay] = useState<number>(1);
+  const router = useRouter();
+  
+  const { hasAccess, isLoading: isAccessLoading } = useSpecificRoutineAccess(routineDay);
 
   useEffect(() => {
     const handleResize = () => {
@@ -50,7 +57,13 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
         if (!postRes.ok || !postJson.posts || postJson.posts.length === 0) {
           throw new Error('Error fetching post');
         }
-        setPost(postJson.posts[0]);
+        
+        const postData = postJson.posts[0];
+        setPost(postData);
+        
+        // Extract and set routine day
+        const dayNumber = extractDayNumberFromString(postData.day);
+        setRoutineDay(dayNumber);
 
         // Fetch previews desde la API interna
         const previewRes = await fetch('/api/supabase/previews');
@@ -77,6 +90,14 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
     fetchData();
   }, [id]);
 
+  // Check access when routine day is updated
+  useEffect(() => {
+    if (!isAccessLoading && routineDay > 1 && !hasAccess) {
+      // Redirect to explore with error parameters
+      router.push(`/explore?error=routine-locked&day=${routineDay}&maxDay=${routineDay - 1}`);
+    }
+  }, [hasAccess, isAccessLoading, routineDay, router]);
+
   return (
     <section className="relative bg-gray-700 to-99%">
       
@@ -93,7 +114,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
               <div className="text-red-600 p-4">Error: {error}</div>
             )}
             {!isLoadingPost && post && (
-              <div className="relative w-full h-auto flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+              <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
                 {/* Imagen de fondo */}
                 <div className="absolute inset-0 z-0">
                   <Image
@@ -105,19 +126,24 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                   />
                 </div>
                 {/* Contenido por encima del fondo */}
-                <div className="relative z-10 w-full h-full flex flex-col md:flex-row">
-                  <div className='relative w-[70%] md:pt-0 pt-3 pl-3 md:pl-6'>
-                    <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-10'>
-                      <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-light text-cream text-center mx-auto place-content-center">
+                <div className="relative z-10 w-full h-full flex flex-col md:flex-row min-h-[350px] md:min-h-[450px]">
+                  <div className='relative w-[70%] md:pt-0 pt-3 pl-3 md:pl-6 flex flex-col justify-between h-full'>
+                    {/* Duración en la parte superior - sin fondo gris */}
+                    <div className='flex justify-start md:mt-10'>
+                      <blockquote className="text-sm lg:text-base font-light text-white capitalize">
                         {post.duration}
                       </blockquote>
                     </div>
-                    <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left mx-auto pt-4 md:mt-4">
-                      {post.title}
-                    </blockquote>
-                    <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mx-auto py-4">
-                      {post.day}
-                    </blockquote>
+                    
+                    {/* Título y día pegados al piso de la card */}
+                    <div className="mb-4 md:mb-6">
+                      <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left">
+                        {post.title}
+                      </blockquote>
+                      <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mt-2">
+                        {post.day}
+                      </blockquote>
+                    </div>
                   </div>
                   {previewUrl && (
                     <div className="w-full flex justify-end mr-4 items-center mt-4">

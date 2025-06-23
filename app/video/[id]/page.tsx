@@ -1,8 +1,11 @@
 'use client'
 import React, { useEffect, useState } from 'react'; 
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/UI/Navbar/navbar'; 
 import MoreVideos from '@/components/MoreVideosRecommendation/more-videos-recommendation';
 import Footer from '@/components/UI/Footer/footer';
+import { useSpecificRoutineAccess } from '@/hooks/useRoutineAccess';
+import { extractDayNumberFromString } from '@/utils/progress-logic';
 
 
 export interface ExploreVideosData {
@@ -26,6 +29,10 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
   const [post, setPost] = useState<ExploreVideosData | null>(null); // Estado para almacenar la rutina
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [routineDay, setRoutineDay] = useState<number>(1);
+  const router = useRouter();
+  
+  const { hasAccess, isLoading: isAccessLoading } = useSpecificRoutineAccess(routineDay);
 
   useEffect(() => {
     async function fetchVideoAndPost() {
@@ -42,6 +49,10 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
         
         const routinePost = postJson.posts[0];
         setPost(routinePost);
+        
+        // Extract and set routine day
+        const dayNumberFromUtil = extractDayNumberFromString(routinePost.day || '');
+        setRoutineDay(dayNumberFromUtil);
         
         // 2. Extraer el número del día (ej: "Day 1" -> 1, "Day 24" -> 24)
         const getDayNumber = (dayString: string) => {
@@ -94,6 +105,14 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
     
     fetchVideoAndPost();
   }, [id]);
+
+  // Check access when routine day is updated
+  useEffect(() => {
+    if (!isAccessLoading && routineDay > 1 && !hasAccess) {
+      // Redirect to explore with error parameters
+      router.push(`/explore?error=routine-locked&day=${routineDay}&maxDay=${routineDay - 1}`);
+    }
+  }, [hasAccess, isAccessLoading, routineDay, router]);
 
   return (
     <section className="relative bg-gray-700">
