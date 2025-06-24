@@ -1,0 +1,95 @@
+name: Unlock Next Challenge Day
+
+on:
+  schedule:
+    # Para testing: cada 5 minutos
+    - cron: '*/5 * * * *'
+    # Para producción: cada día a las 6:00 AM UTC
+    # - cron: '0 6 * * *'
+  workflow_dispatch: # Permitir ejecución manual
+
+jobs:
+  unlock-next-day:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Unlock next challenge day
+        run: |
+          echo "🔓 Unlocking next day of 30-day challenge..."
+          echo "🕒 Current time: $(date)"
+          
+          # Obtener estado actual primero
+          echo "📊 Getting current challenge state..."
+          current_response=$(curl -s -X GET \
+            -H "Content-Type: application/json" \
+            "https://804f-2802-8010-9533-1500-4df6-e6a3-15cf-e5ff.ngrok-free.app/api/supabase/challenge-unlock")
+          
+          echo "📋 Current state: $current_response"
+          
+          if echo "$current_response" | grep -q '"success":true'; then
+            current_day=$(echo "$current_response" | grep -o '"currentChallengeDay":[0-9]*' | cut -d':' -f2)
+            unlocked_routines=$(echo "$current_response" | grep -o '"unlockedRoutines":[0-9]*' | cut -d':' -f2)
+            echo "📍 Current challenge day: $current_day"
+            echo "🔓 Currently unlocked routines: $unlocked_routines"
+            
+            # Mostrar la rutina de hoy si está disponible
+            if echo "$current_response" | grep -q '"todaysRoutine"'; then
+              todays_routine=$(echo "$current_response" | grep -o '"title":"[^"]*"' | cut -d'"' -f4)
+              if [ "$todays_routine" != "null" ] && [ ! -z "$todays_routine" ]; then
+                echo "🎯 Today's routine: $todays_routine"
+              fi
+            fi
+          fi
+          
+          # Avanzar al siguiente día
+          echo "🔄 Unlocking next day..."
+          unlock_response=$(curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: GitHub-Actions-Cron" \
+            "https://804f-2802-8010-9533-1500-4df6-e6a3-15cf-e5ff.ngrok-free.app/api/supabase/challenge-unlock")
+          
+          echo "📝 Unlock Response: $unlock_response"
+          
+          # Verificar si el unlock fue exitoso
+          if echo "$unlock_response" | grep -q '"success":true'; then
+            echo "✅ Next challenge day unlocked successfully!"
+            
+            # Extraer información del nuevo estado
+            new_day=$(echo "$unlock_response" | grep -o '"day":[0-9]*' | tail -1 | cut -d':' -f2)
+            max_unlocked=$(echo "$unlock_response" | grep -o '"maxUnlockedDay":[0-9]*' | cut -d':' -f2)
+            
+            echo "📊 New challenge day: $new_day"
+            echo "🔓 Max unlocked day: $max_unlocked"
+            
+            # Verificar si se saltó domingo
+            if echo "$unlock_response" | grep -q '"skippedSunday":true'; then
+              echo "⏭️ Sunday was skipped (no routine on Sundays)"
+            fi
+            
+            # Verificar si el challenge se completó y resetó
+            if echo "$unlock_response" | grep -q '"challengeCompleted":true'; then
+              echo "🏁 Challenge completed! Restarted from day 1"
+            fi
+            
+            # Mostrar la nueva rutina desbloqueada
+            if echo "$unlock_response" | grep -q '"currentDay"'; then
+              new_routine_title=$(echo "$unlock_response" | grep -o '"title":"[^"]*"' | tail -1 | cut -d'"' -f4)
+              if [ "$new_routine_title" != "null" ] && [ ! -z "$new_routine_title" ]; then
+                echo "🎯 Newly unlocked routine: $new_routine_title"
+              else
+                echo "🔒 No specific routine unlocked (might be Sunday)"
+              fi
+            fi
+            
+          else
+            echo "❌ Failed to unlock next challenge day"
+            echo "Response: $unlock_response"
+            
+            # Verificar si hay un error específico
+            if echo "$unlock_response" | grep -q '"error"'; then
+              error_message=$(echo "$unlock_response" | grep -o '"error":"[^"]*"' | cut -d'"' -f4)
+              echo "❌ Error details: $error_message"
+            fi
+            
+            exit 1
+          fi
