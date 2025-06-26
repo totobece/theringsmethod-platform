@@ -35,7 +35,26 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
   const [routineDay, setRoutineDay] = useState<number>(1);
   const router = useRouter();
   
-  const { hasAccess, isLoading: isAccessLoading } = useSpecificRoutineAccess(routineDay);
+  const { hasAccess, isLoading: isAccessLoading, refreshProgress } = useSpecificRoutineAccess(routineDay);
+
+  // Debug en la consola del navegador cuando se renderiza el componente
+  console.log(`🔍 /routine/[${id}] Component render state:`, {
+    id,
+    routineDay,
+    hasAccess,
+    isAccessLoading,
+    isLoadingPost,
+    postTitle: post?.title,
+    timestamp: new Date().toISOString()
+  });
+
+  // Refresh progress cuando se actualiza el routineDay, no al montar
+  useEffect(() => {
+    if (routineDay > 1) { // Solo refrescar para rutinas que no sean el día 1
+      console.log(`🔄 Refreshing progress for routine day ${routineDay}`);
+      refreshProgress();
+    }
+  }, [routineDay, refreshProgress]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -63,6 +82,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
         
         // Extract and set routine day
         const dayNumber = extractDayNumberFromString(postData.day);
+        console.log(`🔢 Extracted routine day: ${dayNumber} from "${postData.day}"`);
         setRoutineDay(dayNumber);
 
         // Fetch previews desde la API interna
@@ -90,13 +110,36 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
     fetchData();
   }, [id]);
 
-  // Check access when routine day is updated
+  // Check access when routine day is updated - solo redirigir si realmente no hay acceso después de cargar
   useEffect(() => {
-    if (!isAccessLoading && routineDay > 1 && !hasAccess) {
-      // Redirect to explore with error parameters
-      router.push(`/explore?error=routine-locked&day=${routineDay}&maxDay=${routineDay - 1}`);
+    // Debug: log current state
+    console.log(`🔍 /routine/[${id}] Access Check Debug:`, {
+      routineDay,
+      hasAccess,
+      isAccessLoading,
+      isLoadingPost,
+      postTitle: post?.title,
+      shouldRedirect: !isAccessLoading && !isLoadingPost && routineDay > 0 && !hasAccess,
+      timestamp: new Date().toISOString()
+    });
+
+    // SOLO redirigir si:
+    // 1. No está cargando el acceso
+    // 2. No está cargando el post
+    // 3. Ya se determinó el día de la rutina (> 0)
+    // 4. Definitivamente no hay acceso
+    // 5. Y esperamos un poco para evitar redirects prematuros
+    if (!isAccessLoading && !isLoadingPost && routineDay > 0 && !hasAccess) {
+      console.log(`🔒 FINAL DECISION: Routine Day ${routineDay} is locked, will redirect in 500ms`);
+      
+      // Agregar un pequeño delay para evitar redirects prematuros
+      const redirectTimer = setTimeout(() => {
+        router.push(`/explore?error=routine-locked&day=${routineDay}`);
+      }, 500);
+      
+      return () => clearTimeout(redirectTimer);
     }
-  }, [hasAccess, isAccessLoading, routineDay, router]);
+  }, [hasAccess, isAccessLoading, isLoadingPost, routineDay, router, id, post?.title]);
 
   return (
     <section className="relative bg-gray-700 to-99%">

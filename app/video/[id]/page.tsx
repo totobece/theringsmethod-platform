@@ -32,7 +32,47 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
   const [routineDay, setRoutineDay] = useState<number>(1);
   const router = useRouter();
   
-  const { hasAccess, isLoading: isAccessLoading } = useSpecificRoutineAccess(routineDay);
+  const { hasAccess, isLoading: isAccessLoading, refreshProgress, markAsCompleted, isCompleted } = useSpecificRoutineAccess(routineDay);
+
+  // Estado para manejar la completación
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [completionMessage, setCompletionMessage] = useState<string | null>(null);
+
+  // Refresh progress cuando se monta el componente para asegurar datos frescos
+  useEffect(() => {
+    console.log('🔄 Video page: Refreshing progress on component mount');
+    refreshProgress();
+  }, [refreshProgress]);
+
+  // Función para marcar como completada
+  const handleFinishRoutine = async () => {
+    if (isCompleted) {
+      setCompletionMessage('¡Esta rutina ya está completada!');
+      return;
+    }
+
+    setIsCompleting(true);
+    try {
+      await markAsCompleted();
+      setCompletionMessage('¡Rutina completada! La siguiente rutina se desbloqueará en 24 horas.');
+      
+      // Refresh progress to reflect changes
+      setTimeout(() => {
+        refreshProgress();
+      }, 1000);
+
+      // Redirigir al home después de 2 segundos
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error completing routine:', error);
+      setCompletionMessage('Error al completar la rutina. Intenta nuevamente.');
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   useEffect(() => {
     async function fetchVideoAndPost() {
@@ -106,13 +146,14 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
     fetchVideoAndPost();
   }, [id]);
 
-  // Check access when routine day is updated
+  // Check access when routine day is updated - solo redirigir si realmente no hay acceso después de cargar
   useEffect(() => {
-    if (!isAccessLoading && routineDay > 1 && !hasAccess) {
-      // Redirect to explore with error parameters
-      router.push(`/explore?error=routine-locked&day=${routineDay}&maxDay=${routineDay - 1}`);
+    // Solo verificar y redirigir si ya terminó de cargar y definitivamente no hay acceso
+    if (!isAccessLoading && !isLoading && routineDay > 0 && !hasAccess) {
+      console.log(`🔒 Video for Day ${routineDay} is locked, redirecting to explore`);
+      router.push(`/explore?error=routine-locked&day=${routineDay}`);
     }
-  }, [hasAccess, isAccessLoading, routineDay, router]);
+  }, [hasAccess, isAccessLoading, isLoading, routineDay, router]);
 
   return (
     <section className="relative bg-gray-700">
@@ -149,14 +190,38 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
         </div>
       )}
 
-      {/* Botón "Finish Routine" */}
-      <div className="flex justify-center items-center h-[80px] mt-10 ">
-        <a href={`/routine/${id}`} className="bg-wine bottom-0 start-0 flex justify-center items-center rounded-[20px] h-10 w-[200px] group text-xl transform transition duration-500 hover:scale-105">
-          <span className='text-white'>Finish Routine</span>
-           <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0 0V16L13 8L0 0Z" fill="white"/>
-            </svg>
-        </a>
+      {/* Botón "Finish Routine" y mensajes */}
+      <div className="flex flex-col justify-center items-center mt-10 space-y-4">
+        {completionMessage && (
+          <div className={`p-4 rounded-lg text-center max-w-md ${
+            completionMessage.includes('Error') ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+          }`}>
+            {completionMessage}
+          </div>
+        )}
+        
+        {!isCompleted ? (
+          <button
+            onClick={handleFinishRoutine}
+            disabled={isCompleting}
+            className={`bg-wine flex justify-center items-center rounded-[20px] h-12 w-[200px] text-xl transform transition duration-500 hover:scale-105 ${
+              isCompleting ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            <span className='text-white'>
+              {isCompleting ? 'Completando...' : 'Finish Routine'}
+            </span>
+            {!isCompleting && (
+              <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0V16L13 8L0 0Z" fill="white"/>
+              </svg>
+            )}
+          </button>
+        ) : (
+          <div className="bg-green-600 flex justify-center items-center rounded-[20px] h-12 w-[200px] text-xl">
+            <span className='text-white'>✓ Completada</span>
+          </div>
+        )}
       </div>
 
       <div className='justify-center items-center flex flex-col'>

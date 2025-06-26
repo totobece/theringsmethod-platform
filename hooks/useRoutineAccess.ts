@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ProgressData } from '@/utils/progress-logic';
 
 interface UseRoutineAccessReturn {
@@ -11,13 +11,40 @@ interface UseRoutineAccessReturn {
   refreshProgress: () => void;
 }
 
+// Cache global para evitar requests múltiples
+let globalProgressCache: ProgressData | null = null;
+let globalCacheTimestamp: number = 0;
+const CACHE_DURATION = 10000; // Reducir a 10 segundos para debugging
+
+// Función para limpiar el cache manualmente (útil para debugging)
+export const clearProgressCache = () => {
+  globalProgressCache = null;
+  globalCacheTimestamp = 0;
+  console.log('🗑️ Progress cache cleared');
+};
+
 export const useRoutineAccess = (routineDay?: number): UseRoutineAccessReturn => {
-  const [progressData, setProgressData] = useState<ProgressData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [progressData, setProgressData] = useState<ProgressData | null>(globalProgressCache);
+  const [isLoading, setIsLoading] = useState(!globalProgressCache);
   const [error, setError] = useState<string | null>(null);
+  const fetchingRef = useRef(false);
 
   const fetchProgress = async () => {
+    // Evitar requests múltiples simultáneos
+    if (fetchingRef.current) {
+      return;
+    }
+
+    // Usar cache si es reciente (menos de 30 segundos)
+    const now = Date.now();
+    if (globalProgressCache && (now - globalCacheTimestamp) < CACHE_DURATION) {
+      setProgressData(globalProgressCache);
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      fetchingRef.current = true;
       setIsLoading(true);
       setError(null);
       
@@ -38,6 +65,9 @@ export const useRoutineAccess = (routineDay?: number): UseRoutineAccessReturn =>
         throw new Error(data.error);
       }
 
+      // Actualizar cache global
+      globalProgressCache = data;
+      globalCacheTimestamp = now;
       setProgressData(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error fetching progress';
@@ -45,6 +75,7 @@ export const useRoutineAccess = (routineDay?: number): UseRoutineAccessReturn =>
       console.error('Error fetching user progress:', err);
     } finally {
       setIsLoading(false);
+      fetchingRef.current = false;
     }
   };
 
@@ -56,18 +87,56 @@ export const useRoutineAccess = (routineDay?: number): UseRoutineAccessReturn =>
     (progressData ? routineDay <= progressData.maxUnlockedDay : false) : 
     true;
 
+  // Debug adicional para casos problemáticos
+  if (routineDay && progressData) {
+    console.log(`🔍🔍 DETAILED ACCESS CHECK for day ${routineDay}:`, {
+      routineDay,
+      maxUnlockedDay: progressData.maxUnlockedDay,
+      hasAccess,
+      calculation: `${routineDay} <= ${progressData.maxUnlockedDay} = ${routineDay <= progressData.maxUnlockedDay}`,
+      progressDataTimestamp: new Date().toISOString(),
+      cacheAge: globalCacheTimestamp ? `${Date.now() - globalCacheTimestamp}ms` : 'no cache'
+    });
+  }
+
+  const refreshProgress = () => {
+    // Limpiar cache para forzar refresh
+    globalProgressCache = null;
+    globalCacheTimestamp = 0;
+    console.log('🔄 Force refreshing progress - cache cleared');
+    fetchProgress();
+  };
+
   return {
     hasAccess,
     isLoading,
     progressData,
     error,
-    refreshProgress: fetchProgress
+    refreshProgress
   };
 };
 
 // Hook específico para verificar acceso a una rutina individual
 export const useSpecificRoutineAccess = (routineDay: number) => {
   const { hasAccess, isLoading, progressData, error, refreshProgress } = useRoutineAccess(routineDay);
+
+  // Debug: log the state when it changes
+  useEffect(() => {
+    console.log(`🔍 useSpecificRoutineAccess(${routineDay}) Debug:`, {
+      routineDay,
+      hasAccess,
+      isLoading,
+      maxUnlockedDay: progressData?.maxUnlockedDay,
+      progressDataExists: !!progressData,
+      cacheAge: globalCacheTimestamp ? Date.now() - globalCacheTimestamp : 'no cache',
+      progressSample: progressData?.progress?.slice(0, 5)?.map(p => ({
+        day: p.routine_day,
+        unlocked_at: p.unlocked_at,
+        completed_at: p.completed_at
+      })),
+      timestamp: new Date().toISOString()
+    });
+  }, [routineDay, hasAccess, isLoading, progressData]);
 
   const markAsCompleted = async () => {
     try {
@@ -102,6 +171,7 @@ export const useSpecificRoutineAccess = (routineDay: number) => {
     error,
     markAsCompleted,
     isCompleted,
-    progressData
+    progressData,
+    refreshProgress
   };
 };

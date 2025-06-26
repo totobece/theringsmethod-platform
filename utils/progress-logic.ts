@@ -6,9 +6,11 @@ export interface UserProgress {
 
 export interface ProgressData {
   maxUnlockedDay: number;
-  totalDays: number;
-  daysSinceStart: number;
+  currentDay: number;
+  totalRoutines: number;
   progress: UserProgress[];
+  isCompleted: boolean;
+  completionPercentage: number;
 }
 
 export interface UserMetadata {

@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://8a86-2802-8010-9545-a100-fb0d-e8e9-3d82-3922.ngrok-free.app/create-password',
+          emailRedirectTo: 'http://localhost:3000/create-password',
           data: {
             source: 'gohighlevel_30day_challenge',
             challenge_type: '30_day_challenge',
@@ -101,12 +101,37 @@ export async function POST(request: Request) {
       if (signUpError) {
         console.error('❌ Error creando usuario:', signUpError)
         return new Response(JSON.stringify({ 
-          error: `Error creating user: ${signUpError.message}`,
-          code: signUpError.code 
+          error: `Database error saving new user`,
+          received: parsedBody
         }), {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
         })
+      }
+
+      // Crear progreso inicial manualmente como fallback
+      // en caso de que el trigger no haya funcionado
+      if (signUpData?.user?.id) {
+        try {
+          console.log('🔵 Creando progreso inicial manualmente para usuario:', signUpData.user.id)
+          const { error: progressError } = await supabase
+            .from('user_progress')
+            .insert({
+              user_id: signUpData.user.id,
+              routine_day: 1,
+              unlocked_at: new Date().toISOString(),
+              completed_at: null
+            })
+          
+          if (progressError && !progressError.message?.includes('duplicate')) {
+            console.log('⚠️ No se pudo crear progreso inicial (puede que el trigger ya lo haya hecho):', progressError)
+          } else {
+            console.log('✅ Progreso inicial creado manualmente')
+          }
+        } catch (err) {
+          console.log('⚠️ Error intentando crear progreso inicial manual:', err)
+          // No es crítico, continuamos
+        }
       }
       
       // Esperar un poco antes del segundo intento

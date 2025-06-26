@@ -1,13 +1,20 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { calculateUnlockedRoutines, extractDayNumberFromString, isRoutineUnlocked, type UserMetadata } from '@/utils/progress-logic'
+import { extractDayNumberFromString } from '@/utils/progress-logic'
 
 export async function updateSession(request: NextRequest) {
+  console.log(`🚀 Middleware called for: ${request.nextUrl.pathname}`)
+  
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
+
+  // Add headers to prevent caching of protected routes
+  response.headers.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+  response.headers.set('Pragma', 'no-cache')
+  response.headers.set('Expires', '0')
 
   const supabase = createServerClient(
     "https://shrswzchkqiobcikdfrn.supabase.co",
@@ -80,26 +87,55 @@ export async function updateSession(request: NextRequest) {
           return response
         }
         
-        // Get user metadata to calculate unlocked routines
-        const userMetadata = user.user_metadata as UserMetadata
-        const { maxUnlockedDay } = calculateUnlockedRoutines(userMetadata)
-        
         // Extract day number from post data
         const routineDay = extractDayNumberFromString(postData.day)
         
+        // Fetch user progress from the new system
+        const { data: progressData, error: progressError } = await supabase
+          .from('user_progress')
+          .select('routine_day, completed_at, unlocked_at')
+          .eq('user_id', user.id)
+          .order('routine_day', { ascending: true })
+        
+        if (progressError) {
+          console.error('Error fetching user progress in middleware:', progressError)
+          // Allow navigation if there's an error (fail open)
+          return response
+        }
+        
+        // Calculate maxUnlockedDay based on current time
+        const now = new Date()
+        let maxUnlockedDay = 1
+        
+        if (progressData && progressData.length > 0) {
+          for (const entry of progressData) {
+            if (entry.unlocked_at) {
+              const unlockedDate = new Date(entry.unlocked_at)
+              if (unlockedDate <= now) {
+                maxUnlockedDay = Math.max(maxUnlockedDay, entry.routine_day)
+              }
+            }
+          }
+        }
+        
+        console.log(`🔍 Middleware check: Day ${routineDay}, maxUnlocked: ${maxUnlockedDay}, user: ${user.id}`)
+        
         // Check if the routine is unlocked
-        if (!isRoutineUnlocked(routineDay, maxUnlockedDay)) {
+        if (routineDay > maxUnlockedDay) {
           // Redirect to explore page if routine is locked
           url.pathname = '/explore'
           url.searchParams.set('error', 'routine-locked')
           url.searchParams.set('day', routineDay.toString())
           url.searchParams.set('maxDay', maxUnlockedDay.toString())
+          console.log(`🔒 Middleware: Blocking access to day ${routineDay} (max: ${maxUnlockedDay})`)
           return NextResponse.redirect(url)
         }
+        
+        console.log(`✅ Middleware: Allowing access to day ${routineDay}`)
       }
     } catch (error) {
       // In case of any error, allow the request to continue
-      console.error('Error checking routine access:', error)
+      console.error('Error checking routine access in middleware:', error)
     }
   }
 

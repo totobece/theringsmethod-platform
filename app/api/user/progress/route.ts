@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/server';
-import { calculateUnlockedRoutines } from '@/utils/progress-logic';
+import { checkRateLimit } from '@/utils/rate-limiter';
 
 export async function GET() {
   try {
@@ -13,13 +13,15 @@ export async function GET() {
       });
     }
 
-    // Obtener metadata del usuario
-    const userMetadata = user.user_metadata || {};
-    
-    // Calcular rutinas desbloqueadas basado en la fecha de inicio
-    const { maxUnlockedDay, totalDays, daysSinceStart } = calculateUnlockedRoutines(userMetadata);
-    
-    // Obtener progreso actual del usuario desde la base de datos
+    // Rate limiting
+    if (!checkRateLimit(user.id)) {
+      return new Response(JSON.stringify({ error: 'Too many requests' }), { 
+        status: 429,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Obtener el progreso completo del usuario
     const { data: progress, error: progressError } = await supabase
       .from('user_progress')
       .select('routine_day, completed_at, unlocked_at')
@@ -34,20 +36,89 @@ export async function GET() {
       });
     }
 
+    // Si no hay progreso, crear entrada para día 1
+    if (!progress || progress.length === 0) {
+      console.log(`Creating initial progress for user ${user.id}`);
+      
+      const { error: insertError } = await supabase
+        .from('user_progress')
+        .insert({
+          user_id: user.id,
+          routine_day: 1,
+          unlocked_at: new Date().toISOString(),
+          completed_at: null
+        });
+
+      if (insertError) {
+        console.error('Error creating initial progress:', insertError);
+        return new Response(JSON.stringify({ error: 'Error creating progress' }), { 
+          status: 500,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Retornar progreso inicial
+      return new Response(JSON.stringify({
+        maxUnlockedDay: 1,
+        currentDay: 1,
+        totalRoutines: 24,
+        progress: [{
+          routine_day: 1,
+          completed_at: null,
+          unlocked_at: new Date().toISOString()
+        }],
+        isCompleted: false,
+        completionPercentage: 0
+      }), { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Calcular el día máximo desbloqueado basado en el progreso temporal
+    const now = new Date();
+    let maxUnlockedDay = 1;
+
+    console.log(`🔍 DEBUG: Current time: ${now.toISOString()}`);
+    console.log(`🔍 DEBUG: Progress entries: ${progress.length}`);
+
+    for (const entry of progress) {
+      if (entry.unlocked_at) {
+        const unlockedDate = new Date(entry.unlocked_at);
+        const isUnlocked = unlockedDate <= now;
+        console.log(`🔍 DEBUG: Day ${entry.routine_day} - unlocks at ${unlockedDate.toISOString()} - available: ${isUnlocked}`);
+        
+        if (isUnlocked) {
+          maxUnlockedDay = Math.max(maxUnlockedDay, entry.routine_day);
+        }
+      }
+    }
+
+    console.log(`🔍 DEBUG: Calculated maxUnlockedDay: ${maxUnlockedDay}`);
+
+    // Determinar el día actual (el día más bajo no completado o el siguiente día si todos están completos)
+    const incompleteEntry = progress.find(p => p.completed_at === null);
+    const currentDay = incompleteEntry ? incompleteEntry.routine_day : Math.min(progress.length + 1, 24);
+
+    // Calcular estadísticas
+    const completedCount = progress.filter(p => p.completed_at !== null).length;
+    const isCompleted = completedCount >= 24;
+    const completionPercentage = Math.round((completedCount / 24) * 100);
+
     return new Response(JSON.stringify({
-      maxUnlockedDay,
-      totalDays,
-      daysSinceStart,
+      maxUnlockedDay: Math.min(maxUnlockedDay, 24),
+      currentDay: Math.min(currentDay, 24),
+      totalRoutines: 24,
       progress: progress || [],
-      userStatus: userMetadata.challenge_type || 'unknown',
-      userId: user.id
-    }), {
+      isCompleted,
+      completionPercentage
+    }), { 
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    console.error('Error in progress API:', error);
+    console.error('Error in GET /api/user/progress:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -76,38 +147,101 @@ export async function POST(request: Request) {
       });
     }
 
-    // Verificar que el usuario tenga acceso a esta rutina
-    const userMetadata = user.user_metadata || {};
-    const { maxUnlockedDay } = calculateUnlockedRoutines(userMetadata);
-
-    if (routineDay > maxUnlockedDay) {
-      return new Response(JSON.stringify({ error: 'Routine not unlocked yet' }), { 
-        status: 403,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
-
     if (action === 'complete') {
-      // Marcar rutina como completada
-      const { error } = await supabase
+      // Verificar que el usuario tenga acceso a esta rutina
+      const { data: currentProgress } = await supabase
         .from('user_progress')
-        .upsert({
-          user_id: user.id,
-          routine_day: routineDay,
-          completed_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,routine_day'
-        });
+        .select('routine_day, completed_at, unlocked_at')
+        .eq('user_id', user.id)
+        .eq('routine_day', routineDay)
+        .single();
 
-      if (error) {
-        console.error('Error completing routine:', error);
-        return new Response(JSON.stringify({ error: 'Error completing routine' }), { 
+      if (!currentProgress || !currentProgress.unlocked_at) {
+        return new Response(JSON.stringify({ error: 'Routine not unlocked' }), { 
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      const now = new Date();
+      const unlockedDate = new Date(currentProgress.unlocked_at);
+      
+      if (unlockedDate > now) {
+        return new Response(JSON.stringify({ error: 'Routine not yet available' }), { 
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Verificar si ya está completada
+      if (currentProgress.completed_at) {
+        return new Response(JSON.stringify({
+          success: true,
+          message: `Routine ${routineDay} was already completed`,
+          alreadyCompleted: true
+        }), { 
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // Marcar rutina como completada
+      const { error: updateError } = await supabase
+        .from('user_progress')
+        .update({ completed_at: now.toISOString() })
+        .eq('user_id', user.id)
+        .eq('routine_day', routineDay);
+
+      if (updateError) {
+        console.error('Error updating routine completion:', updateError);
+        return new Response(JSON.stringify({ error: 'Error marking routine as completed' }), { 
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         });
       }
 
-      return new Response(JSON.stringify({ success: true, action: 'completed' }), {
+      // Desbloquear la siguiente rutina (24 horas después)
+      const nextDay = routineDay + 1;
+      let nextUnlockTime = null;
+      
+      if (nextDay <= 24) {
+        const unlockTime = new Date(now);
+        unlockTime.setHours(unlockTime.getHours() + 24); // 24 horas después
+        nextUnlockTime = unlockTime.toISOString();
+
+        // Verificar si ya existe entrada para el siguiente día
+        const { data: nextDayProgress } = await supabase
+          .from('user_progress')
+          .select('routine_day')
+          .eq('user_id', user.id)
+          .eq('routine_day', nextDay)
+          .single();
+
+        if (!nextDayProgress) {
+          // Crear entrada para el siguiente día
+          const { error: insertError } = await supabase
+            .from('user_progress')
+            .insert({
+              user_id: user.id,
+              routine_day: nextDay,
+              unlocked_at: nextUnlockTime,
+              completed_at: null
+            });
+
+          if (insertError) {
+            console.error('Error creating next day progress:', insertError);
+            // No es crítico, la rutina se completó exitosamente
+          }
+        }
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: `Routine ${routineDay} completed successfully`,
+        nextDay: nextDay <= 24 ? nextDay : null,
+        nextDayUnlocksAt: nextUnlockTime,
+        challengeCompleted: nextDay > 24
+      }), { 
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -119,7 +253,7 @@ export async function POST(request: Request) {
     });
 
   } catch (error) {
-    console.error('Error in progress POST:', error);
+    console.error('Error in POST /api/user/progress:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), { 
       status: 500,
       headers: { 'Content-Type': 'application/json' }

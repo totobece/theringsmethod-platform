@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
-  const next = 'https://d596-2800-810-495-599a-1cb2-f1aa-b11-b17d.ngrok-free.app/create-password'
+  const next = 'http://localhost:3000/create-password'
 
   // Create redirect link without the secret token
   const redirectTo = request.nextUrl.clone()
