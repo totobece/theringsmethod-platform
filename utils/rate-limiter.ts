@@ -1,7 +1,7 @@
 // Rate limiter simple para APIs
 const requestCounts = new Map<string, { count: number; resetTime: number }>();
 const RATE_LIMIT_WINDOW = 60000; // 1 minuto
-const MAX_REQUESTS = 30; // Máximo 30 requests por minuto por usuario
+const MAX_REQUESTS = 100; // Aumentado a 100 requests por minuto por usuario
 
 export function checkRateLimit(userId: string): boolean {
   const now = Date.now();
@@ -17,6 +17,7 @@ export function checkRateLimit(userId: string): boolean {
   }
   
   if (userLimit.count >= MAX_REQUESTS) {
+    console.warn(`Rate limit exceeded for user ${userId}: ${userLimit.count}/${MAX_REQUESTS}`);
     return false; // Rate limit excedido
   }
   

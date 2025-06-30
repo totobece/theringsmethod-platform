@@ -7,6 +7,7 @@ import MyLoader from '../Skeletons/CardSkeletons';
 import Link from 'next/link';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
+import { findPreviewForRoutine, PreviewData } from '@/utils/preview-utils';
 
 export interface ExploreVideosData {
   id: string;
@@ -17,18 +18,24 @@ export interface ExploreVideosData {
   day: string;
 }
 
-export default function ExploreVideoSlider() {
+interface ExploreVideoSliderProps {
+  searchTerm?: string;
+}
+
+export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: ExploreVideoSliderProps = {}) {
   const [data, setData] = useState<ExploreVideosData[]>([]);
   const [isLoading, setIsLoading] = useState(true); 
   const [error, setError] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<{ name: string; url: string; }[]>([]);
+  const [previewData, setPreviewData] = useState<PreviewData[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize: number = 8;
   const searchParams = useSearchParams();
-  const searchTerm = searchParams.get('search') || ''; 
+  
+  // Usar searchTerm del prop o del searchParams
+  const searchTerm = propSearchTerm ?? (searchParams.get('search') || ''); 
   
   // Hook para acceso a rutinas
-  const { progressData, isLoading: isAccessLoading } = useRoutineAccess(); 
+  const { maxUnlockedDay, isLoading: isAccessLoading } = useRoutineAccess(); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -47,8 +54,8 @@ export default function ExploreVideoSlider() {
 
         // postsJson.posts es un array de posts
         setData(postsJson.posts || []);
-        // previewsJson es un array de { name, url }
-        setPreviewData(previewsJson || []);
+        // previewsJson es un array de { name, url, day }
+        setPreviewData(Array.isArray(previewsJson) ? previewsJson : []);
       } catch (error: unknown) {
         setError((error as Error).message || 'Error fetching data');
       } finally {
@@ -84,15 +91,12 @@ export default function ExploreVideoSlider() {
       {!isLoading && !isAccessLoading && !error && currentData.map(dataItem => {
         // Verificar si la rutina está desbloqueada
         const routineDay = extractDayNumberFromString(dataItem.day);
-        const isUnlocked = progressData ? routineDay <= progressData.maxUnlockedDay : false;
-        const daysUntilUnlock = progressData ? Math.max(0, routineDay - progressData.maxUnlockedDay) : 999;
+        const isUnlocked = maxUnlockedDay ? routineDay <= maxUnlockedDay : false;
+        const daysUntilUnlock = maxUnlockedDay ? Math.max(0, routineDay - maxUnlockedDay) : 999;
         
-        // Buscar preview por id (filename sin extensión)
-        let preview = previewData.find(preview => preview.name?.split('.')[0] === dataItem.id);
-        // Si no hay preview asociada, usar la primera imagen como fallback (igual que MainPlayRoutine)
-        if (!preview && previewData.length > 0) {
-          preview = previewData[0];
-        }
+        // Buscar preview específica para esta rutina
+        const preview = findPreviewForRoutine(previewData, dataItem);
+        
         return (
           <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
             <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
@@ -123,7 +127,7 @@ export default function ExploreVideoSlider() {
                 <div className='flex-1 flex justify-center items-center mb-4'>
                   {isUnlocked ? (
                     <Link href={`/routine/${dataItem.id}`}>
-                      {preview && preview.url && (
+                      {preview ? (
                         <Image
                           className='rounded-md'
                           src={preview.url}
@@ -139,6 +143,10 @@ export default function ExploreVideoSlider() {
                           height={9}
                           loading="lazy"
                         />
+                      ) : (
+                        <div className="w-full h-48 bg-gray-600 rounded-md flex items-center justify-center">
+                          <span className="text-white text-sm">Sin preview</span>
+                        </div>
                       )}
                     </Link>
                   ) : (
@@ -167,7 +175,7 @@ export default function ExploreVideoSlider() {
                 </div>
                 
                 {/* Título y día en la parte inferior */}
-                <div className='mt-auto text-right'>
+                <div className={`mt-auto ${!isUnlocked ? 'text-center' : 'text-right'}`}>
                   <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
                     {dataItem.title}
                   </blockquote>

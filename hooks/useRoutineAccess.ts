@@ -1,144 +1,178 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import ProgressManager from '@/utils/progress-manager';
 import { ProgressData } from '@/utils/progress-logic';
+import { User } from '@supabase/supabase-js';
 
-interface UseRoutineAccessReturn {
-  hasAccess: boolean;
-  isLoading: boolean;
-  progressData: ProgressData | null;
-  error: string | null;
-  refreshProgress: () => void;
-}
+// Variable global para rastrear si ya se inicializó el manager
+let isGloballyInitialized = false;
 
-// Cache global para evitar requests múltiples
-let globalProgressCache: ProgressData | null = null;
-let globalCacheTimestamp: number = 0;
-const CACHE_DURATION = 10000; // Reducir a 10 segundos para debugging
+export function useRoutineAccess() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const mountedRef = useRef(true);
+  const initializedRef = useRef(false);
 
-// Función para limpiar el cache manualmente (útil para debugging)
-export const clearProgressCache = () => {
-  globalProgressCache = null;
-  globalCacheTimestamp = 0;
-  console.log('🗑️ Progress cache cleared');
-};
-
-export const useRoutineAccess = (routineDay?: number): UseRoutineAccessReturn => {
-  const [progressData, setProgressData] = useState<ProgressData | null>(globalProgressCache);
-  const [isLoading, setIsLoading] = useState(!globalProgressCache);
-  const [error, setError] = useState<string | null>(null);
-  const fetchingRef = useRef(false);
-
-  const fetchProgress = async () => {
-    // Evitar requests múltiples simultáneos
-    if (fetchingRef.current) {
-      return;
-    }
-
-    // Usar cache si es reciente (menos de 30 segundos)
-    const now = Date.now();
-    if (globalProgressCache && (now - globalCacheTimestamp) < CACHE_DURATION) {
-      setProgressData(globalProgressCache);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      fetchingRef.current = true;
-      setIsLoading(true);
-      setError(null);
-      
-      const response = await fetch('/api/user/progress', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      // Actualizar cache global
-      globalProgressCache = data;
-      globalCacheTimestamp = now;
-      setProgressData(data);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error fetching progress';
-      setError(errorMessage);
-      console.error('Error fetching user progress:', err);
-    } finally {
-      setIsLoading(false);
-      fetchingRef.current = false;
-    }
-  };
+  const progressManager = ProgressManager.getInstance();
 
   useEffect(() => {
-    fetchProgress();
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
-  const hasAccess = routineDay ? 
-    (progressData ? routineDay <= progressData.maxUnlockedDay : false) : 
-    true;
+  useEffect(() => {
+    // PROTECCIÓN MEJORADA: Solo inicializar UNA VEZ por toda la aplicación
+    if (initializedRef.current || isGloballyInitialized) {
+      // Si ya está inicializado, solo suscribirse
+      const unsubscribe = progressManager.subscribe((data) => {
+        if (mountedRef.current) {
+          setProgressData(data);
+          setIsLoading(false);
+        }
+      });
 
-  // Debug adicional para casos problemáticos
-  if (routineDay && progressData) {
-    console.log(`🔍🔍 DETAILED ACCESS CHECK for day ${routineDay}:`, {
-      routineDay,
-      maxUnlockedDay: progressData.maxUnlockedDay,
-      hasAccess,
-      calculation: `${routineDay} <= ${progressData.maxUnlockedDay} = ${routineDay <= progressData.maxUnlockedDay}`,
-      progressDataTimestamp: new Date().toISOString(),
-      cacheAge: globalCacheTimestamp ? `${Date.now() - globalCacheTimestamp}ms` : 'no cache'
+      // Verificar si hay datos en cache
+      const cachedData = progressManager.getCached();
+      if (cachedData && mountedRef.current) {
+        setProgressData(cachedData);
+        setIsLoading(false);
+      }
+
+      return unsubscribe;
+    }
+
+    // PREVENIR MÚLTIPLES INICIALIZACIONES SIMULTÁNEAS
+    if (isGloballyInitialized) {
+      return;
+    }
+
+    initializedRef.current = true;
+    isGloballyInitialized = true;
+
+    console.log('🎯 useRoutineAccess: FIRST TIME INITIALIZATION');
+
+    const initializeUser = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (mountedRef.current) {
+          setUser(user);
+        }
+      } catch (error) {
+        console.error('❌ useRoutineAccess: Error getting user:', error);
+      }
+    };
+
+    const loadProgress = async () => {
+      if (!mountedRef.current) return;
+      
+      // Verificar si hay datos en cache primero
+      const cachedData = progressManager.getCached();
+      if (cachedData) {
+        console.log('📄 useRoutineAccess: Using cached data');
+        setProgressData(cachedData);
+        return;
+      }
+
+      // Solo hacer fetch si no hay cache
+      setIsLoading(true);
+      try {
+        const data = await progressManager.getProgress();
+        if (mountedRef.current) {
+          setProgressData(data);
+        }
+      } catch (error) {
+        console.error('❌ useRoutineAccess: Error loading progress:', error);
+      } finally {
+        if (mountedRef.current) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    // Suscribirse a cambios en el progress manager
+    const unsubscribe = progressManager.subscribe((data) => {
+      if (mountedRef.current) {
+        console.log('📡 useRoutineAccess: Received progress update');
+        setProgressData(data);
+        setIsLoading(false);
+      }
     });
-  }
 
-  const refreshProgress = () => {
-    // Limpiar cache para forzar refresh
-    globalProgressCache = null;
-    globalCacheTimestamp = 0;
-    console.log('🔄 Force refreshing progress - cache cleared');
-    fetchProgress();
+    // Inicializar
+    initializeUser();
+    loadProgress();
+
+    return () => {
+      unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Solo debe ejecutarse una vez
+
+  const isRoutineUnlocked = (day: number): boolean => {
+    if (!progressData) return false;
+    return day <= progressData.maxUnlockedDay;
   };
+
+  const isRoutineCompleted = (day: number): boolean => {
+    if (!progressData) return false;
+    return progressData.progress.some(p => p.routine_day === day && p.completed_at);
+  };
+
+  const refreshProgress = async () => {
+    console.log('� ProgressManager: Manual refresh requested');
+    
+    setIsLoading(true);
+    try {
+      const data = await progressManager.refresh();
+      if (mountedRef.current) {
+        setProgressData(data);
+      }
+    } catch (error) {
+      console.error('❌ useRoutineAccess: Error refreshing progress:', error);
+    } finally {
+      if (mountedRef.current) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Extraer días completados de la estructura de progreso
+  const completedDays = progressData?.progress
+    .filter(p => p.completed_at)
+    .map(p => p.routine_day) || [];
 
   return {
-    hasAccess,
     isLoading,
     progressData,
-    error,
-    refreshProgress
+    user,
+    isRoutineUnlocked,
+    isRoutineCompleted,
+    refreshProgress,
+    maxUnlockedDay: progressData?.maxUnlockedDay || 0,
+    completedDays,
   };
-};
+}
 
-// Hook específico para verificar acceso a una rutina individual
-export const useSpecificRoutineAccess = (routineDay: number) => {
-  const { hasAccess, isLoading, progressData, error, refreshProgress } = useRoutineAccess(routineDay);
-
-  // Debug: log the state when it changes
-  useEffect(() => {
-    console.log(`🔍 useSpecificRoutineAccess(${routineDay}) Debug:`, {
-      routineDay,
-      hasAccess,
-      isLoading,
-      maxUnlockedDay: progressData?.maxUnlockedDay,
-      progressDataExists: !!progressData,
-      cacheAge: globalCacheTimestamp ? Date.now() - globalCacheTimestamp : 'no cache',
-      progressSample: progressData?.progress?.slice(0, 5)?.map(p => ({
-        day: p.routine_day,
-        unlocked_at: p.unlocked_at,
-        completed_at: p.completed_at
-      })),
-      timestamp: new Date().toISOString()
-    });
-  }, [routineDay, hasAccess, isLoading, progressData]);
-
-  const markAsCompleted = async () => {
+// Hook específico para páginas de rutina individual
+export function useSpecificRoutineAccess(routineDay: number) {
+  const baseHook = useRoutineAccess();
+  
+  // Calcular si tiene acceso a esta rutina específica
+  const hasAccess = baseHook.progressData ? routineDay <= baseHook.progressData.maxUnlockedDay : false;
+  
+  // Verificar si esta rutina específica está completada
+  const isCompleted = baseHook.progressData 
+    ? baseHook.progressData.progress.some(p => p.routine_day === routineDay && p.completed_at)
+    : false;
+  
+  // Función para marcar esta rutina como completada
+  const markAsCompleted = async (): Promise<void> => {
     try {
       const response = await fetch('/api/user/progress', {
         method: 'POST',
@@ -146,32 +180,58 @@ export const useSpecificRoutineAccess = (routineDay: number) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          routineDay,
+          routineDay: routineDay,
           action: 'complete'
-        })
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to mark routine as completed');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error completing routine');
       }
 
-      // Refresh progress after marking as completed
-      refreshProgress();
-    } catch (err) {
-      console.error('Error marking routine as completed:', err);
-      throw err;
+      const result = await response.json();
+      console.log('✅ Routine completed successfully:', result);
+      
+      // Refresh progress to reflect changes
+      await baseHook.refreshProgress();
+      
+    } catch (error) {
+      console.error('❌ Error marking routine as completed:', error);
+      throw error;
     }
   };
-
-  const isCompleted = progressData?.progress.find(p => p.routine_day === routineDay)?.completed_at !== null;
-
+  
   return {
+    ...baseHook,
     hasAccess,
-    isLoading,
-    error,
-    markAsCompleted,
+    routineDay,
     isCompleted,
-    progressData,
-    refreshProgress
+    markAsCompleted,
   };
-};
+}
+
+// Función helper para verificar si una rutina está desbloqueada
+export function isRoutineUnlocked(day: number, maxUnlockedDay: number): boolean {
+  return day <= maxUnlockedDay;
+}
+
+// Función helper para verificar si una rutina está completada
+export function isRoutineCompleted(day: number, progressData: ProgressData | null): boolean {
+  if (!progressData) return false;
+  return progressData.progress.some(p => p.routine_day === day && p.completed_at);
+}
+
+// Funciones para limpiar cache (compatibilidad con scripts)
+export function clearProgressCache() {
+  const manager = ProgressManager.getInstance();
+  manager.clearCache();
+}
+
+// Función para resetear rate limit (placeholder por compatibilidad)
+export function resetRateLimit() {
+  console.log('Rate limit reset - placeholder function');
+}
+
+// Export default para compatibilidad
+export default useRoutineAccess;

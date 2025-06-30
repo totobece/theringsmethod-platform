@@ -1,14 +1,74 @@
 'use client'
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'; // Importa usePathname para obtener el pathname actual
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import LogoDuo from '@/public/images/the rings method white no bg.png';
 
 const Sidebar = () => {
-  const pathname = usePathname(); // Obtener la ruta actual
+  const pathname = usePathname();
+  const [trialBannerHeight, setTrialBannerHeight] = useState(0);
+
+  useEffect(() => {
+    // Función para detectar la altura del TrialBanner
+    const detectTrialBannerHeight = () => {
+      const trialBanner = document.querySelector('[data-trial-banner]');
+      if (trialBanner) {
+        setTrialBannerHeight(trialBanner.getBoundingClientRect().height);
+      } else {
+        setTrialBannerHeight(0);
+      }
+    };
+
+    // Detectar al cargar
+    detectTrialBannerHeight();
+
+    // Observer para detectar cambios en el DOM
+    const observer = new MutationObserver(detectTrialBannerHeight);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+
+    // También escuchar resize por si acaso
+    window.addEventListener('resize', detectTrialBannerHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', detectTrialBannerHeight);
+    };
+  }, []);
 
   return (
-    <div style={{ width: "12.5%" }} className="fixed left-0 top-24 bottom-0 bg-gray-700 p-0 text-white hidden md:flex flex-col h-[calc(100vh-4rem)]"> {/* Fijo en el lateral y altura completa */}
+    <div 
+      style={{ width: "12.5%" }} 
+      className="fixed left-0 top-0 bg-gray-700 p-0 text-white hidden md:flex flex-col h-screen pt-24"
+    >
+      {/* Logo de The Rings Method - mismo tamaño y posición que en navbar */}
+      <div className="absolute top-0 left-0 h-24 flex items-center justify-start px-8">
+        <Link href="/">
+          <Image
+            src={LogoDuo}
+            alt='logo-duo'
+            style={{ 
+              objectFit: 'cover', 
+              width: '100px', 
+              height: '39px' 
+            }} 
+          />
+        </Link>
+      </div>
+
+      {/* Spacer dinámico para el TrialBanner */}
+      <div 
+        className="shrink-0"
+        style={{ height: `${trialBannerHeight}px` }}
+      ></div>
+      
       <h2 className="text-lg font-medium p-6">Settings</h2>
-      <ul className="flex-1 space-y-0"> {/* Sin espacio vertical para separar cada link con un borde */}
+      <ul className="flex-1 space-y-0">
         <li > 
           <Link 
             href="/account" 

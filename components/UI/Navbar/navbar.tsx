@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import LogoDuo from '@/public/images/the rings method white no bg.png';
 import { useRouter } from 'next/navigation';
@@ -12,17 +12,66 @@ export default function Navbar() {
   const router = useRouter(); 
   const [isSearchOpen, setIsSearchOpen] = useState(false); 
   const pathname = usePathname(); 
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Búsqueda en tiempo real
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      return;
+    }
+
+    const debounceTimer = setTimeout(() => {
+      // Solo hacer búsqueda en tiempo real si estamos en explore
+      if (pathname === '/explore') {
+        const newUrl = new URL(window.location.href);
+        if (searchTerm.trim()) {
+          newUrl.searchParams.set('search', searchTerm.trim());
+        } else {
+          newUrl.searchParams.delete('search');
+        }
+        router.push(newUrl.pathname + newUrl.search);
+      }
+    }, 300); // Debounce de 300ms
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm, pathname, router]);
+
+  // Enfocar el input cuando se abre la búsqueda
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 150); // Esperar a que termine la animación
+      return () => clearTimeout(timer);
+    }
+  }, [isSearchOpen]); 
 
 
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      router.push(`/explore?search=${encodeURIComponent(searchTerm.trim())}`);
+      // Si no estamos en explore, navegar a explore con la búsqueda
+      if (pathname !== '/explore') {
+        router.push(`/explore?search=${encodeURIComponent(searchTerm.trim())}`);
+        // Cerrar el search bar después de navegar
+        setIsSearchOpen(false);
+      }
+      // Si ya estamos en explore, la búsqueda en tiempo real ya se está manejando
     }
   };
   
   const toggleSearch = () => {
+    if (isSearchOpen) {
+      // Si estamos cerrando la búsqueda, limpiar el término
+      setSearchTerm('');
+      // Si estamos en explore y hay una búsqueda activa, limpiarla
+      if (pathname === '/explore') {
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.delete('search');
+        router.push(newUrl.pathname + newUrl.search);
+      }
+    }
     setIsSearchOpen(!isSearchOpen);
   };
  
@@ -47,27 +96,42 @@ export default function Navbar() {
         <Link href="/explore" className="text-white hover:text-gray-200 px-4 text-xl">
           Explore
         </Link>
-       
       </div>
 
       {/* Boton de busqueda */}
-      <div className="relative flex items-center ">
-          {isSearchOpen && (
+      <div className="relative flex items-center">
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            isSearchOpen ? 'w-48 sm:w-72 opacity-100' : 'w-0 opacity-0'
+          }`}>
             <form onSubmit={handleSearch} className="sm:ml-0">
               <input
+                ref={searchInputRef}
                 type="search"
                 id="default-search"
-                className="bg-gray-600 block w-48 sm:w-72 p-4 pl-10 text-sm text-cream border border-gray-600 rounded-[30px]"
-                placeholder="Search..."
+                className="bg-gray-600 block w-full p-4 pl-10 text-sm text-cream border border-gray-600 rounded-[30px] transition-all duration-300 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none"
+                placeholder="Search routines and meditations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                required
               />
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg
+                  className="w-4 h-4 text-gray-400"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                </svg>
+              </div>
             </form>
-          )}
-          <button onClick={toggleSearch} className={`relative text-cream hover:text-white pl-4 text-xl mt-[3px] `} >
+          </div>
+          <button 
+            onClick={toggleSearch} 
+            className="relative text-cream hover:text-white pl-4 text-xl mt-[3px] transition-all duration-300"
+          >
             <svg
-              className="w-6 h-6 text-gray-500 dark:text-gray-400 transition-transform duration-300 transform"
+              className="w-6 h-6 text-gray-500 dark:text-gray-400"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

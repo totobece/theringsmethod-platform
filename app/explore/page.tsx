@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import ExploreVideoSlider from "@/components/ExploreVideos/explore-videos"
+import MeditationsComponent from "@/components/MeditationsComponent/meditations-component"
 import Navbar from "@/components/UI/Navbar/navbar"
 import Footer from "@/components/UI/Footer/footer"
 import TrialBanner from '@/components/TrialBanner/trial-banner'
@@ -15,10 +16,14 @@ interface TrialStatus {
   redirect?: string
 }
 
+type FilterType = 'routines' | 'meditations'
+
 export default function Explore() {
   const [trialStatus, setTrialStatus] = useState<TrialStatus | null>(null)
   const [showLockedNotification, setShowLockedNotification] = useState(false)
   const [lockedRoutineInfo, setLockedRoutineInfo] = useState<{day: number, maxDay: number} | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [activeFilter, setActiveFilter] = useState<FilterType>('routines')
   const searchParams = useSearchParams()
   const router = useRouter()
 
@@ -39,6 +44,12 @@ export default function Explore() {
 
     checkTrialAndUser()
   }, [router])
+
+  useEffect(() => {
+    // Obtener el término de búsqueda de los searchParams del navbar
+    const searchFromUrl = searchParams.get('search') || ''
+    setSearchTerm(searchFromUrl)
+  }, [searchParams])
 
   useEffect(() => {
     // Check if user was redirected from a locked routine
@@ -114,7 +125,44 @@ export default function Explore() {
       <Navbar/>
       {trialStatus.user && (
         <>
-          <ExploreVideoSlider/>
+          {/* Filter Section */}
+          <div className="container mx-auto px-4 pt-8 pb-6">
+            {/* Filter Tabs - Centrado */}
+            <div className="flex justify-center mb-8">
+              <div className="flex space-x-1 bg-gray-600 rounded-lg p-1 max-w-md">
+                <button
+                  onClick={() => setActiveFilter('routines')}
+                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                    activeFilter === 'routines'
+                      ? 'bg-gray-700 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                >
+                  <span className="font-medium">Rutinas</span>
+                </button>
+                <button
+                  onClick={() => setActiveFilter('meditations')}
+                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                    activeFilter === 'meditations'
+                      ? 'bg-gray-700 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                >
+                  <span className="font-medium">Meditaciones</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Content based on active filter */}
+          <div className="container mx-auto px-4 pb-8">
+            {activeFilter === 'routines' ? (
+              <ExploreVideoSlider searchTerm={searchTerm} />
+            ) : (
+              <MeditationsComponent searchTerm={searchTerm} />
+            )}
+          </div>
+
           <Footer/>
         </>
       )}

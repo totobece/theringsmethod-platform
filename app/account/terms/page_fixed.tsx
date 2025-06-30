@@ -12,10 +12,12 @@ export default async function TermsPage() {
 
         <div className="flex-1 md:ml-[12.5%] mx-auto px-8 pt-24 pb-12">
           <div className="space-y-8">
-            
+            <div>
+              <h1 className="text-black text-2xl font-normal lg:text-4xl">Terms & Conditions</h1>
+            </div>
           </div>
           
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl">
             <div className="text-gray-700 space-y-6">
               <div className="text-center">
                 <h2 className="text-2xl font-bold text-black mb-2">THE RINGS METHOD® TERMS AND CONDITIONS OF SERVICE</h2>

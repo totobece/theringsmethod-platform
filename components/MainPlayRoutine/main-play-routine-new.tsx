@@ -23,6 +23,7 @@ const MainPlayRoutine = () => {
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
   
@@ -113,6 +114,7 @@ const MainPlayRoutine = () => {
       // Obtener la preview específica para esta rutina
       const fetchPreview = async () => {
         try {
+          setIsImageLoaded(false); // Reset image loading state
           const dayNumber = extractDayNumberFromString(currentDayRoutine.day);
           const response = await fetch(`/api/supabase/previews?day=${dayNumber}`);
           if (response.ok) {
@@ -120,10 +122,12 @@ const MainPlayRoutine = () => {
             setImageUrl(previewData.url);
           } else {
             setImageUrl(null);
+            setIsImageLoaded(true); // No image to load
           }
         } catch (error) {
           console.error('Error fetching preview for current routine:', error);
           setImageUrl(null);
+          setIsImageLoaded(true); // No image to load
         }
       };
 
@@ -140,22 +144,32 @@ const MainPlayRoutine = () => {
       if (day1Routine) {
         const fetchDay1Preview = async () => {
           try {
+            setIsImageLoaded(false); // Reset image loading state
             const response = await fetch('/api/supabase/previews?day=1');
             if (response.ok) {
               const previewData = await response.json();
               setImageUrl(previewData.url);
+            } else {
+              setIsImageLoaded(true); // No image to load
             }
           } catch (error) {
             console.error('Error fetching Day 1 preview:', error);
+            setIsImageLoaded(true); // No image to load
           }
         };
         fetchDay1Preview();
+      } else {
+        setIsImageLoaded(true); // No routine, no image to load
       }
     }
-  }, [maxUnlockedDay, allRoutines]);  return (
+  }, [maxUnlockedDay, allRoutines]);
+
+  const shouldShowSkeleton = isLoading || isAccessLoading || (imageUrl && !isImageLoaded);
+
+  return (
     <section id="service-presentation" className='w-full relative animate-slidein '>
-      <div className='mx-auto w-full items-start px-4 md:px-16'>
-        {(isLoading || isAccessLoading) ? (
+      <div className='mx-auto w-full items-start'>
+        {shouldShowSkeleton ? (
           <MainPlayRoutineSkeleton />
         ) : error ? (
           <div className="text-red-600 p-4">
@@ -167,7 +181,7 @@ const MainPlayRoutine = () => {
             )}
           </div>
         ) : currentRoutine ? (
-          <div key={currentRoutine.id} className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+          <div key={currentRoutine.id} className="relative w-full h-auto flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
             {/* Imagen de fondo */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -225,13 +239,15 @@ const MainPlayRoutine = () => {
                     maxHeight: '600px',
                     objectFit: 'cover'
                   }}
+                  onLoad={() => setIsImageLoaded(true)}
+                  onError={() => setIsImageLoaded(true)}
                 />
               </div>
             )}
             </div>
           </div>
         ) : (
-          <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden">
+          <div className="relative w-full h-auto flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden">
             {/* Imagen de fondo */}
             <div className="absolute inset-0 z-0">
               <Image

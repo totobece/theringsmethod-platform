@@ -4,9 +4,9 @@ type LoaderProps = object;
 
 const MyLoader: React.FC<LoaderProps> = () => {
   return (
-    <div className="relative my-4 px-4 justify-center w-full md:w-1/3 lg:w-1/4">
+    <div className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
         <div
-          className="relative aspect-video mx-auto rounded-xl md:w-full w-[90%] bg-cream animate-pulse"
+          className="card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 bg-cream animate-pulse"
         ></div>
     </div>
   );

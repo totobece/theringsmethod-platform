@@ -1,6 +1,7 @@
 import Navbar from '@/components/UI/Navbar/navbar';
 import MainPlayRoutine from '@/components/MainPlayRoutine/main-play-routine';
 import WeekVideoSlider from '@/components/WeekVideoSlider/week-video-slider';
+import MeditationsComponent from '@/components/MeditationsComponent/meditations-component';
 import { checkUserTrialStatus } from "@/utils/trial-check";
 import { redirect } from 'next/navigation'
 import Footer from '@/components/UI/Footer/footer';
@@ -38,9 +39,15 @@ export default async function Home() {
       </div>
           </div>
           
-          <div className='md:pb-16'>
+          <div className='md:pb-16 md:px-6 px-4'>
           <WeekVideoSlider />
           </div>
+          
+          {/* Meditaciones Section */}
+          <div className="md:px-6 px-4 py-8">
+            <MeditationsComponent />
+          </div>
+          
           <div>
             <ExploreVideoSlider/>
           </div>

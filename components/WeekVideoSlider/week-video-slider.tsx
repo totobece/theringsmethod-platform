@@ -9,6 +9,7 @@ import WeekVideoSliderSkeleton from '../Skeletons/WeekVideoSliderSkeleton';
 import Link from 'next/link';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
+import { findPreviewForRoutine, PreviewData } from '@/utils/preview-utils';
 
 export interface WeekVideosData {
   id: string;
@@ -25,20 +26,16 @@ export default function WeekVideoSlider() {
   const [currentWeek, setCurrentWeek] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [firstPreviewUrl, setFirstPreviewUrl] = useState<string | null>(null);
+  const [previewsData, setPreviewsData] = useState<PreviewData[]>([]);
   const [width, setWidth] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
   
   // Hook para acceso a rutinas
-  const { progressData, isLoading: isAccessLoading } = useRoutineAccess();
+  const { maxUnlockedDay, isLoading: isAccessLoading } = useRoutineAccess();
 
   // Función para calcular la semana actual basada en el progreso
-  const calculateCurrentWeek = (progressData: { maxUnlockedDay: number }): number => {
-    if (!progressData) return 1;
-    
-    const maxUnlockedDay = progressData.maxUnlockedDay;
-    
+  const calculateCurrentWeek = (maxUnlockedDay: number): number => {
     // Si no hay rutinas desbloqueadas, mostrar semana 1
     if (maxUnlockedDay === 0) return 1;
     
@@ -69,8 +66,8 @@ export default function WeekVideoSlider() {
 
   // Efecto para actualizar la semana y las rutinas cuando cambia el progreso
   useEffect(() => {
-    if (progressData && allData.length > 0) {
-      const newWeek = calculateCurrentWeek(progressData);
+    if (maxUnlockedDay && allData.length > 0) {
+      const newWeek = calculateCurrentWeek(maxUnlockedDay);
       setCurrentWeek(newWeek);
       
       const weekRoutines = getWeekRoutines(allData, newWeek);
@@ -80,11 +77,11 @@ export default function WeekVideoSlider() {
         weekRoutines.map(r => ({ 
           day: r.day, 
           title: r.title, 
-          isUnlocked: extractDayNumberFromString(r.day) <= progressData.maxUnlockedDay 
+          isUnlocked: extractDayNumberFromString(r.day) <= maxUnlockedDay 
         }))
       );
     }
-  }, [progressData, allData]);
+  }, [maxUnlockedDay, allData]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -129,18 +126,14 @@ export default function WeekVideoSlider() {
           }
         };
 
-        // Obtener todas las rutinas
+        // Obtener todas las rutinas y previews
         const [postsData, allPreviewsData] = await Promise.all([
           fetchWithHandling('/api/supabase/posts'),
           fetchWithHandling('/api/supabase/previews'),
         ]);
 
         setAllData(postsData.posts || []);
-        if (Array.isArray(allPreviewsData) && allPreviewsData.length > 0) {
-          setFirstPreviewUrl(allPreviewsData[0].url);
-        } else {
-          setFirstPreviewUrl(null);
-        }
+        setPreviewsData(Array.isArray(allPreviewsData) ? allPreviewsData : []);
 
       } catch(error: unknown) {
         setError((error as Error).message || 'Error fetching data');
@@ -211,13 +204,13 @@ export default function WeekVideoSlider() {
               <div className="flex flex-row gap-6">
                 {currentWeekData.map((dataItem, idx) => {
                   const routineDay = extractDayNumberFromString(dataItem.day);
-                  const isUnlocked = progressData ? routineDay <= progressData.maxUnlockedDay : false;
-                  const daysUntilUnlock = progressData ? Math.max(0, routineDay - progressData.maxUnlockedDay) : 999;
+                  const isUnlocked = maxUnlockedDay ? routineDay <= maxUnlockedDay : false;
+                  const daysUntilUnlock = maxUnlockedDay ? Math.max(0, routineDay - maxUnlockedDay) : 999;
                   
                   return (
-                    <div key={dataItem.id + '-' + idx} className='flex flex-col justify-center min-w-[300px]'>
+                    <div key={dataItem.id + '-' + idx} className='flex flex-col justify-center min-w-[300px] max-w-[300px]'>
                       <motion.div whileHover={{ y: isUnlocked ? -10 : 0 }} className='justify-center flex'>
-                        <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[320px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
+                        <div className={`card rounded-xl boxshadow p-[20px] w-full min-h-[320px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
                           {/* Imagen de fondo */}
                           <div className="absolute inset-0 z-0">
                             <Image
@@ -245,23 +238,30 @@ export default function WeekVideoSlider() {
                             <div className='flex-1 flex justify-center items-center mb-4'>
                               {isUnlocked ? (
                                 <Link href={`/routine/${dataItem.id}`}>
-                                  {firstPreviewUrl && (
-                                    <Image
-                                      className='rounded-md'
-                                      src={firstPreviewUrl}
-                                      alt="Preview"
-                                      sizes="100vw"
-                                      style={{
-                                        width: '100%',
-                                        height: 'auto',
-                                        maxHeight: '200px',
-                                        objectFit: 'cover'
-                                      }}
-                                      width={16}
-                                      height={9}
-                                      loading="lazy"
-                                    />
-                                  )}
+                                  {(() => {
+                                    const preview = findPreviewForRoutine(previewsData, dataItem);
+                                    return preview ? (
+                                      <Image
+                                        className='rounded-md'
+                                        src={preview.url}
+                                        alt={`Preview for ${dataItem.title}`}
+                                        sizes="100vw"
+                                        style={{
+                                          width: '100%',
+                                          height: 'auto',
+                                          maxHeight: '200px',
+                                          objectFit: 'cover'
+                                        }}
+                                        width={16}
+                                        height={9}
+                                        loading="lazy"
+                                      />
+                                    ) : (
+                                      <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
+                                        <span className="text-white text-sm">Sin preview</span>
+                                      </div>
+                                    );
+                                  })()}
                                 </Link>
                               ) : (
                                 <div className="flex flex-col items-center text-white">

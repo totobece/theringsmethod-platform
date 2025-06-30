@@ -51,7 +51,10 @@ export default function TrialBanner({ daysRemaining }: TrialBannerProps) {
   }
 
   return (
-    <div className={`${getBannerColor()} ${getTextColor()} p-3 text-center relative`}>
+    <div 
+      data-trial-banner
+      className={`${getBannerColor()} ${getTextColor()} p-3 text-center relative`}
+    >
       <div className="max-w-4xl mx-auto flex items-center justify-between">
         <div className="flex-1 text-center">
           <span className="font-medium">

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/UI/Navbar/navbar'; 
 import MoreVideos from '@/components/MoreVideosRecommendation/more-videos-recommendation';
+import MeditationsComponent from '@/components/MeditationsComponent/meditations-component';
 import Footer from '@/components/UI/Footer/footer';
 import { useSpecificRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
@@ -32,17 +33,11 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
   const [routineDay, setRoutineDay] = useState<number>(1);
   const router = useRouter();
   
-  const { hasAccess, isLoading: isAccessLoading, refreshProgress, markAsCompleted, isCompleted } = useSpecificRoutineAccess(routineDay);
+  const { hasAccess, isLoading: isAccessLoading, markAsCompleted, isCompleted } = useSpecificRoutineAccess(routineDay);
 
   // Estado para manejar la completación
   const [isCompleting, setIsCompleting] = useState(false);
   const [completionMessage, setCompletionMessage] = useState<string | null>(null);
-
-  // Refresh progress cuando se monta el componente para asegurar datos frescos
-  useEffect(() => {
-    console.log('🔄 Video page: Refreshing progress on component mount');
-    refreshProgress();
-  }, [refreshProgress]);
 
   // Función para marcar como completada
   const handleFinishRoutine = async () => {
@@ -56,11 +51,6 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
       await markAsCompleted();
       setCompletionMessage('¡Rutina completada! La siguiente rutina se desbloqueará en 24 horas.');
       
-      // Refresh progress to reflect changes
-      setTimeout(() => {
-        refreshProgress();
-      }, 1000);
-
       // Redirigir al home después de 2 segundos
       setTimeout(() => {
         router.push('/');
@@ -222,6 +212,14 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
             <span className='text-white'>✓ Completada</span>
           </div>
         )}
+      </div>
+
+      {/* Meditaciones Section */}
+      <div className="mt-16 mb-8 px-4 md:px-6">
+        <h2 className="text-2xl md:text-3xl font-medium text-white text-center mb-8">
+          Relájate con nuestras meditaciones
+        </h2>
+        <MeditationsComponent showTitle={false} />
       </div>
 
       <div className='justify-center items-center flex flex-col'>

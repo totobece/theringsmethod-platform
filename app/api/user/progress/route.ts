@@ -1,6 +1,37 @@
 import { createClient } from '@/utils/supabase/server';
 import { checkRateLimit } from '@/utils/rate-limiter';
 
+// Circuit breaker simple para evitar bucles infinitos
+const circuitBreaker = new Map<string, { count: number, lastReset: number }>();
+const MAX_CALLS_PER_MINUTE = 50; // Aumentado de 10 a 50 para múltiples componentes
+const RESET_INTERVAL = 60000; // 1 minuto
+
+function checkCircuitBreaker(userId: string): boolean {
+  const now = Date.now();
+  const userState = circuitBreaker.get(userId);
+  
+  if (!userState) {
+    circuitBreaker.set(userId, { count: 1, lastReset: now });
+    return true;
+  }
+  
+  // Reset contador si ha pasado el intervalo
+  if (now - userState.lastReset > RESET_INTERVAL) {
+    circuitBreaker.set(userId, { count: 1, lastReset: now });
+    return true;
+  }
+  
+  // Incrementar contador
+  userState.count++;
+  
+  if (userState.count > MAX_CALLS_PER_MINUTE) {
+    console.log(`🚨 Circuit breaker triggered for user ${userId}: ${userState.count} calls in last minute`);
+    return false;
+  }
+  
+  return true;
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -9,6 +40,14 @@ export async function GET() {
     if (userError || !user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { 
         status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Circuit breaker check
+    if (!checkCircuitBreaker(user.id)) {
+      return new Response(JSON.stringify({ error: 'Circuit breaker: Too many rapid requests' }), { 
+        status: 429,
         headers: { 'Content-Type': 'application/json' }
       });
     }
@@ -79,14 +118,20 @@ export async function GET() {
     const now = new Date();
     let maxUnlockedDay = 1;
 
-    console.log(`🔍 DEBUG: Current time: ${now.toISOString()}`);
-    console.log(`🔍 DEBUG: Progress entries: ${progress.length}`);
+    // Solo debug logging en desarrollo
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔍 DEBUG: Current time: ${now.toISOString()}`);
+      console.log(`🔍 DEBUG: Progress entries: ${progress.length}`);
+    }
 
     for (const entry of progress) {
       if (entry.unlocked_at) {
         const unlockedDate = new Date(entry.unlocked_at);
         const isUnlocked = unlockedDate <= now;
-        console.log(`🔍 DEBUG: Day ${entry.routine_day} - unlocks at ${unlockedDate.toISOString()} - available: ${isUnlocked}`);
+        
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`🔍 DEBUG: Day ${entry.routine_day} - unlocks at ${unlockedDate.toISOString()} - available: ${isUnlocked}`);
+        }
         
         if (isUnlocked) {
           maxUnlockedDay = Math.max(maxUnlockedDay, entry.routine_day);
@@ -94,7 +139,9 @@ export async function GET() {
       }
     }
 
-    console.log(`🔍 DEBUG: Calculated maxUnlockedDay: ${maxUnlockedDay}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🔍 DEBUG: Calculated maxUnlockedDay: ${maxUnlockedDay}`);
+    }
 
     // Determinar el día actual (el día más bajo no completado o el siguiente día si todos están completos)
     const incompleteEntry = progress.find(p => p.completed_at === null);

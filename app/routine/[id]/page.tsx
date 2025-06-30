@@ -27,6 +27,7 @@ export interface WeekVideosData {
 export default function Post({ params: { id } }: { params: { id: string } }) {
   const [post, setPost] = useState<WeekVideosData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [gifUrl, setGifUrl] = useState<string | null>(null);
   const [isLoadingPost, setIsLoadingPost] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +36,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
   const [routineDay, setRoutineDay] = useState<number>(1);
   const router = useRouter();
   
-  const { hasAccess, isLoading: isAccessLoading, refreshProgress } = useSpecificRoutineAccess(routineDay);
+  const { hasAccess, isLoading: isAccessLoading } = useSpecificRoutineAccess(routineDay);
 
   // Debug en la consola del navegador cuando se renderiza el componente
   console.log(`🔍 /routine/[${id}] Component render state:`, {
@@ -47,14 +48,6 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
     postTitle: post?.title,
     timestamp: new Date().toISOString()
   });
-
-  // Refresh progress cuando se actualiza el routineDay, no al montar
-  useEffect(() => {
-    if (routineDay > 1) { // Solo refrescar para rutinas que no sean el día 1
-      console.log(`🔄 Refreshing progress for routine day ${routineDay}`);
-      refreshProgress();
-    }
-  }, [routineDay, refreshProgress]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -85,24 +78,28 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
         console.log(`🔢 Extracted routine day: ${dayNumber} from "${postData.day}"`);
         setRoutineDay(dayNumber);
 
-        // Fetch previews desde la API interna
-        const previewRes = await fetch('/api/supabase/previews');
-        const previewJson = await previewRes.json();
-        type PreviewImage = { url: string };
-        let foundUrl = null;
-        if (Array.isArray(previewJson) && previewJson.length > 0) {
-          // Busca la preview que coincida con el id
-          const found = previewJson.find((img: PreviewImage) => img.url && img.url.includes(id));
-          foundUrl = found ? found.url : previewJson[0].url;
-        } else if (previewJson.images && Array.isArray(previewJson.images) && previewJson.images.length > 0) {
-          const found = previewJson.images.find((img: PreviewImage) => img.url && img.url.includes(id));
-          foundUrl = found ? found.url : previewJson.images[0].url;
+        // Fetch preview específica para esta rutina
+        const previewRes = await fetch(`/api/supabase/previews?day=${dayNumber}`);
+        if (previewRes.ok) {
+          const previewJson = await previewRes.json();
+          setPreviewUrl(previewJson.url || null);
+        } else {
+          setPreviewUrl(null);
         }
-        setPreviewUrl(foundUrl);
+
+        // Fetch gif específico para esta rutina
+        const gifRes = await fetch(`/api/supabase/gifs?day=${dayNumber}`);
+        if (gifRes.ok) {
+          const gifJson = await gifRes.json();
+          setGifUrl(gifJson.url || null);
+        } else {
+          setGifUrl(null);
+        }
       } catch {
         setError('Ups! An error ocurred. Please try again later');
         setPost(null);
         setPreviewUrl(null);
+        setGifUrl(null);
       } finally {
         setIsLoadingPost(false);
       }
@@ -164,7 +161,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                     src={isMobile ? "/images/smaller rectangle.png" : "/images/RECTANGLE BIG.png"}
                     alt="Background"
                     fill
-                    className="object-cover rounded-2xl md:rounded-3xl"
+                    className="object-cover"
                     priority
                   />
                 </div>
@@ -193,10 +190,17 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                       <Image
                         src={previewUrl}
                         alt="Preview"
-                        width={500}
-                        height={500}
+                        width={16}
+                        height={9}
+                        sizes="(max-width: 768px) 95vw, 50vw"
                         className="rounded-lg"
-                        style={{ width: '800px', height: '500px' }}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          maxWidth: '800px',
+                          maxHeight: '600px',
+                          objectFit: 'cover'
+                        }}
                       />
                     </div>
                   )}
@@ -317,6 +321,52 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
         </>
       )}
       <div className='justify-center items-center flex flex-col'>
+        {/* Sección Do it Indoor con GIF */}
+        {!isLoadingPost && post && (
+          <div className="w-full max-w-4xl mx-auto px-4 md:px-16 mb-12 md:mb-16">
+            <div className="text-center mb-8">
+              <h2 className='text-white text-pretty font-medium text-2xl md:text-4xl'>
+                Do it Indoor
+              </h2>
+            </div>
+            <div className="flex justify-center">
+              {gifUrl ? (
+                <div className="relative max-w-md md:max-w-lg lg:max-w-xl">
+                  <Image
+                    src={gifUrl}
+                    alt={`Indoor exercise demonstration for ${post.title}`}
+                    width={600}
+                    height={400}
+                    className="rounded-lg shadow-lg"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      maxWidth: '600px'
+                    }}
+                    unoptimized // Para gifs animados
+                    priority={false}
+                  />
+                </div>
+              ) : (
+                <div className="relative max-w-md md:max-w-lg lg:max-w-xl">
+                  <div className="w-full h-64 md:h-80 bg-gray-600 rounded-lg flex items-center justify-center">
+                    <div className="text-center text-white">
+                      <svg 
+                        className="w-16 h-16 mx-auto mb-4 opacity-60" 
+                        fill="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                      <p className="text-lg opacity-80">Demo disponible próximamente</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        
         <h1 className='text-white mt-12 md:mt-20 text-pretty text-center px-12 lg:px-20 font-medium text-3xl md:text-5xl'>Discover more routines to try!</h1>
 </div>
 <MoreVideos/>

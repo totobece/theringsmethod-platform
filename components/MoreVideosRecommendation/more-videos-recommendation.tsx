@@ -5,6 +5,7 @@ import MoreVideosSkeleton from '../Skeletons/MoreVideosSkeleton';
 import Link from 'next/link';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
+import { findPreviewForRoutine, PreviewData } from '@/utils/preview-utils';
 
 export interface ExploreVideosData {
   id: string;
@@ -17,12 +18,12 @@ export interface ExploreVideosData {
 
 export default function VideoPlayer({ params: { id } = { id: undefined } }: { params?: { id?: string | undefined } }) {
   const [data, setData] = useState<ExploreVideosData[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewData, setPreviewData] = useState<PreviewData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // Hook para acceso a rutinas
-  const { progressData, isLoading: isAccessLoading } = useRoutineAccess();
+  const { maxUnlockedDay, isLoading: isAccessLoading } = useRoutineAccess();
 
   useEffect(() => {
     const fetchDataAndPreview = async () => {
@@ -38,16 +39,10 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
           : (postsJson.posts || []);
         setData(filteredPosts);
 
-        // Fetch preview (solo una imagen)
+        // Fetch preview (todas las previews)
         const previewsRes = await fetch('/api/supabase/previews');
         const previewsJson = await previewsRes.json();
-        let url: string | null = null;
-        if (Array.isArray(previewsJson) && previewsJson.length > 0) {
-          url = previewsJson[0].url;
-        } else if (previewsJson.images && Array.isArray(previewsJson.images) && previewsJson.images.length > 0) {
-          url = previewsJson.images[0].url;
-        }
-        setPreviewUrl(url);
+        setPreviewData(Array.isArray(previewsJson) ? previewsJson : []);
       } catch (error: unknown) {
         setError((error as Error).message || 'Error fetching data');
         console.error("Error fetching data:", error);
@@ -73,8 +68,11 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
         {!isLoading && !isAccessLoading && !error && data.map(dataItem => {
           // Verificar si la rutina está desbloqueada
           const routineDay = extractDayNumberFromString(dataItem.day);
-          const isUnlocked = progressData ? routineDay <= progressData.maxUnlockedDay : false;
-          const daysUntilUnlock = progressData ? Math.max(0, routineDay - progressData.maxUnlockedDay) : 999;
+          const isUnlocked = maxUnlockedDay ? routineDay <= maxUnlockedDay : false;
+          const daysUntilUnlock = maxUnlockedDay ? Math.max(0, routineDay - maxUnlockedDay) : 999;
+          
+          // Buscar preview específica para esta rutina
+          const preview = findPreviewForRoutine(previewData, dataItem);
           
           return (
             <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
@@ -106,10 +104,10 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                   <div className='flex-1 flex justify-center items-center mb-4'>
                     {isUnlocked ? (
                       <Link href={`/routine/${dataItem.id}`}>
-                        {previewUrl && (
+                        {preview ? (
                           <Image
                             className='rounded-md'
-                            src={previewUrl}
+                            src={preview.url}
                             alt={`Preview for ${dataItem.title}`}
                             sizes="100vw"
                             style={{
@@ -122,6 +120,10 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                             height={9}
                             loading="lazy"
                           />
+                        ) : (
+                          <div className="w-full h-48 bg-gray-600 rounded-md flex items-center justify-center">
+                            <span className="text-white text-sm">Sin preview</span>
+                          </div>
                         )}
                       </Link>
                     ) : (
