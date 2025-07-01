@@ -34,7 +34,7 @@ export default async function Home() {
           <div className='md:pt-6 md:px-6'>
           <MainPlayRoutine />
           <div className={`max-w-full relative md:text-start text-start`}>
-      <h1 className='mt-28 mb-10 md:px-0 px-4 text-white font-light text-2xl md:text-3xl'>Featuring this week:</h1>
+      <h1 className='mt-12 mb-6 md:px-0 px-4 text-white font-light text-2xl md:text-3xl md:text-start text-center'>Featuring this week:</h1>
 
       </div>
           </div>

@@ -154,7 +154,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
               <div className="text-red-600 p-4">Error: {error}</div>
             )}
             {!isLoadingPost && post && (
-              <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+              <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[0px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
                 {/* Imagen de fondo */}
                 <div className="absolute inset-0 z-0">
                   <Image

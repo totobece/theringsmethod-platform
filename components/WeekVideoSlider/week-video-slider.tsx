@@ -186,8 +186,8 @@ export default function WeekVideoSlider() {
         <div className="max-w-full relative overflow-hidden">
           {/* Indicador de semana */}
           <div className="mb-4 text-center">
-            <h3 className="text-xl font-medium text-cream">
-              Semana {currentWeek} - Días {(currentWeek - 1) * 6 + 1} al {currentWeek * 6}
+            <h3 className="text-xl text-cream">
+              Semana {currentWeek} - Día {(currentWeek - 1) * 6 + 1} a {currentWeek * 6}
             </h3>
           </div>
           
