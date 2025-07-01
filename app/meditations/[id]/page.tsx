@@ -1,6 +1,7 @@
 'use client'
-import React, { useEffect, useState } from 'react'; 
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMediaDuration } from '@/hooks/useMediaDuration';
 import Navbar from '@/components/UI/Navbar/navbar'; 
 import MoreVideos from '@/components/MoreVideosRecommendation/more-videos-recommendation';
 import MeditationsComponent from '@/components/MeditationsComponent/meditations-component';
@@ -20,7 +21,69 @@ export default function MeditationPlayer({ params: { id } }: { params: { id: str
   const [meditation, setMeditation] = useState<Meditation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showPlayPrompt, setShowPlayPrompt] = useState(false);
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Obtener la duración real del archivo multimedia
+  const realDuration = useMediaDuration(
+    meditation?.url || '', 
+    meditation?.type || 'audio'
+  );
+
+  // Usar la duración real si está disponible, si no, usar la del archivo
+  const displayDuration = realDuration !== 'N/A' ? realDuration : meditation?.duration || 'N/A';
+
+  // Efecto para manejar el autoplay cuando se carga una nueva meditación
+  useEffect(() => {
+    if (meditation && !isLoading) {
+      // Pequeño delay para asegurar que el elemento DOM esté listo
+      const timer = setTimeout(() => {
+        const mediaElement = meditation.type === 'video' ? videoRef.current : audioRef.current;
+        if (mediaElement) {
+          // Configurar y intentar reproducir
+          mediaElement.currentTime = 0;
+          const playPromise = mediaElement.play();
+          
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log('Autoplay funcionó correctamente');
+                setShowPlayPrompt(false);
+                // Si es video y se reproduce correctamente, desmutear
+                if (meditation.type === 'video') {
+                  mediaElement.muted = false;
+                }
+              })
+              .catch((error) => {
+                console.log('Autoplay fue bloqueado:', error.name);
+                setShowPlayPrompt(true);
+              });
+          }
+        }
+      }, 800); // Delay más largo para dar tiempo a que se cargue completamente
+
+      return () => clearTimeout(timer);
+    }
+  }, [meditation, isLoading]);
+
+  // Función para manejar el click del botón de play
+  const handlePlayClick = () => {
+    const mediaElement = meditation?.type === 'video' ? videoRef.current : audioRef.current;
+    if (mediaElement) {
+      // Si es video, desmutear antes de reproducir
+      if (meditation?.type === 'video') {
+        mediaElement.muted = false;
+      }
+      
+      mediaElement.play().then(() => {
+        setShowPlayPrompt(false);
+      }).catch((error) => {
+        console.error('Error al reproducir:', error);
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchMeditation = async () => {
@@ -109,7 +172,7 @@ export default function MeditationPlayer({ params: { id } }: { params: { id: str
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">{meditation.title}</h1>
           <p className="text-gray-400 text-lg">
-            {meditation.type === 'video' ? 'Video' : 'Audio'} · {meditation.duration}
+            {meditation.type === 'video' ? 'Video' : 'Audio'} · {displayDuration}
           </p>
         </div>
 
@@ -118,10 +181,28 @@ export default function MeditationPlayer({ params: { id } }: { params: { id: str
           <div className="relative w-full h-0 pb-[56.25%] bg-gray-600 rounded-lg overflow-hidden">
             {meditation.type === 'video' ? (
               <video
+                ref={videoRef}
                 src={meditation.url}
                 controls
+                autoPlay
+                muted
+                playsInline
+                preload="auto"
                 className="absolute top-0 left-0 w-full h-full object-contain"
-                poster="/images/meditation-poster.jpg" // Opcional: agregar poster
+                onLoadedData={(e) => {
+                  // Intentar reproducir cuando los datos están cargados
+                  const video = e.target as HTMLVideoElement;
+                  video.play().catch(() => {
+                    console.log('Autoplay bloqueado, el usuario deberá hacer clic para reproducir');
+                    setShowPlayPrompt(true);
+                  });
+                }}
+                onPlay={(e) => {
+                  // Desmutear el video cuando comience a reproducirse
+                  const video = e.target as HTMLVideoElement;
+                  video.muted = false;
+                  setShowPlayPrompt(false);
+                }}
               >
                 Tu navegador no soporta el elemento de video.
               </video>
@@ -134,13 +215,39 @@ export default function MeditationPlayer({ params: { id } }: { params: { id: str
                     </svg>
                   </div>
                   <audio
+                    ref={audioRef}
                     src={meditation.url}
                     controls
+                    autoPlay
+                    preload="auto"
                     className="w-full max-w-md"
+                    onLoadedData={(e) => {
+                      // Intentar reproducir cuando los datos están cargados
+                      const audio = e.target as HTMLAudioElement;
+                      audio.play().catch(() => {
+                        console.log('Autoplay bloqueado, el usuario deberá hacer clic para reproducir');
+                        setShowPlayPrompt(true);
+                      });
+                    }}
+                    onPlay={() => setShowPlayPrompt(false)}
                   >
                     Tu navegador no soporta el elemento de audio.
                   </audio>
                 </div>
+              </div>
+            )}
+
+            {/* Botón de play overlay cuando el autoplay está bloqueado */}
+            {showPlayPrompt && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
+                <button
+                  onClick={handlePlayClick}
+                  className="bg-wine hover:bg-red-700 text-white rounded-full p-6 transition-all duration-300 hover:scale-110 shadow-lg"
+                >
+                  <svg className="w-12 h-12 text-white fill-white" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
               </div>
             )}
           </div>

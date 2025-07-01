@@ -75,8 +75,8 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
           const preview = findPreviewForRoutine(previewData, dataItem);
           
           return (
-            <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
-              <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
+            <div key={dataItem.id} className="justify-center w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mb-6 px-3">
+              <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[320px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
                 {/* Imagen de fondo */}
                 <div className="absolute inset-0 z-0">
                   <Image
@@ -109,11 +109,11 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                             className='rounded-md'
                             src={preview.url}
                             alt={`Preview for ${dataItem.title}`}
-                            sizes="100vw"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                             style={{
                               width: '100%',
                               height: 'auto',
-                              maxHeight: '280px',
+                              maxHeight: '180px',
                               objectFit: 'cover'
                             }}
                             width={16}
@@ -121,7 +121,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                             loading="lazy"
                           />
                         ) : (
-                          <div className="w-full h-48 bg-gray-600 rounded-md flex items-center justify-center">
+                          <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
                             <span className="text-white text-sm">Sin preview</span>
                           </div>
                         )}
@@ -130,7 +130,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                       <div className="flex flex-col items-center text-white">
                         {/* Icono de candado */}
                         <svg 
-                          className="w-12 h-12 mb-3" 
+                          className="w-8 h-8 mb-2" 
                           fill="currentColor" 
                           viewBox="0 0 24 24"
                         >
@@ -139,11 +139,11 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                         
                         {/* Texto de bloqueo */}
                         <div className="text-center">
-                          <p className="text-sm font-medium mb-1">Bloqueada</p>
+                          <p className="text-xs font-medium mb-1">Bloqueada</p>
                           <p className="text-xs opacity-80">
                             {daysUntilUnlock === 0 
                               ? 'Se desbloquea mañana' 
-                              : `Se desbloquea en ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
+                              : `En ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
                             }
                           </p>
                         </div>
@@ -153,10 +153,10 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                   
                   {/* Título y día en la parte inferior */}
                   <div className='mt-auto text-right'>
-                    <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
+                    <blockquote className={`text-base lg:text-lg font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
                       {dataItem.title}
                     </blockquote>
-                    <blockquote className={`text-base font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
+                    <blockquote className={`text-sm font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
                       {dataItem.day}
                     </blockquote>
                   </div>

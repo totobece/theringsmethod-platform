@@ -40,14 +40,53 @@ export async function GET() {
         // Extraer información del nombre del archivo
         const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
         
-        // Intentar extraer duración del nombre (ej: "5 min", "10min", "15 minutes")
-        const durationMatch = fileNameWithoutExt.match(/(\d+)\s*(?:min|minute|minutes|m)/i);
-        const duration = durationMatch ? `${durationMatch[1]} min` : 'N/A';
+        // Intentar extraer duración del nombre con múltiples patrones
+        let duration = 'N/A';
+        
+        // Patrones para buscar duración (más flexibles)
+        const durationPatterns = [
+          /(\d+)\s*(?:min|minute|minutes|m)(?:\s|$)/i,  // "5 min", "10min", etc.
+          /(\d+):\d+/,  // "5:30", "10:15" (formato mm:ss)
+          /(\d+)\s*(?:seg|second|seconds|s)(?:\s|$)/i,  // "30 seg", "45s", etc.
+          /duration[:\s]*(\d+)\s*(?:min|m)/i,  // "duration: 5 min"
+          /time[:\s]*(\d+)\s*(?:min|m)/i,      // "time: 10 min"
+          /(?:^|\s)(\d+)(?:\s|$)/              // Cualquier número solo
+        ];
 
-        // Limpiar el título removiendo información de duración
+        // Buscar duración usando los patrones
+        for (const pattern of durationPatterns) {
+          const match = fileNameWithoutExt.match(pattern);
+          if (match) {
+            const minutes = parseInt(match[1], 10);
+            if (minutes > 0 && minutes <= 120) { // Validar que sea un tiempo razonable
+              duration = `${minutes} min`;
+              break;
+            }
+          }
+        }
+
+        // Si no se encontró duración en el nombre, intentar otras estrategias
+        if (duration === 'N/A') {
+          // Buscar patrones de tiempo más específicos
+          const timeMatch = fileNameWithoutExt.match(/(\d{1,2}):(\d{2})/);
+          if (timeMatch) {
+            const minutes = parseInt(timeMatch[1], 10);
+            const seconds = parseInt(timeMatch[2], 10);
+            if (minutes >= 0 && seconds >= 0 && seconds < 60) {
+              duration = seconds > 0 ? `${minutes}:${seconds.toString().padStart(2, '0')} min` : `${minutes} min`;
+            }
+          }
+        }
+
+        // Limpiar el título removiendo información de duración y otros metadatos
         let title = fileNameWithoutExt
-          .replace(/(\d+)\s*(?:min|minute|minutes|m)/gi, '')
-          .replace(/[_-]/g, ' ')
+          .replace(/(\d+)\s*(?:min|minute|minutes|m)(?:\s|$)/gi, '') // remover duración
+          .replace(/(\d+):\d+/g, '') // remover formato mm:ss
+          .replace(/(\d+)\s*(?:seg|second|seconds|s)(?:\s|$)/gi, '') // remover segundos
+          .replace(/duration[:\s]*\d+\s*(?:min|m)/gi, '') // remover "duration: X min"
+          .replace(/time[:\s]*\d+\s*(?:min|m)/gi, '') // remover "time: X min"
+          .replace(/[_-]/g, ' ') // reemplazar guiones y guiones bajos con espacios
+          .replace(/\s+/g, ' ') // normalizar espacios múltiples
           .trim();
 
         // Capitalizar primera letra de cada palabra

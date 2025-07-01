@@ -108,7 +108,7 @@ export default function Navbar() {
                 ref={searchInputRef}
                 type="search"
                 id="default-search"
-                className="bg-gray-600 block w-full p-4 pl-10 text-sm text-cream border border-gray-600 rounded-[30px] transition-all duration-300 focus:ring-2 focus:ring-gray-500 focus:border-gray-500 outline-none"
+                className="bg-transparent block w-full p-4 pl-10 text-sm text-cream border border-gray-600 rounded-[30px] transition-all duration-300 outline-none placeholder-gray-400 hover:bg-transparent focus:bg-transparent"
                 placeholder="Search routines and meditations..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}

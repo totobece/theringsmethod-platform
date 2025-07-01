@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Play, Clock, Music } from 'lucide-react';
 import Image from 'next/image';
+import { useMediaDuration } from '@/hooks/useMediaDuration';
 
 interface Meditation {
   id: string;
@@ -76,6 +77,60 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     }
   };
 
+  // Componente individual para cada card de meditación
+  const MeditationCard: React.FC<{ meditation: Meditation }> = ({ meditation }) => {
+    const realDuration = useMediaDuration(meditation.url, meditation.type);
+    const displayDuration = realDuration !== 'N/A' ? realDuration : meditation.duration;
+
+    return (
+      <div
+        key={meditation.id}
+        onClick={() => handleMeditationClick(meditation)}
+        className="cursor-pointer group transform hover:scale-105 transition-all duration-300"
+      >
+        <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[280px] mb-5 items-center relative overflow-hidden">
+          {/* Imagen de fondo */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/smaller rectangle.png"
+              alt="Card Background"
+              fill
+              className="object-cover rounded-xl"
+            />
+          </div>
+
+          {/* Overlay con gradiente */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 rounded-xl" />
+
+          {/* Contenido */}
+          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-4">
+            {/* Título centrado y más compacto */}
+            <div className="mb-6">
+              <h3 className="text-white font-bold text-lg leading-tight line-clamp-2">
+                {meditation.title}
+              </h3>
+            </div>
+
+            {/* Botón de play centrado */}
+            <div className="flex justify-center mb-6">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:bg-wine/80 transition-all duration-300">
+                <Play className="w-6 h-6 text-white fill-white" />
+              </div>
+            </div>
+
+            {/* Información en la parte inferior */}
+            <div className="flex items-center justify-center">
+              <div className="flex items-center gap-1 text-gray-200">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm">{displayDuration}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="w-full">
@@ -84,19 +139,21 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
             Meditaciones
           </h2>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {[...Array(8)].map((_, index) => (
             <div key={index} className="relative">
-              <div className="card rounded-xl boxshadow p-[20px] max-w-full min-h-[320px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
+              <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[280px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
                 {/* Simular la estructura de la card real */}
-                <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-4 py-6">
+                <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-4">
                   {/* Título simulado */}
-                  <div className="mb-8 w-full">
-                    <div className="h-6 bg-gray-500 rounded w-3/4 mx-auto mb-2"></div>
+                  <div className="mb-6 w-full">
+                    <div className="h-5 bg-gray-500 rounded w-3/4 mx-auto mb-2"></div>
                     <div className="h-4 bg-gray-500 rounded w-1/2 mx-auto"></div>
                   </div>
                   {/* Botón play simulado */}
-                  <div className="w-16 h-16 bg-gray-500 rounded-full"></div>
+                  <div className="w-12 h-12 bg-gray-500 rounded-full mb-6"></div>
+                  {/* Duración simulada */}
+                  <div className="h-4 bg-gray-500 rounded w-16"></div>
                 </div>
               </div>
             </div>
@@ -156,53 +213,9 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
         </h2>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {displayedMeditations.map((meditation) => (
-          <div
-            key={meditation.id}
-            onClick={() => handleMeditationClick(meditation)}
-            className="cursor-pointer group transform hover:scale-105 transition-all duration-300"
-          >
-            <div className="card rounded-xl boxshadow p-[20px] max-w-full min-h-[320px] mb-5 items-center relative overflow-hidden">
-              {/* Imagen de fondo */}
-              <div className="absolute inset-0 z-0">
-                <Image
-                  src="/images/smaller rectangle.png"
-                  alt="Card Background"
-                  fill
-                  className="object-cover rounded-xl"
-                />
-              </div>
-
-              {/* Overlay con gradiente */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 rounded-xl" />
-
-              {/* Contenido */}
-              <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-4 py-6">
-                {/* Título centrado y más grande */}
-                <div className="mb-8">
-                  <h3 className="text-white font-bold text-xl leading-tight line-clamp-3">
-                    {meditation.title}
-                  </h3>
-                </div>
-
-                {/* Botón de play centrado */}
-                <div className="flex justify-center mb-8">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-4 group-hover:bg-wine/80 transition-all duration-300">
-                    <Play className="w-8 h-8 text-white fill-white" />
-                  </div>
-                </div>
-
-                {/* Información en la parte inferior */}
-                <div className="flex items-center justify-center">
-                  <div className="flex items-center gap-1 text-gray-200">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">{meditation.duration}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MeditationCard key={meditation.id} meditation={meditation} />
         ))}
       </div>
     </div>
