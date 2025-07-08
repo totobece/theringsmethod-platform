@@ -43,14 +43,15 @@ export async function GET() {
         // Intentar extraer duración del nombre con múltiples patrones
         let duration = 'N/A';
         
-        // Patrones para buscar duración (más flexibles)
+        // Patrones para buscar duración (más específicos y ordenados por prioridad)
         const durationPatterns = [
+          /MEDITACION\s+(\d+)(?:\s|$)/i,           // "MEDITACION 1", "MEDITACION 2", etc.
+          /TRM\s+Meditacion\s+(\d+)(?:\s|$)/i,     // "TRM Meditacion 2"
           /(\d+)\s*(?:min|minute|minutes|m)(?:\s|$)/i,  // "5 min", "10min", etc.
-          /(\d+):\d+/,  // "5:30", "10:15" (formato mm:ss)
+          /(\d+):\d+/,                             // "5:30", "10:15" (formato mm:ss)
           /(\d+)\s*(?:seg|second|seconds|s)(?:\s|$)/i,  // "30 seg", "45s", etc.
-          /duration[:\s]*(\d+)\s*(?:min|m)/i,  // "duration: 5 min"
-          /time[:\s]*(\d+)\s*(?:min|m)/i,      // "time: 10 min"
-          /(?:^|\s)(\d+)(?:\s|$)/              // Cualquier número solo
+          /duration[:\s]*(\d+)\s*(?:min|m)/i,      // "duration: 5 min"
+          /time[:\s]*(\d+)\s*(?:min|m)/i,          // "time: 10 min"
         ];
 
         // Buscar duración usando los patrones

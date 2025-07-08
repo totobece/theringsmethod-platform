@@ -27,20 +27,28 @@ export function useMediaDuration(url: string, type: 'video' | 'audio'): string {
           : document.createElement('audio');
 
         mediaElement.preload = 'metadata';
+        mediaElement.crossOrigin = 'anonymous'; // Agregar para evitar problemas de CORS
+        mediaElement.muted = true; // Importante para videos
         
         const loadedPromise = new Promise<void>((resolve, reject) => {
           const timeout = setTimeout(() => {
             reject(new Error('Timeout loading media'));
-          }, 10000); // 10 segundos timeout
+          }, 5000); // Reducir timeout a 5 segundos
 
           mediaElement.onloadedmetadata = () => {
             clearTimeout(timeout);
             resolve();
           };
 
-          mediaElement.onerror = () => {
+          mediaElement.onerror = (e) => {
             clearTimeout(timeout);
+            console.warn('Error loading media metadata:', e);
             reject(new Error('Error loading media'));
+          };
+
+          mediaElement.onabort = () => {
+            clearTimeout(timeout);
+            reject(new Error('Media loading aborted'));
           };
         });
 

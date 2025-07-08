@@ -247,14 +247,18 @@ export async function POST(request: Request) {
         });
       }
 
-      // Desbloquear la siguiente rutina (24 horas después)
+      // Desbloquear la siguiente rutina a medianoche del día siguiente
       const nextDay = routineDay + 1;
       let nextUnlockTime = null;
       
       if (nextDay <= 24) {
+        // Calcular medianoche del día siguiente en UTC
         const unlockTime = new Date(now);
-        unlockTime.setHours(unlockTime.getHours() + 24); // 24 horas después
+        unlockTime.setUTCDate(unlockTime.getUTCDate() + 1); // Día siguiente en UTC
+        unlockTime.setUTCHours(0, 0, 0, 0); // Medianoche UTC (00:00:00.000)
         nextUnlockTime = unlockTime.toISOString();
+        
+        console.log(`🕛 Next routine (Day ${nextDay}) will unlock at midnight UTC: ${nextUnlockTime}`);
 
         // Verificar si ya existe entrada para el siguiente día
         const { data: nextDayProgress } = await supabase

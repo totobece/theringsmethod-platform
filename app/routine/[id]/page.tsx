@@ -154,7 +154,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
               <div className="text-red-600 p-4">Error: {error}</div>
             )}
             {!isLoadingPost && post && (
-              <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[0px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+              <div className="relative w-full min-h-[250px] md:min-h-[300px] flex flex-col md:flex-row p-6 border-[0px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
                 {/* Imagen de fondo */}
                 <div className="absolute inset-0 z-0">
                   <Image
@@ -166,17 +166,17 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                   />
                 </div>
                 {/* Contenido por encima del fondo */}
-                <div className="relative z-10 w-full h-full flex flex-col md:flex-row min-h-[350px] md:min-h-[450px]">
-                  <div className='relative w-[70%] md:pt-0 pt-3 pl-3 md:pl-6 flex flex-col justify-between h-full'>
+                <div className="relative z-10 w-full h-full flex flex-col md:flex-row min-h-[200px] md:min-h-[250px]">
+                  <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6 flex flex-col justify-between h-full'>
                     {/* Duración en la parte superior - sin fondo gris */}
-                    <div className='flex justify-start md:mt-10'>
+                    <div className='flex justify-start md:mt-6'>
                       <blockquote className="text-sm lg:text-base font-light text-white capitalize">
                         {post.duration}
                       </blockquote>
                     </div>
                     
                     {/* Título y día pegados al piso de la card */}
-                    <div className="mb-4 md:mb-6">
+                    <div className="mb-2 md:mb-4">
                       <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left">
                         {post.title}
                       </blockquote>
@@ -186,7 +186,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                     </div>
                   </div>
                   {previewUrl && (
-                    <div className="w-full flex justify-end mr-4 items-center mt-4">
+                    <div className="w-full flex justify-end mr-0 items-start mt-1">
                       <Image
                         src={previewUrl}
                         alt="Preview"

@@ -167,8 +167,22 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
       {/* Reproductor de video */}
       {videoUrl && !isLoading && (
         <div className="max-w-full mx-auto flex justify-center items-center h-full">
-          <video controls autoPlay className=' h-full w-full'   data-testid="video-player">
+          <video 
+            controls 
+            autoPlay 
+            className='h-full w-full'
+            data-testid="video-player"
+            crossOrigin="anonymous"
+            onError={(e) => {
+              console.error('Error loading video:', e);
+              setError('Error al cargar el video. Intenta nuevamente.');
+            }}
+            onAbort={(e) => {
+              console.warn('Video loading aborted:', e);
+            }}
+          >
             <source src={videoUrl} type="video/mp4" />
+            Tu navegador no soporta la reproducción de video.
           </video>
         </div>
       )}

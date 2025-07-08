@@ -1,7 +1,7 @@
 'use client'
 import { login, signup } from './actions'
 import Image from 'next/image'
-import LogoDuo from '@/public/images/the rings method black no bg.png'
+import LogoDuo from '@/public/logo-blanco-trm.png'
 import { useRef, useState } from 'react'
 
 export default function LoginPage() {

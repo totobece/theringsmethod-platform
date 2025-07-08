@@ -167,7 +167,7 @@ const MainPlayRoutine = () => {
             )}
           </div>
         ) : currentRoutine ? (
-          <div key={currentRoutine.id} className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[0px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+          <div key={currentRoutine.id} className="relative w-full min-h-[250px] md:min-h-[300px] flex flex-col md:flex-row p-6 border-[0px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
             {/* Imagen de fondo */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -180,8 +180,8 @@ const MainPlayRoutine = () => {
             </div>
             {/* Contenido por encima del fondo */}
             <div className="relative z-10 w-full h-full flex flex-col md:flex-row">
-            <div className='relative w-[70%] md:pt-0 pt-3 pl-3 md:pl-6'>
-              <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-10'>
+            <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6'>
+              <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-6'>
                 <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-light text-cream text-center mx-auto place-content-center">
                   {currentRoutine.duration}
                 </blockquote>
@@ -210,7 +210,7 @@ const MainPlayRoutine = () => {
               </div>
             </div>
             {imageUrl && (
-              <div className="w-full flex justify-end mr-4 items-center mt-4">
+              <div className="w-full flex justify-end mr-0 items-start mt-1">
                 <Image
                   src={imageUrl}
                   alt="Preview"
@@ -231,7 +231,7 @@ const MainPlayRoutine = () => {
             </div>
           </div>
         ) : (
-          <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden">
+          <div className="relative w-full min-h-[250px] md:min-h-[300px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden">
             {/* Imagen de fondo */}
             <div className="absolute inset-0 z-0">
               <Image
@@ -243,7 +243,7 @@ const MainPlayRoutine = () => {
               />
             </div>
             {/* Contenido por encima del fondo */}
-            <div className="relative z-10 w-full h-full flex flex-col md:flex-row items-center justify-center text-center py-16">
+            <div className="relative z-10 w-full h-full flex flex-col md:flex-row items-center justify-center text-center py-8">
               <div className="text-white">
                 <div className="mb-4">
                   <svg 

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import LogoDuo from '@/public/images/the rings method white no bg.png';
+import LogoDuo from '@/public/logo-blanco-trm.png';
 
 const Sidebar = () => {
   const pathname = usePathname();
@@ -52,10 +52,13 @@ const Sidebar = () => {
           <Image
             src={LogoDuo}
             alt='logo-duo'
+            width={120}
+            height={45}
             style={{ 
-              objectFit: 'cover', 
-              width: '100px', 
-              height: '39px' 
+              objectFit: 'contain',
+              width: 'auto',
+              height: '45px',
+              maxWidth: '120px'
             }} 
           />
         </Link>

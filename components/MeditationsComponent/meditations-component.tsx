@@ -80,7 +80,9 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
   // Componente individual para cada card de meditación
   const MeditationCard: React.FC<{ meditation: Meditation }> = ({ meditation }) => {
     const realDuration = useMediaDuration(meditation.url, meditation.type);
-    const displayDuration = realDuration !== 'N/A' ? realDuration : meditation.duration;
+    // Priorizar la duración extraída del API sobre la duración real si es confiable
+    const displayDuration = meditation.duration !== 'N/A' ? meditation.duration : 
+                           (realDuration !== 'N/A' ? realDuration : meditation.duration);
 
     return (
       <div

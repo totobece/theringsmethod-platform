@@ -75,7 +75,9 @@ export default function MeditationPage() {
 
   useEffect(() => {
     if (meditation && meditation.url) {
-      const audioElement = new Audio(meditation.url);
+      const audioElement = new Audio();
+      audioElement.crossOrigin = 'anonymous'; // Agregar para evitar problemas de CORS
+      audioElement.preload = 'metadata';
       setAudio(audioElement);
 
       audioElement.addEventListener('loadedmetadata', () => {
@@ -90,6 +92,18 @@ export default function MeditationPage() {
         setIsPlaying(false);
       });
 
+      audioElement.addEventListener('error', (e) => {
+        console.error('Audio loading error:', e);
+        setError('Error al cargar el audio de la meditación');
+      });
+
+      audioElement.addEventListener('abort', (e) => {
+        console.warn('Audio loading aborted:', e);
+      });
+
+      // Establecer la fuente después de configurar los event listeners
+      audioElement.src = meditation.url;
+
       return () => {
         audioElement.pause();
         audioElement.remove();
@@ -97,14 +111,21 @@ export default function MeditationPage() {
     }
   }, [meditation]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = async () => {
     if (audio) {
-      if (isPlaying) {
-        audio.pause();
-      } else {
-        audio.play();
+      try {
+        if (isPlaying) {
+          audio.pause();
+          setIsPlaying(false);
+        } else {
+          await audio.play();
+          setIsPlaying(true);
+        }
+      } catch (error) {
+        console.error('Error playing audio:', error);
+        setError('Error al reproducir el audio. Intenta nuevamente.');
+        setIsPlaying(false);
       }
-      setIsPlaying(!isPlaying);
     }
   };
 
