@@ -72,8 +72,7 @@ const getPostById = async (id: string) => {
   return data
 }
 
-export { getAllPosts, getPostsByWeek, getPostById };
-
+// Main GET handler for the API route
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);

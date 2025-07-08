@@ -10,6 +10,8 @@ import Link from 'next/link';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
 import { findPreviewForRoutine, PreviewData } from '@/utils/preview-utils';
+import { useI18n } from '@/contexts/I18nContext';
+import { translateRoutineData } from '@/utils/content-translation';
 
 export interface WeekVideosData {
   id: string;
@@ -30,6 +32,7 @@ export default function WeekVideoSlider() {
   const [width, setWidth] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
+  const { t, locale } = useI18n();
   
   // Hook para acceso a rutinas
   const { maxUnlockedDay, isLoading: isAccessLoading } = useRoutineAccess();
@@ -187,7 +190,7 @@ export default function WeekVideoSlider() {
           {/* Indicador de semana */}
           <div className="mb-4 text-center">
             <h3 className="text-xl text-cream">
-              Semana {currentWeek} - Día {(currentWeek - 1) * 6 + 1} a {currentWeek * 6}
+              {t('dynamicContent.weekLabel')} {currentWeek} - {t('dynamicContent.dayLabel')} {(currentWeek - 1) * 6 + 1} a {currentWeek * 6}
             </h3>
           </div>
           
@@ -244,7 +247,7 @@ export default function WeekVideoSlider() {
                                       <Image
                                         className='rounded-md'
                                         src={preview.url}
-                                        alt={`Preview for ${dataItem.title}`}
+                                        alt={`Preview for ${translateRoutineData(dataItem, locale).title}`}
                                         sizes="100vw"
                                         style={{
                                           width: '100%',
@@ -258,7 +261,7 @@ export default function WeekVideoSlider() {
                                       />
                                     ) : (
                                       <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
-                                        <span className="text-white text-sm">Sin preview</span>
+                                        <span className="text-white text-sm">{t('common.noPreview')}</span>
                                       </div>
                                     );
                                   })()}
@@ -276,11 +279,11 @@ export default function WeekVideoSlider() {
                                   
                                   {/* Texto de bloqueo */}
                                   <div className="text-center">
-                                    <p className="text-sm font-medium mb-1">Bloqueada</p>
+                                    <p className="text-sm font-medium mb-1">{t('routines.locked')}</p>
                                     <p className="text-xs opacity-80">
                                       {daysUntilUnlock === 0 
-                                        ? 'Se desbloquea mañana' 
-                                        : `Se desbloquea en ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
+                                        ? t('routines.unlocksTomorrow')
+                                        : t('routines.unlocksInDays', { count: daysUntilUnlock })
                                       }
                                     </p>
                                   </div>
@@ -291,10 +294,10 @@ export default function WeekVideoSlider() {
                             {/* Título y día en la parte inferior */}
                             <div className='mt-auto text-right'>
                               <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
-                                {dataItem.title}
+                                {translateRoutineData(dataItem, locale).title}
                               </blockquote>
                               <blockquote className={`text-base font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
-                                {dataItem.day}
+                                {translateRoutineData(dataItem, locale).day}
                               </blockquote>
                             </div>
                           </div>

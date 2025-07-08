@@ -4,10 +4,12 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import LogoDuo from '@/public/logo-blanco-trm.png';
+import { useI18n } from '@/contexts/I18nContext';
 
 const Sidebar = () => {
   const pathname = usePathname();
   const [trialBannerHeight, setTrialBannerHeight] = useState(0);
+  const { t } = useI18n();
 
   useEffect(() => {
     // Función para detectar la altura del TrialBanner
@@ -70,14 +72,14 @@ const Sidebar = () => {
         style={{ height: `${trialBannerHeight}px` }}
       ></div>
       
-      <h2 className="text-lg font-medium p-6">Settings</h2>
+      <h2 className="text-lg font-medium p-6">{t('sidebar.settings')}</h2>
       <ul className="flex-1 space-y-0">
         <li > 
           <Link 
             href="/account" 
             className={`block p-6 transition ${pathname === '/account' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
           >
-            Account
+            {t('sidebar.account')}
           </Link>
         </li>
         <li >
@@ -85,7 +87,7 @@ const Sidebar = () => {
             href="/account/billing" 
             className={`block p-6 transition ${pathname === '/account/billing' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
           >
-            Billing & Plans
+            {t('sidebar.billing')}
           </Link>
         </li>
         <li >
@@ -93,7 +95,7 @@ const Sidebar = () => {
             href="/account/terms" 
             className={`block p-6 transition ${pathname === '/account/terms' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
           >
-            Terms & Conditions
+            {t('sidebar.terms')}
           </Link>
         </li>
         <li>
@@ -101,7 +103,7 @@ const Sidebar = () => {
             href="/account/support" 
             className={`block p-6 transition ${pathname === '/account/support' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
           >
-            Support
+            {t('sidebar.support')}
           </Link>
         </li>
       </ul>

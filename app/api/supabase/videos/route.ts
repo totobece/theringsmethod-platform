@@ -92,8 +92,6 @@ const getAllVideos = async (): Promise<WeekVideos[]> => {
   return weekVideos;
 }
 
-export { getAllVideos };
-
 export async function GET() {
   try {
     const weekVideos = await getAllVideos();

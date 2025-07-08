@@ -4,7 +4,9 @@ import Image from 'next/image';
 import LogoDuo from '@/public/logo-blanco-trm.png';
 import { useRouter } from 'next/navigation';
 import  Link  from 'next/link';
-import { usePathname } from 'next/navigation'; 
+import { usePathname } from 'next/navigation';
+import LanguageSelector from '@/components/UI/LanguageSelector/language-selector';
+import { useI18n } from '@/contexts/I18nContext'; 
 
 
 export default function Navbar() {
@@ -13,6 +15,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false); 
   const pathname = usePathname(); 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useI18n();
 
   // Búsqueda en tiempo real
   useEffect(() => {
@@ -97,10 +100,10 @@ export default function Navbar() {
       </div>
       <div className="hidden lg:flex items-center justify-center flex-1">
         <Link href="/" className="text-white hover:text-gray-300 px-4 text-xl">
-          Home
+          {t('navbar.home')}
         </Link>
         <Link href="/explore" className="text-white hover:text-gray-200 px-4 text-xl">
-          Explore
+          {t('navbar.explore')}
         </Link>
       </div>
 
@@ -115,7 +118,7 @@ export default function Navbar() {
                 type="search"
                 id="default-search"
                 className="bg-transparent block w-full p-4 pl-10 text-sm text-cream border border-gray-600 rounded-[30px] transition-all duration-300 outline-none placeholder-gray-400 hover:bg-transparent focus:bg-transparent"
-                placeholder="Search routines and meditations..."
+                placeholder={t('navbar.search')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -148,7 +151,7 @@ export default function Navbar() {
           </button>
 
           {/* Boton usuario */}
-              <div className="relative px-6 mr-6">
+              <div className="relative px-6">
                 <Link href="/account">
                   <svg
                     className="w-9 h-9 text-cream"
@@ -164,6 +167,11 @@ export default function Navbar() {
                     />
                   </svg>
                 </Link>
+              </div>
+
+              {/* Selector de idioma */}
+              <div className="mr-6">
+                <LanguageSelector />
               </div>
                {/* Mobile menu */}
             <div className='position: absolute lg:hidden  right-0  cursor-pointer py-6'>
@@ -182,16 +190,16 @@ export default function Navbar() {
                 >
                   <div className="float-right min-h-full w-[75%] bg-gray-700 px-6 py-12 shadow-2xl">
                     <menu>
-                      <li className='py-6 text-cream text-xl'><Link href="/">Home</Link></li>
-                      <li className='pb-6 text-cream text-xl'><Link href="/explore">Explore</Link></li>
+                      <li className='py-6 text-cream text-xl'><Link href="/">{t('navbar.home')}</Link></li>
+                      <li className='pb-6 text-cream text-xl'><Link href="/explore">{t('navbar.explore')}</Link></li>
                       <li className='border-b border-gray-600'></li>
-                      <h1 className='text-xl  text-white py-4'> Settings</h1>
+                      <h1 className='text-xl  text-white py-4'>{t('sidebar.settings')}</h1>
                       <li > 
                   <Link 
                     href="/account" 
                     className={`block p-4 transition text-white ${pathname === '/account' ? 'bg-gray-600' : ''}`}
                   >
-                    Account
+                    {t('sidebar.account')}
                   </Link>
                 </li>
                 <li >
@@ -199,7 +207,7 @@ export default function Navbar() {
                     href="/account/billing" 
                     className={`block p-4 transition text-white ${pathname === '/account/billing' ? 'bg-gray-600' : ''}`}
                   >
-                    Billing & Plans
+                    {t('sidebar.billing')}
                   </Link>
                 </li>
                 <li >
@@ -207,7 +215,7 @@ export default function Navbar() {
                     href="/account/terms" 
                     className={`block p-4 transition text-white ${pathname === '/account/terms' ? 'bg-gray-600' : ''}`}
                   >
-                    Terms & Conditions
+                    {t('sidebar.terms')}
                   </Link>
                 </li>
                 <li>
@@ -215,7 +223,7 @@ export default function Navbar() {
                     href="/account/support" 
                     className={`block p-4 transition text-white ${pathname === '/account/support' ? 'bg-gray-600' : ''}`}
                   >
-                    Support
+                    {t('sidebar.support')}
                   </Link>
                 </li>
                       

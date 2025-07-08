@@ -1,12 +1,14 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { useI18n } from '@/contexts/I18nContext'
 
 interface TrialBannerProps {
   daysRemaining?: number
 }
 
 export default function TrialBanner({ daysRemaining }: TrialBannerProps) {
+  const { t } = useI18n();
   const [days, setDays] = useState<number | null>(null)
   const [isVisible, setIsVisible] = useState(true)
   const supabase = createClient()
@@ -59,17 +61,17 @@ export default function TrialBanner({ daysRemaining }: TrialBannerProps) {
         <div className="flex-1 text-center">
           <span className="font-medium">
             {days === 0 ? (
-              'Your trial expires today!'
+              t('trial.expiresToday')
             ) : days === 1 ? (
-              'Your trial expires tomorrow!'
+              t('trial.expiresTomorrow')
             ) : (
-              `Your trial expires in ${days} days`
+              t('trial.expiresIn', { days })
             )}
           </span>
           {days > 0 && (
             <span className="ml-2">
               <a href="/account/support" className="underline hover:no-underline">
-                Contact us to extend
+                {t('trial.contactToExtend')}
               </a>
             </span>
           )}

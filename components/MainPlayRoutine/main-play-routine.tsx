@@ -7,6 +7,8 @@ import { usePathname } from 'next/navigation';
 import MainPlayRoutineSkeleton from '../Skeletons/MainPlayRoutineSkeleton';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
+import { useI18n } from '@/contexts/I18nContext';
+import { translateRoutineData } from '@/utils/content-translation';
 
 interface RoutineData {
   id: string;
@@ -25,6 +27,7 @@ const MainPlayRoutine = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+  const { t, locale } = useI18n();
   
   // Hook para acceso a rutinas globales
   const { maxUnlockedDay, isLoading: isAccessLoading } = useRoutineAccess();
@@ -183,14 +186,14 @@ const MainPlayRoutine = () => {
             <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6'>
               <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-6'>
                 <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-light text-cream text-center mx-auto place-content-center">
-                  {currentRoutine.duration}
+                  {translateRoutineData(currentRoutine, locale).duration}
                 </blockquote>
               </div>
               <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left mx-auto pt-4 md:mt-4">
-                {currentRoutine.title}
+                {translateRoutineData(currentRoutine, locale).title}
               </blockquote>
               <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mx-auto py-4 ">
-                {currentRoutine.day}
+                {translateRoutineData(currentRoutine, locale).day}
               </blockquote>
               <div className='relative h-[95%] md:h-[30%] lg:h-[60%] place-content-center'>
                 {!isRoutinePage && (
@@ -199,7 +202,7 @@ const MainPlayRoutine = () => {
                       <button
                         className="bg-wine my-4 md:my-8re absolute bottom-0 start-0 flex justify-center items-center rounded-[20px] h-10 w-[150px] md:w-[200px] group text-xl transform transition duration-500 hover:scale-105"
                       >
-                        <span className='text-white text-base md:text-lg'>Start Routine</span>
+                        <span className='text-white text-base md:text-lg'>{t('common.startRoutine')}</span>
                         <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M0 0V16L13 8L0 0Z" fill="white" />
                         </svg>
@@ -254,11 +257,11 @@ const MainPlayRoutine = () => {
                     <path d="M18,8H17V6A5,5 0 0,0 12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8M12,3A3,3 0 0,1 15,6V8H9V6A3,3 0 0,1 12,3M18,20H6V10H18V20Z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-normal mb-2">No hay rutinas desbloqueadas</h3>
+                <h3 className="text-2xl md:text-3xl font-normal mb-2">{t('routines.noRoutinesUnlocked')}</h3>
                 <p className="text-lg opacity-80">
                   {maxUnlockedDay 
-                    ? `Las nuevas rutinas se desbloquean completando las anteriores. Próxima rutina: Day ${maxUnlockedDay + 1}`
-                    : 'Cargando información de progreso...'
+                    ? t('routines.unlockMessage', { day: maxUnlockedDay + 1 })
+                    : t('routines.loadingProgress')
                   }
                 </p>
               </div>

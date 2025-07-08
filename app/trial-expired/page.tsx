@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import Navbar from '@/components/UI/Navbar/navbar'
 import Footer from '@/components/UI/Footer/footer'
+import { useI18n } from '@/contexts/I18nContext'
 
 export default function TrialExpiredPage() {
+  const { t } = useI18n();
   const [userEmail, setUserEmail] = useState<string>('')
   const supabase = createClient()
 
@@ -31,19 +33,19 @@ export default function TrialExpiredPage() {
         <div className="max-w-2xl mx-auto text-center space-y-8 bg-white p-8 rounded-2xl shadow-lg">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold text-gray-800">
-              Your 90-Day Trial Has Expired
+              {t('trialExpired.title')}
             </h1>
             <p className="text-xl text-gray-600">
-              Thank you for using The Rings Method Platform!
+              {t('trialExpired.thankYou')}
             </p>
           </div>
 
           <div className="space-y-4 text-gray-700">
             <p className="text-lg">
-              Your 90-day trial period has ended for account: <strong>{userEmail}</strong>
+              {t('trialExpired.trialEndedFor')} <strong>{userEmail}</strong>
             </p>
             <p>
-              To continue accessing our premium content and features, please contact our support team or upgrade your account.
+              {t('trialExpired.contactSupport')}
             </p>
           </div>
 
@@ -53,13 +55,13 @@ export default function TrialExpiredPage() {
                 href="/account/support" 
                 className="bg-gray-600 text-white px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-700 transition"
               >
-                Contact Support
+                {t('trialExpired.contactUs')}
               </a>
               <button 
                 onClick={handleSignOut}
                 className="border border-gray-600 text-gray-600 px-8 py-3 rounded-full text-lg font-medium hover:bg-gray-50 transition"
               >
-                Sign Out
+                {t('auth.signOut')}
               </button>
             </div>
           </div>

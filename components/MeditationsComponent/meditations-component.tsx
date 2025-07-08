@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Play, Clock, Music } from 'lucide-react';
 import Image from 'next/image';
 import { useMediaDuration } from '@/hooks/useMediaDuration';
+import { useI18n } from '@/contexts/I18nContext';
+import { filterMeditationsByLanguage } from '@/utils/content-translation';
 
 interface Meditation {
   id: string;
@@ -32,14 +34,39 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { t, locale } = useI18n();
 
   useEffect(() => {
-    fetchMeditations();
-  }, []);
+    const fetchMeditations = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('/api/supabase/meditations');
+        
+        if (!response.ok) {
+          throw new Error('Error fetching meditations');
+        }
 
-  const fetchMeditations = async () => {
+        const data = await response.json();
+        const allMeditations = data.meditations || [];
+        
+        // Filtrar meditaciones por idioma
+        const languageFilteredMeditations = filterMeditationsByLanguage(allMeditations, locale);
+        setMeditations(languageFilteredMeditations);
+      } catch (err) {
+        console.error('Error fetching meditations:', err);
+        setError('Error loading meditations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMeditations();
+  }, [locale]); // Re-ejecutar cuando cambie el idioma
+
+  const handleRetry = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       const response = await fetch('/api/supabase/meditations');
       
       if (!response.ok) {
@@ -47,7 +74,11 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       }
 
       const data = await response.json();
-      setMeditations(data.meditations || []);
+      const allMeditations = data.meditations || [];
+      
+      // Filtrar meditaciones por idioma
+      const languageFilteredMeditations = filterMeditationsByLanguage(allMeditations, locale);
+      setMeditations(languageFilteredMeditations);
     } catch (err) {
       console.error('Error fetching meditations:', err);
       setError('Error loading meditations');
@@ -60,6 +91,7 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
   const filteredMeditations = meditations.filter(meditation => {
     const matchesSearch = meditation.title.toLowerCase().includes(searchTerm.toLowerCase());
     const notExcluded = !excludeId || meditation.id !== excludeId;
+    
     return matchesSearch && notExcluded;
   });
 
@@ -138,7 +170,7 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       <div className="w-full">
         {showTitle && (
           <h2 className="text-2xl font-bold text-white mb-6">
-            Meditaciones
+            {t('meditations.title')}
           </h2>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -170,13 +202,13 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       <div className="w-full">
         {showTitle && (
           <h2 className="text-2xl font-bold text-white mb-6">
-            Meditaciones
+            {t('meditations.title')}
           </h2>
         )}
         <div className="text-center text-red-400 py-8">
           <p>{error}</p>
           <button 
-            onClick={fetchMeditations}
+            onClick={handleRetry}
             className="mt-4 px-4 py-2 bg-wine hover:bg-red-700 rounded-lg transition-colors"
           >
             Reintentar
@@ -191,15 +223,15 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       <div className="w-full">
         {showTitle && (
           <h2 className="text-2xl font-bold text-white mb-6">
-            Meditaciones
+            {t('meditations.title')}
           </h2>
         )}
         <div className="text-center text-gray-400 py-8">
           <Music className="w-16 h-16 mx-auto mb-4 text-gray-600" />
           <p>
             {searchTerm ? 
-              `No se encontraron meditaciones que coincidan con "${searchTerm}"` : 
-              'No hay meditaciones disponibles'
+              t('meditations.noResultsFound', { searchTerm }) : 
+              t('meditations.noMeditations')
             }
           </p>
         </div>
@@ -211,7 +243,7 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     <div className="w-full">
       {showTitle && (
         <h2 className="text-2xl font-bold text-white mb-6">
-          Meditaciones
+          {t('meditations.title')}
         </h2>
       )}
       

@@ -17,14 +17,24 @@ interface Meditation {
 }
 
 // Componente para la página individual de meditación
-export default function MeditationPlayer({ params: { id } }: { params: { id: string } }) {
+export default function MeditationPlayer({ params }: { params: Promise<{ id: string }> }) {
   const [meditation, setMeditation] = useState<Meditation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showPlayPrompt, setShowPlayPrompt] = useState(false);
+  const [id, setId] = useState<string | null>(null);
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Resolver params asíncrono
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
 
   // Obtener la duración real del archivo multimedia
   const realDuration = useMediaDuration(
@@ -87,6 +97,8 @@ export default function MeditationPlayer({ params: { id } }: { params: { id: str
 
   useEffect(() => {
     const fetchMeditation = async () => {
+      if (!id) return; // Early return si no hay id
+      
       try {
         setIsLoading(true);
         setError(null);
@@ -121,9 +133,7 @@ export default function MeditationPlayer({ params: { id } }: { params: { id: str
       }
     };
 
-    if (id) {
-      fetchMeditation();
-    }
+    fetchMeditation();
   }, [id]);
 
   if (isLoading) {

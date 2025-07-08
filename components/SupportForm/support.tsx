@@ -4,8 +4,10 @@ import React from 'react';
 import { useForm, ValidationError } from '@formspree/react';
 import Footer from '@/components/UI/Footer/footer';
 import Navbar from '@/components/UI/Navbar/navbar';
+import { useI18n } from '@/contexts/I18nContext';
 
 function ContactForm() {
+  const { t } = useI18n();
   const [state, handleSubmit] = useForm("myyqlkdn");
 
   if (state.succeeded) {
@@ -14,7 +16,7 @@ function ContactForm() {
       <Navbar />
       <div className="px-8 py-40 bg-gray-700 flex items-center justify-center h-full">
         <p className="text-4xl text-center font-semibold text-white">
-        Ticket submitted! <br />Our team will contact you soon.
+        {t('support.ticketSubmitted')} <br />{t('support.teamWillContact')}
         </p>
       </div>
       <Footer/>
@@ -32,12 +34,12 @@ function ContactForm() {
         
       </div>
           <h1 className="text-gray-600 text-4xl lg:text-6xl">
-            Contact with Support
+            {t('support.contactWithSupport')}
           </h1>
           <form className="mt-6 text-left p-4 lg:p-6" onSubmit={handleSubmit}>
             <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-medium">*Full Name</span>
+                      <span className="text-gray-600 text-xl font-medium">{t('support.fullName')}</span>
                       <input
                         type="text"
                         name="name"
@@ -64,7 +66,7 @@ function ContactForm() {
                   </div>
                   <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-medium" >*Email</span>
+                      <span className="text-gray-600 text-xl font-medium" >{t('support.email')}</span>
                       <input
                         name="email"
                         type="email"
@@ -92,7 +94,7 @@ function ContactForm() {
                   </div>
                   <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-medium" >*Phone number</span>
+                      <span className="text-gray-600 text-xl font-medium" >{t('support.phoneNumber')}</span>
                       <input
                         name="Numero"
                         type="text"
@@ -120,7 +122,7 @@ function ContactForm() {
                   </div>
                     <div className="mb-2 ">
                       <label>
-                        <span className="text-gray-600 text-xl font-medium " >Your message</span>
+                        <span className="text-gray-600 text-xl font-medium " >{t('support.yourMessage')}</span>
                         <textarea
                           name="message"
                 
@@ -154,7 +156,7 @@ function ContactForm() {
                 type='submit'
                 disabled={state.submitting}
                 >
-                  Send
+                  {t('support.send')}
                 </button>
                 
               

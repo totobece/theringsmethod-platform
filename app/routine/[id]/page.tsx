@@ -10,6 +10,8 @@ import PostDetailsSkeleton from '@/components/Skeletons/PostDetailsSkeleton';
 import MainPlayRoutineSkeleton from '@/components/Skeletons/MainPlayRoutineSkeleton';
 import { useSpecificRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
+import { useI18n } from '@/contexts/I18nContext';
+import { translateRoutineData } from '@/utils/content-translation';
 
 export interface WeekVideosData {
   id: string;
@@ -24,7 +26,7 @@ export interface WeekVideosData {
   episode: string;
 }
 
-export default function Post({ params: { id } }: { params: { id: string } }) {
+export default function Post({ params }: { params: Promise<{ id: string }> }) {
   const [post, setPost] = useState<WeekVideosData | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
@@ -34,9 +36,20 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
   const [isExerciseOpen, setIsExerciseOpen] = useState(false);
   const [isProTipOpen, setIsProTipOpen] = useState(false);
   const [routineDay, setRoutineDay] = useState<number>(1);
+  const [id, setId] = useState<string | null>(null);
   const router = useRouter();
+  const { t, locale } = useI18n();
   
   const { hasAccess, isLoading: isAccessLoading } = useSpecificRoutineAccess(routineDay);
+
+  // Resolver params asíncrono
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
 
   // Debug en la consola del navegador cuando se renderiza el componente
   console.log(`🔍 /routine/[${id}] Component render state:`, {
@@ -60,6 +73,8 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return; // Early return si no hay id
+      
       setIsLoadingPost(true);
       setError(null);
       try {
@@ -171,17 +186,17 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                     {/* Duración en la parte superior - sin fondo gris */}
                     <div className='flex justify-start md:mt-6'>
                       <blockquote className="text-sm lg:text-base font-light text-white capitalize">
-                        {post.duration}
+                        {translateRoutineData(post, locale).duration}
                       </blockquote>
                     </div>
                     
                     {/* Título y día pegados al piso de la card */}
                     <div className="mb-2 md:mb-4">
                       <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left">
-                        {post.title}
+                        {translateRoutineData(post, locale).title}
                       </blockquote>
                       <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mt-2">
-                        {post.day}
+                        {translateRoutineData(post, locale).day}
                       </blockquote>
                     </div>
                   </div>
@@ -227,7 +242,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                           <button
                             className="bg-wine flex justify-center items-center rounded-[20px] h-12 w-[180px] md:w-[220px] group text-xl transform transition duration-500 hover:scale-105"
                           >
-                            <span className='text-white text-base md:text-lg'>Start Routine</span>
+                            <span className='text-white text-base md:text-lg'>{t('common.startRoutine')}</span>
                             <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <path d="M0 0V16L13 8L0 0Z" fill="white" />
                             </svg>
@@ -240,9 +255,9 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                         
                         {/* Areas You'll Improve */}
                         <div className="space-y-4">
-                          <h2 className="text-white text-xl font-semibold">Areas You&apos;ll Improve</h2>
+                          <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.areasImprove')}</h2>
                           <div className="text-white text-base font-light leading-relaxed">
-                            {post['areas-improve']?.split('\n').map((line, index) => (
+                            {translateRoutineData(post, locale)['areas-improve']?.split('\n').map((line, index) => (
                               <div key={index} className="mb-2">{line}</div>
                             ))}
                           </div>
@@ -250,9 +265,9 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
 
                         {/* Rings Height */}
                         <div className="space-y-4">
-                          <h2 className="text-white text-xl font-semibold">Rings Height</h2>
+                          <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.ringsHeight')}</h2>
                           <div className="text-white text-base font-light leading-relaxed">
-                            {post['rings-placement']?.split('\n').map((line, index) => (
+                            {translateRoutineData(post, locale)['rings-placement']?.split('\n').map((line, index) => (
                               <div key={index} className="mb-2">{line}</div>
                             ))}
                           </div>
@@ -261,7 +276,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                         {/* Exercise (Toggle desplegable) */}
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
-                            <h2 className="text-white text-xl font-semibold">Exercises</h2>
+                            <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.exercise')}</h2>
                             <button 
                               onClick={() => setIsExerciseOpen(!isExerciseOpen)}
                               className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -278,7 +293,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                           </div>
                           <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExerciseOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                             <div className="text-white text-base font-light leading-relaxed pt-2">
-                              {post.exercise?.split('\n').map((line, index) => (
+                              {translateRoutineData(post, locale).exercise?.split('\n').map((line, index) => (
                                 <div key={index} className="mb-2">{line}</div>
                               ))}
                             </div>
@@ -288,7 +303,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                         {/* Pro Tip (Toggle desplegable) */}
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
-                            <h2 className="text-white text-xl font-semibold">Pro Tip</h2>
+                            <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.proTip')}</h2>
                             <button 
                               onClick={() => setIsProTipOpen(!isProTipOpen)}
                               className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
@@ -305,7 +320,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                           </div>
                           <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isProTipOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
                             <div className="text-white text-base font-light leading-relaxed pt-2">
-                              {post.pro_tip?.split('\n').map((line, index) => (
+                              {translateRoutineData(post, locale).pro_tip?.split('\n').map((line, index) => (
                                 <div key={index} className="mb-2">{line}</div>
                               ))}
                             </div>
@@ -326,7 +341,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
           <div className="w-full max-w-4xl mx-auto px-4 md:px-16 mb-12 md:mb-16">
             <div className="text-center mb-8">
               <h2 className='text-white text-pretty font-medium text-2xl md:text-4xl'>
-                Do it Indoor
+                {t('dynamicContent.doItIndoor')}
               </h2>
             </div>
             <div className="flex justify-center">
@@ -358,7 +373,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
                       >
                         <path d="M8 5v14l11-7z"/>
                       </svg>
-                      <p className="text-lg opacity-80">Demo disponible próximamente</p>
+                      <p className="text-lg opacity-80">{t('dynamicContent.demoAvailable')}</p>
                     </div>
                   </div>
                 </div>
@@ -367,7 +382,7 @@ export default function Post({ params: { id } }: { params: { id: string } }) {
           </div>
         )}
         
-        <h1 className='text-white mt-12 md:mt-20 text-pretty text-center px-12 lg:px-20 font-medium text-3xl md:text-5xl'>Discover more routines to try!</h1>
+        <h1 className='text-white mt-12 md:mt-20 text-pretty text-center px-12 lg:px-20 font-medium text-3xl md:text-5xl'>{t('dynamicContent.moreRoutines')}</h1>
 </div>
 <MoreVideos/>
 <Footer/>

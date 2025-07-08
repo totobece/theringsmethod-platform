@@ -25,15 +25,25 @@ interface Video {
 
 
 // Definición del componente VideoPlayer que recibe un parámetro id de tipo string
-export default function VideoPlayer({ params: { id } }: { params: { id: string } }) {
+export default function VideoPlayer({ params }: { params: Promise<{ id: string }> }) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null); // Estado para almacenar la URL del video
   const [post, setPost] = useState<ExploreVideosData | null>(null); // Estado para almacenar la rutina
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [routineDay, setRoutineDay] = useState<number>(1);
+  const [id, setId] = useState<string | null>(null);
   const router = useRouter();
   
   const { hasAccess, isLoading: isAccessLoading, markAsCompleted, isCompleted } = useSpecificRoutineAccess(routineDay);
+
+  // Resolver params asíncrono
+  useEffect(() => {
+    const resolveParams = async () => {
+      const resolvedParams = await params;
+      setId(resolvedParams.id);
+    };
+    resolveParams();
+  }, [params]);
 
   // Estado para manejar la completación
   const [isCompleting, setIsCompleting] = useState(false);
@@ -66,6 +76,8 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
 
   useEffect(() => {
     async function fetchVideoAndPost() {
+      if (!id) return; // Early return si no hay id
+      
       try {
         setIsLoading(true);
         
@@ -243,7 +255,7 @@ export default function VideoPlayer({ params: { id } }: { params: { id: string }
       
 
       </div>
-      <MoreVideos params={{ id }} />
+      <MoreVideos params={{ id: id || '' }} />
       <Footer/>
     </section>
   );

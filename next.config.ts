@@ -6,7 +6,7 @@ const nextConfig = {
       // puedes agregar otros dominios aquí si los necesitas
     ],
   },
-  // ...otras configuraciones
+  // i18n se maneja manualmente en App Router usando contexto React
 };
 
 module.exports = nextConfig;

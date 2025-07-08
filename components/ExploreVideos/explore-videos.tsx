@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
 import { findPreviewForRoutine, PreviewData } from '@/utils/preview-utils';
+import { useI18n } from '@/contexts/I18nContext';
+import { translateRoutineData } from '@/utils/content-translation';
 
 export interface ExploreVideosData {
   id: string;
@@ -30,6 +32,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize: number = 8;
   const searchParams = useSearchParams();
+  const { t, locale } = useI18n();
   
   // Usar searchTerm del prop o del searchParams
   const searchTerm = propSearchTerm ?? (searchParams.get('search') || ''); 
@@ -131,7 +134,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                         <Image
                           className='rounded-md'
                           src={preview.url}
-                          alt={`Preview for ${dataItem.title}`}
+                          alt={`Preview for ${translateRoutineData(dataItem, locale).title}`}
                           sizes="100vw"
                           style={{
                             width: '100%',
@@ -162,11 +165,11 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                       
                       {/* Texto de bloqueo */}
                       <div className="text-center">
-                        <p className="text-sm font-medium mb-1">Bloqueada</p>
+                        <p className="text-sm font-medium mb-1">{t('routines.locked')}</p>
                         <p className="text-xs opacity-80">
                           {daysUntilUnlock === 0 
-                            ? 'Se desbloquea mañana' 
-                            : `Se desbloquea en ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
+                            ? t('routines.unlocksTomorrow')
+                            : t('routines.unlocksInDays', { count: daysUntilUnlock })
                           }
                         </p>
                       </div>
@@ -177,10 +180,10 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                 {/* Título y día en la parte inferior */}
                 <div className={`mt-auto ${!isUnlocked ? 'text-center' : 'text-right'}`}>
                   <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
-                    {dataItem.title}
+                    {translateRoutineData(dataItem, locale).title}
                   </blockquote>
                   <blockquote className={`text-base font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
-                    {dataItem.day}
+                    {translateRoutineData(dataItem, locale).day}
                   </blockquote>
                 </div>
               </div>

@@ -1,16 +1,16 @@
 'use client'
 import { createClient } from '@/utils/supabase/client'
 import { useState } from 'react';
-import { redirect } from 'next/navigation';
 import Navbar from '@/components/UI/Navbar/navbar';
 import Footer from '@/components/UI/Footer/footer';
 import { useRouter } from 'next/navigation';
+import { useI18n } from '@/contexts/I18nContext';
 
 export default function Reset () {
+    const { t } = useI18n();
     const supabase = createClient()
 
     const [error, setError] = useState<string | null>(null);
-    const [successEmail, setSuccessEmail] = useState<boolean>(false);
     const [successPassword, setSuccessPassword] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const router = useRouter()
@@ -26,13 +26,11 @@ export default function Reset () {
 
     const confirmPasswords = async () => {
         const {password, confirmPassword} = data;
-        if (password !== confirmPassword) setError('The passwords are incorrect');
+        if (password !== confirmPassword) setError(t('auth.errorPasswordsNotMatch'));
 
         const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{6,}$/;
     if (!passwordRegex.test(password)) {
-      setError(
-        "Password must be at least 6 characters, contain at least one uppercase letter, and at least one digit."
-      );
+      setError(t('auth.errorPasswordRequirements'));
       return;
     }
 
@@ -52,13 +50,13 @@ export default function Reset () {
         }
         if (error) {
             console.log(error);
-            setError('An error ocurred during reset your password, please try in a few seconds')
+            setError(t('auth.errorOccurredReset'))
         }
     }
 
-    const handleChange = (e: any) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;
-        setData((prev: any) => ({
+        setData((prev) => ({
             ...prev,
             [name]: value,
         }));
@@ -70,16 +68,16 @@ export default function Reset () {
 
       <div className="w-full max-w-3xl m-auto px-2 pt-4 pb-12">
 
-      <div className="w-full space-y-8 p-8  rounded-2xl bg-cream border-2 border-gray-600 border  ">
+      <div className="w-full space-y-8 p-8 rounded-2xl bg-cream border-2 border-gray-600">
 
       <h1 className="text-black text-center w-full font-medium text-3xl lg:text-5xl ">
-        Reset your password
+        {t('auth.resetPassword')}
           </h1>
 
       <form className='flex flex-col' >
         {error && <div className="text-red-500">{error}</div>}
         <div className='flex flex-col'>
-          <label htmlFor="email">Enter your new password</label>
+          <label htmlFor="email">{t('auth.enterNewPassword')}</label>
           <input onChange={handleChange} value={data?.password} name="password" type={showPassword ? 'text' : 'password'} required className='
                     block
                     w-full
@@ -97,7 +95,7 @@ export default function Reset () {
                     focus:ring-white'/>
         </div>
         <div className='flex flex-col'>
-          <label htmlFor="password">Confirm your new password</label>
+          <label htmlFor="password">{t('auth.confirmPassword')}</label>
           <input onChange={handleChange} value={data?.confirmPassword} name="confirmPassword" type={showPassword ? 'text' : 'password'} required 
           className=' block
                     w-full
@@ -117,12 +115,11 @@ export default function Reset () {
       </form>
     
         <div className='cursor-pointer hover:underline items-start' onClick={() => setShowPassword(!showPassword)}>
-          <p className='text-sm ' >Show password</p>
+          <p className='text-sm'>{showPassword ? t('auth.hidePassword') : t('auth.showPassword')}</p>
         </div>
-        {successEmail && <div className='bg-green-100 text-green-600 mx-8 px-4'>Success! Check your email</div> }
-        {successPassword && <div className='bg-green-100 text-green-600 mx-8 px-4 h-[100px]  items-center flex mt-5 rounded-xl justify-center text-xl'>Success! Your password has been changed</div>}
+        {successPassword && <div className='bg-green-100 text-green-600 mx-8 px-4 h-[100px]  items-center flex mt-5 rounded-xl justify-center text-xl'>{t('auth.successPasswordChanged')}</div>}
         <div className='w-full items-center justify-center flex'>
-        <button onClick={confirmPasswords} className='relative w-[300px] bg-gray-600 transition px-6 text-xl inline-flex h-12  animate-shimmer items-center justify-center rounded-[40px] font-medium text-white'>Confirm</button>
+        <button onClick={confirmPasswords} className='relative w-[300px] bg-gray-600 transition px-6 text-xl inline-flex h-12  animate-shimmer items-center justify-center rounded-[40px] font-medium text-white'>{t('auth.confirm')}</button>
         </div>      
       </div>
       </div>

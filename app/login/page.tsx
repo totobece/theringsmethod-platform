@@ -3,6 +3,8 @@ import { login, signup } from './actions'
 import Image from 'next/image'
 import LogoDuo from '@/public/logo-blanco-trm.png'
 import { useRef, useState } from 'react'
+import { useI18n } from '@/contexts/I18nContext'
+import LanguageSelector from '@/components/UI/LanguageSelector/language-selector'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -10,15 +12,12 @@ export default function LoginPage() {
   const [acceptsTerms, setAcceptsTerms] = useState(false)
   const [acceptsPrivacy, setAcceptsPrivacy] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
+  const { t } = useI18n()
 
   const handleCheckboxChange = (setter: (v: boolean) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setter(e.target.checked)
   }
 
-  const handleSignupButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    setIsModalOpen(true)
-  }
   const closeModal = () => setIsModalOpen(false)
 
   // Envía el formulario con la acción de signup
@@ -46,11 +45,21 @@ export default function LoginPage() {
 
   return (
     <section className="bg-cream min-h-screen w-full flex animate-slidein full-height">
+      {/* Language Selector - positioned absolutely in top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSelector />
+      </div>
+      
       <div className={`w-full max-w-xl m-auto px-2 pt-6 pb-12 ${isModalOpen ? 'blur-md' : ''}`}>
         <div className="w-full space-y-10 p-8 rounded-2xl bg-cream border-2 border-gray-600 ">
           <div>
             <h1 className="text-black w/full font-medium text-3xl lg:text-5xl">
-              Welcome to <br /> the Rings Method!
+              {t('auth.welcomeTitle').split('\\n').map((line, index) => (
+                <span key={index}>
+                  {line}
+                  {index === 0 && <br />}
+                </span>
+              ))}
             </h1>
           </div>
           <form
@@ -59,7 +68,7 @@ export default function LoginPage() {
             ref={formRef}
           >
             <div className="flex flex-col">
-              <label className="text-gray-600 text-xl font-medium" htmlFor="email">Email:</label>
+              <label className="text-gray-600 text-xl font-medium" htmlFor="email">{t('auth.email')}:</label>
               <input
                 id="email"
                 name="email"
@@ -69,7 +78,7 @@ export default function LoginPage() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="text-gray-600 text-xl font-medium" htmlFor="password">Password:</label>
+              <label className="text-gray-600 text-xl font-medium" htmlFor="password">{t('auth.password')}:</label>
               <input
                 id="password"
                 name="password"
@@ -79,22 +88,16 @@ export default function LoginPage() {
               />
             </div>
             <div className="cursor-pointer hover:underline py-6 flex justify-center" onClick={() => setShowPassword(!showPassword)}>
-              <p className="text-md text-black">{showPassword ? 'Hide password' : 'Show password'}</p>
+              <p className="text-md text-black">{showPassword ? t('auth.hidePassword') : t('auth.showPassword')}</p>
             </div>
             <div className="justify-center flex w/full space-x-4 px-4">
               <button
                 formAction={login}
                 className="relative bg-gray-600 transition px-6 text-xl inline-flex h-12 animate-shimmer items-center justify-center rounded-[40px] font-medium text-white"
               >
-                Log in
+                {t('auth.login')}
               </button>
-              <button
-                type="button"
-                onClick={handleSignupButtonClick}
-                className="relative bg-gray-600 transition px-6 text-xl inline-flex h-12 animate-shimmer items-center justify-center rounded-[40px] font-medium text-white"
-              >
-                Sign up
-              </button>
+             
             </div>
           </form>
           <div className="flex justify-between">
@@ -116,7 +119,7 @@ export default function LoginPage() {
             <button className="absolute top-4 right-0 p-2 text-3xl" onClick={closeModal}>
               &times;
             </button>
-            <h2 className="text-2xl font-bold mb-14">Terms and Conditions</h2>
+            <h2 className="text-2xl font-bold mb-14">{t('auth.termsAndConditions')}</h2>
             <div className="flex flex-col space-y-4">
               <label className="flex items-center">
                 <input
@@ -125,7 +128,7 @@ export default function LoginPage() {
                   onChange={handleCheckboxChange(setAcceptsTerms)}
                   className="mr-2"
                 />
-                Accept <a href='/account/terms' className='px-1 hover:underline'>Terms and Conditions</a>
+                {t('auth.acceptTerms')} <a href='/account/terms' className='px-1 hover:underline'>{t('auth.termsAndConditions')}</a>
               </label>
               <label className="flex items-center">
                 <input
@@ -134,7 +137,7 @@ export default function LoginPage() {
                   onChange={handleCheckboxChange(setAcceptsPrivacy)}
                   className="mr-2"
                 />
-                Accept <a href="/privacypolicie" className='hover:underline px-1'>Privacy Policy</a>
+                {t('auth.acceptTerms')} <a href="/privacypolicie" className='hover:underline px-1'>{t('auth.privacyPolicy')}</a>
               </label>
             </div>
             <div className="absolute inset-x-28 bottom-4">
@@ -144,7 +147,7 @@ export default function LoginPage() {
                 className="relative bg-gray-600 transition px-6 text-xl inline-flex h-12 animate-shimmer items-center justify-center rounded-[40px] font-medium text-white"
                 disabled={!(acceptsTerms && acceptsPrivacy)}
               >
-                Sign up
+                {t('auth.signUp')}
               </button>
             </div>
           </div>
