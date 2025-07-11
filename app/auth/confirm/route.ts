@@ -2,6 +2,7 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@/utils/supabase/server'
+import { createRedirectUrl, getBaseUrl } from '@/utils/url-helpers'
 
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request: NextRequest) {
@@ -15,11 +16,11 @@ export async function GET(request: NextRequest) {
     console.log('Token hash present:', !!token_hash);
     console.log('Type:', type);
     
-    // Usar la URL base actual del request para construir la redirección
-    const redirectTo = request.nextUrl.clone()
-    redirectTo.pathname = '/create-password'
-    redirectTo.search = ''
+    // Obtener la URL base y construir redirección
+    const baseUrl = getBaseUrl(request);
+    const redirectTo = createRedirectUrl(request, '/create-password');
     
+    console.log('Base URL determined:', baseUrl);
     console.log('Redirect URL will be:', redirectTo.toString());
 
     if (token_hash && type) {
@@ -34,25 +35,23 @@ export async function GET(request: NextRequest) {
       
       if (!error) {
         console.log('OTP verification successful, redirecting to create-password');
-        return NextResponse.redirect(redirectTo, 302)
+        return NextResponse.redirect(redirectTo.toString(), 302)
       } else {
         console.error('Error verifying OTP:', error)
         // Aún redirigir a create-password en caso de error menor
-        return NextResponse.redirect(redirectTo, 302)
+        return NextResponse.redirect(redirectTo.toString(), 302)
       }
     }
 
     console.log('Missing token_hash or type, redirecting to error page');
     // return the user to an error page with some instructions
-    redirectTo.pathname = '/error'
-    return NextResponse.redirect(redirectTo, 302)
+    const errorRedirect = createRedirectUrl(request, '/error');
+    return NextResponse.redirect(errorRedirect.toString(), 302)
   } catch (error) {
     console.error('Fatal error in auth/confirm:', error);
     
     // En caso de error fatal, redirigir a login
-    const errorRedirect = request.nextUrl.clone()
-    errorRedirect.pathname = '/login'
-    errorRedirect.search = ''
-    return NextResponse.redirect(errorRedirect, 302)
+    const errorRedirect = createRedirectUrl(request, '/login');
+    return NextResponse.redirect(errorRedirect.toString(), 302)
   }
 }
