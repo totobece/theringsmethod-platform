@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       return supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'http://localhost:3000/create-password',
+          emailRedirectTo: 'https://app.theringsmethod.com/create-password',
           data: {
             source: 'gohighlevel_30day_challenge',
             challenge_type: '30_day_challenge',
