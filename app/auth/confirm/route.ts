@@ -2,7 +2,6 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@/utils/supabase/server'
-import { createRedirectUrl, getBaseUrl } from '@/utils/url-helpers'
 
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request: NextRequest) {
@@ -17,10 +16,19 @@ export async function GET(request: NextRequest) {
     console.log('Type:', type);
     
     // Obtener la URL base y construir redirección
-    const baseUrl = getBaseUrl(request);
-    const redirectTo = createRedirectUrl(request, '/create-password');
+    // Para auth/confirm siempre usar el dominio público si está disponible
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
     
-    console.log('Base URL determined:', baseUrl);
+    // Solo usar forwarded headers si realmente estamos detrás de un proxy
+    const baseUrl = forwardedHost && forwardedHost !== 'localhost:3000' 
+      ? `${forwardedProto}://${forwardedHost}`
+      : request.nextUrl.origin;
+    
+    const redirectTo = new URL('/create-password', baseUrl);
+    
+    console.log('Forwarded host:', forwardedHost);
+    console.log('Using base URL:', baseUrl);
     console.log('Redirect URL will be:', redirectTo.toString());
 
     if (token_hash && type) {
@@ -45,13 +53,19 @@ export async function GET(request: NextRequest) {
 
     console.log('Missing token_hash or type, redirecting to error page');
     // return the user to an error page with some instructions
-    const errorRedirect = createRedirectUrl(request, '/error');
+    const errorRedirect = new URL('/error', baseUrl);
     return NextResponse.redirect(errorRedirect.toString(), 302)
   } catch (error) {
     console.error('Fatal error in auth/confirm:', error);
     
-    // En caso de error fatal, redirigir a login
-    const errorRedirect = createRedirectUrl(request, '/login');
+    // En caso de error fatal, redirigir a login usando el mismo baseUrl
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+    const baseUrl = forwardedHost && forwardedHost !== 'localhost:3000' 
+      ? `${forwardedProto}://${forwardedHost}`
+      : request.nextUrl.origin;
+      
+    const errorRedirect = new URL('/login', baseUrl);
     return NextResponse.redirect(errorRedirect.toString(), 302)
   }
 }
