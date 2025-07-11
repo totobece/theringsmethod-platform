@@ -1,0 +1,75 @@
+config:
+  target: 'http://localhost:3001'
+  phases:
+    # Fase 1: Ramp up gradual
+    - duration: 120
+      arrivalRate: 20
+      name: "Ramp up"
+    # Fase 2: Carga media sostenida
+    - duration: 300
+      arrivalRate: 50
+      name: "Sustained load"
+    # Fase 3: Pico de tráfico - 100 usuarios
+    - duration: 180
+      arrivalRate: 100
+      name: "Peak load"
+    # Fase 4: Estrés máximo - 150 usuarios
+    - duration: 120
+      arrivalRate: 150
+      name: "Stress test"
+    # Fase 5: Cool down
+    - duration: 60
+      arrivalRate: 10
+      name: "Cool down"
+
+scenarios:
+  - name: "Flujo completo de usuario"
+    weight: 50
+    flow:
+      # Entrada a la plataforma
+      - get:
+          url: "/"
+      - think: 2
+
+      # Navegar a explorar
+      - get:
+          url: "/explore"
+      - think: 3
+
+      # Ver página de cuenta
+      - get:
+          url: "/account"
+      - think: 2
+
+      # Volver a home
+      - get:
+          url: "/"
+      - think: 1
+
+  - name: "Uso intensivo de APIs"
+    weight: 30
+    flow:
+      # Cargar datos múltiples veces
+      - loop:
+        - get:
+            url: "/api/supabase/posts"
+        - get:
+            url: "/api/supabase/meditations"
+        - get:
+            url: "/api/supabase/videos"
+        - think: 1
+        count: 3
+
+  - name: "Test de páginas dinámicas"
+    weight: 20
+    flow:
+      # Test de páginas específicas (simulando acceso a rutinas/videos)
+      - get:
+          url: "/routine/1"
+      - think: 3
+      - get:
+          url: "/meditations/1"
+      - think: 2
+      - get:
+          url: "/video/1"
+      - think: 4

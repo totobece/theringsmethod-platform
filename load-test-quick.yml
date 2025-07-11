@@ -1,0 +1,35 @@
+config:
+  target: 'http://localhost:3001'
+  phases:
+    # Test rápido de 2 minutos
+    - duration: 30
+      arrivalRate: 20
+      name: "Quick test"
+    - duration: 60
+      arrivalRate: 50
+      name: "Peak test"
+    - duration: 30
+      arrivalRate: 10
+      name: "Cool down"
+
+scenarios:
+  - name: "Homepage test"
+    weight: 40
+    flow:
+      - get:
+          url: "/"
+      - think: 1
+
+  - name: "API test"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/supabase/posts"
+      - think: 0.5
+
+  - name: "Explore test"
+    weight: 30
+    flow:
+      - get:
+          url: "/explore"
+      - think: 1

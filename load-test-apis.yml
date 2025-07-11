@@ -1,0 +1,46 @@
+config:
+  target: 'http://localhost:3001'
+  phases:
+    - duration: 300
+      arrivalRate: 75
+      name: "API stress test"
+
+scenarios:
+  - name: "Test API Supabase Posts"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/supabase/posts"
+          headers:
+            Accept: "application/json"
+          capture:
+            - json: "$.posts.length"
+              as: "postsCount"
+      - think: 0.5
+
+  - name: "Test API Supabase Meditations" 
+    weight: 25
+    flow:
+      - get:
+          url: "/api/supabase/meditations"
+          headers:
+            Accept: "application/json"
+      - think: 0.5
+
+  - name: "Test API Supabase Videos"
+    weight: 25  
+    flow:
+      - get:
+          url: "/api/supabase/videos"
+          headers:
+            Accept: "application/json"
+      - think: 0.5
+
+  - name: "Test API User Progress"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/user/progress"
+          headers:
+            Accept: "application/json"
+      - think: 0.5
