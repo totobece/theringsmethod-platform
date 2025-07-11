@@ -2,17 +2,30 @@
 import { login, signup } from './actions'
 import Image from 'next/image'
 import LogoDuo from '@/public/logo-blanco-trm.png'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useI18n } from '@/contexts/I18nContext'
 import LanguageSelector from '@/components/UI/LanguageSelector/language-selector'
+import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [acceptsTerms, setAcceptsTerms] = useState(false)
   const [acceptsPrivacy, setAcceptsPrivacy] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
   const { t } = useI18n()
+  const searchParams = useSearchParams()
+
+  // Manejar errores de URL
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error === 'link_expired') {
+      setErrorMessage(t('auth.linkExpired'))
+    } else if (error === 'auth_error') {
+      setErrorMessage(t('auth.authError'))
+    }
+  }, [searchParams, t])
 
   const handleCheckboxChange = (setter: (v: boolean) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setter(e.target.checked)
@@ -61,6 +74,11 @@ export default function LoginPage() {
                 </span>
               ))}
             </h1>
+            {errorMessage && (
+              <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {errorMessage}
+              </div>
+            )}
           </div>
           <form
             className="flex flex-col"

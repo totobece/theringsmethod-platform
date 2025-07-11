@@ -8,6 +8,18 @@ export async function GET(request: NextRequest) {
   try {
     console.log('Auth confirm called with URL:', request.url);
     
+    // Debuggear todos los headers importantes
+    console.log('=== HEADERS DEBUG ===');
+    console.log('host:', request.headers.get('host'));
+    console.log('x-forwarded-host:', request.headers.get('x-forwarded-host'));
+    console.log('x-forwarded-proto:', request.headers.get('x-forwarded-proto'));
+    console.log('x-forwarded-for:', request.headers.get('x-forwarded-for'));
+    console.log('origin:', request.headers.get('origin'));
+    console.log('referer:', request.headers.get('referer'));
+    console.log('request.nextUrl.origin:', request.nextUrl.origin);
+    console.log('request.nextUrl.host:', request.nextUrl.host);
+    console.log('=====================');
+    
     const { searchParams } = new URL(request.url)
     const token_hash = searchParams.get('token_hash')
     const type = searchParams.get('type') as EmailOtpType | null
@@ -15,21 +27,31 @@ export async function GET(request: NextRequest) {
     console.log('Token hash present:', !!token_hash);
     console.log('Type:', type);
     
-    // Obtener la URL base y construir redirección
-    // Para auth/confirm siempre usar el dominio público si está disponible
+    // Determinar la URL base correcta para redirección
+    const host = request.headers.get('host');
     const forwardedHost = request.headers.get('x-forwarded-host');
     const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
     
-    // Solo usar forwarded headers si realmente estamos detrás de un proxy
-    const baseUrl = forwardedHost && forwardedHost !== 'localhost:3000' 
-      ? `${forwardedProto}://${forwardedHost}`
-      : request.nextUrl.origin;
+    let baseUrl: string;
+    
+    // Si el host contiene el dominio de producción, usar https
+    if (host && host.includes('theringsmethod.com')) {
+      baseUrl = `https://${host}`;
+      console.log('Using production domain from host:', baseUrl);
+    }
+    // Si tenemos headers de proxy válidos, usarlos
+    else if (forwardedHost && forwardedHost.includes('theringsmethod.com')) {
+      baseUrl = `${forwardedProto}://${forwardedHost}`;
+      console.log('Using forwarded headers:', baseUrl);
+    }
+    // Fallback a la URL original
+    else {
+      baseUrl = request.nextUrl.origin;
+      console.log('Using fallback origin:', baseUrl);
+    }
     
     const redirectTo = new URL('/create-password', baseUrl);
-    
-    console.log('Forwarded host:', forwardedHost);
-    console.log('Using base URL:', baseUrl);
-    console.log('Redirect URL will be:', redirectTo.toString());
+    console.log('Final redirect URL will be:', redirectTo.toString());
 
     if (token_hash && type) {
       console.log('Creating Supabase client...');
@@ -45,8 +67,18 @@ export async function GET(request: NextRequest) {
         console.log('OTP verification successful, redirecting to create-password');
         return NextResponse.redirect(redirectTo.toString(), 302)
       } else {
-        console.error('Error verifying OTP:', error)
-        // Aún redirigir a create-password en caso de error menor
+        console.error('Error verifying OTP:', error);
+        console.error('Error code:', error.code);
+        console.error('Error status:', error.status);
+        
+        // Si el token expiró o es inválido, redirigir a error
+        if (error.code === 'otp_expired' || error.code === 'otp_invalid') {
+          console.log('Token expired/invalid, redirecting to login with error');
+          const errorRedirect = new URL('/login?error=link_expired', baseUrl);
+          return NextResponse.redirect(errorRedirect.toString(), 302);
+        }
+        
+        // Para otros errores, aún intentar redirigir a create-password
         return NextResponse.redirect(redirectTo.toString(), 302)
       }
     }
@@ -58,14 +90,21 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Fatal error in auth/confirm:', error);
     
-    // En caso de error fatal, redirigir a login usando el mismo baseUrl
+    // En caso de error fatal, redirigir a login usando la misma lógica de baseUrl
+    const host = request.headers.get('host');
     const forwardedHost = request.headers.get('x-forwarded-host');
     const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
-    const baseUrl = forwardedHost && forwardedHost !== 'localhost:3000' 
-      ? `${forwardedProto}://${forwardedHost}`
-      : request.nextUrl.origin;
+    
+    let baseUrl: string;
+    if (host && host.includes('theringsmethod.com')) {
+      baseUrl = `https://${host}`;
+    } else if (forwardedHost && forwardedHost.includes('theringsmethod.com')) {
+      baseUrl = `${forwardedProto}://${forwardedHost}`;
+    } else {
+      baseUrl = request.nextUrl.origin;
+    }
       
-    const errorRedirect = new URL('/login', baseUrl);
+    const errorRedirect = new URL('/login?error=auth_error', baseUrl);
     return NextResponse.redirect(errorRedirect.toString(), 302)
   }
 }
