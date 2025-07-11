@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/contexts/I18nContext";
+import TranslationGuard from "@/components/UI/TranslationGuard/translation-guard";
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -29,7 +30,9 @@ export default function RootLayout({
        
       <body className={poppins.className}>
         <I18nProvider>
-          {children}
+          <TranslationGuard>
+            {children}
+          </TranslationGuard>
         </I18nProvider>
       </body>
      

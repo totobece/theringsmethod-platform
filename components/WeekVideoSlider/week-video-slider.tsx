@@ -279,11 +279,11 @@ export default function WeekVideoSlider() {
                                   
                                   {/* Texto de bloqueo */}
                                   <div className="text-center">
-                                    <p className="text-sm font-medium mb-1">{t('routines.locked')}</p>
+                                    <p className="text-sm font-medium mb-1">{t('common.locked')}</p>
                                     <p className="text-xs opacity-80">
                                       {daysUntilUnlock === 0 
-                                        ? t('routines.unlocksTomorrow')
-                                        : t('routines.unlocksInDays', { count: daysUntilUnlock })
+                                        ? t('dynamicContent.unlocksTomorrow') 
+                                        : t('dynamicContent.unlocksIn', { count: daysUntilUnlock })
                                       }
                                     </p>
                                   </div>

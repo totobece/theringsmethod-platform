@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client'
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -80,7 +79,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
   return (
     <section style={{ minHeight: '100vh' }} className='relative bg-none' >
     <div className={`max-w-full sm:px-6 relative lg:text-start md:text-start text-center`}>
-      <h1 className='pt-16 mx-3 md:mx-0 text-white font-normal text-3xl md:text-6xl'>Explore the Rings Method experience</h1>
+      <h1 className='pt-16 mx-3 md:mx-0 text-white font-normal text-3xl md:text-6xl'>{t('common.exploreRingsMethod')}</h1>
     </div>
     <div className="w-full flex mt-16 flex-wrap items-center justify-center">
       {(isLoading || isAccessLoading) && (
@@ -148,7 +147,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                         />
                       ) : (
                         <div className="w-full h-48 bg-gray-600 rounded-md flex items-center justify-center">
-                          <span className="text-white text-sm">Sin preview</span>
+                          <span className="text-white text-sm">{t('common.noPreview')}</span>
                         </div>
                       )}
                     </Link>
@@ -165,11 +164,11 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                       
                       {/* Texto de bloqueo */}
                       <div className="text-center">
-                        <p className="text-sm font-medium mb-1">{t('routines.locked')}</p>
+                        <p className="text-sm font-medium mb-1">{t('common.locked')}</p>
                         <p className="text-xs opacity-80">
                           {daysUntilUnlock === 0 
-                            ? t('routines.unlocksTomorrow')
-                            : t('routines.unlocksInDays', { count: daysUntilUnlock })
+                            ? t('dynamicContent.unlocksTomorrow') 
+                            : t('dynamicContent.unlocksIn', { count: daysUntilUnlock })
                           }
                         </p>
                       </div>
@@ -194,9 +193,9 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
         
       {!isLoading && currentData.length === 0 && (
         <div>
-        <h1 className='text-2xl text-center text-gray-700'>Couldn't find: <span className='font-medium text-2xl text-gray-700'>&quot;{searchTerm}&quot; 
+        <h1 className='text-2xl text-center text-gray-700'>{t('common.couldntFind')}: <span className='font-medium text-2xl text-gray-700'>&quot;{searchTerm}&quot; 
         </span> </h1>
-        <h1 className='text-xl text-center text-gray-700'>Try searching again using a different spelling or keyword.</h1>
+        <h1 className='text-xl text-center text-gray-700'>{t('common.trySearchAgain')}</h1>
         </div>
       )}
 

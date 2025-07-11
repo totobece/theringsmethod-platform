@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
 import { findPreviewForRoutine, PreviewData } from '@/utils/preview-utils';
+import { useI18n } from '@/contexts/I18nContext';
 
 export interface ExploreVideosData {
   id: string;
@@ -21,6 +22,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
   const [previewData, setPreviewData] = useState<PreviewData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n();
   
   // Hook para acceso a rutinas
   const { maxUnlockedDay, isLoading: isAccessLoading } = useRoutineAccess();
@@ -122,7 +124,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                           />
                         ) : (
                           <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
-                            <span className="text-white text-sm">Sin preview</span>
+                            <span className="text-white text-sm">{t('common.noPreview')}</span>
                           </div>
                         )}
                       </Link>
@@ -139,11 +141,11 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                         
                         {/* Texto de bloqueo */}
                         <div className="text-center">
-                          <p className="text-xs font-medium mb-1">Bloqueada</p>
+                          <p className="text-xs font-medium mb-1">{t('common.locked')}</p>
                           <p className="text-xs opacity-80">
                             {daysUntilUnlock === 0 
-                              ? 'Se desbloquea mañana' 
-                              : `En ${daysUntilUnlock} día${daysUntilUnlock > 1 ? 's' : ''}`
+                              ? t('dynamicContent.unlocksTomorrow') 
+                              : t('dynamicContent.unlocksIn', { count: daysUntilUnlock })
                             }
                           </p>
                         </div>
