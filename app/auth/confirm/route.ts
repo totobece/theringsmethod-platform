@@ -5,25 +5,12 @@ import { createClient } from '@/utils/supabase/server'
 
 // Creating a handler to a GET request to route /auth/confirm
 export async function GET(request: NextRequest) {
-  try {
-    console.log('Auth confirm called with URL:', request.url);
-    
-    // Debuggear todos los headers importantes
-    console.log('=== HEADERS DEBUG ===');
-    console.log('host:', request.headers.get('host'));
-    console.log('x-forwarded-host:', request.headers.get('x-forwarded-host'));
-    console.log('x-forwarded-proto:', request.headers.get('x-forwarded-proto'));
-    console.log('x-forwarded-for:', request.headers.get('x-forwarded-for'));
-    console.log('origin:', request.headers.get('origin'));
-    console.log('referer:', request.headers.get('referer'));
-    console.log('request.nextUrl.origin:', request.nextUrl.origin);
-    console.log('request.nextUrl.host:', request.nextUrl.host);
-    console.log('=====================');
-    
+  try {    console.log('Auth confirm called with URL:', request.url);
+
     const { searchParams } = new URL(request.url)
     const token_hash = searchParams.get('token_hash')
     const type = searchParams.get('type') as EmailOtpType | null
-    
+
     console.log('Token hash present:', !!token_hash);
     console.log('Type:', type);
     

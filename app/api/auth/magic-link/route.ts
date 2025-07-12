@@ -38,6 +38,27 @@ export async function POST(request: Request) {
     
     // Extraer email y redirectTo del JSON parseado
     const { email, redirectTo } = parsedBody
+    
+    // Determinar la URL de redirección basada en el host del request
+    const host = request.headers.get('host');
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const forwardedProto = request.headers.get('x-forwarded-proto') || 'https';
+    
+    let baseUrl: string;
+    if (host && host.includes('theringsmethod.com')) {
+      const protocol = forwardedProto === 'http' ? 'http' : 'https';
+      baseUrl = `${protocol}://${host}`;
+    } else if (forwardedHost && forwardedHost.includes('theringsmethod.com')) {
+      baseUrl = `${forwardedProto}://${forwardedHost}`;
+    } else {
+      baseUrl = 'http://localhost:3000'; // Fallback para desarrollo
+    }
+    
+    const finalRedirectTo = redirectTo || `${baseUrl}/create-password`;
+    
+    console.log('🔵 Host detectado:', host);
+    console.log('🔵 Base URL determinada:', baseUrl);
+    console.log('🔵 Redirect URL final:', finalRedirectTo);
     console.log('🔵 Email extraído:', email)
     console.log('🔵 RedirectTo extraído:', redirectTo)
     
@@ -62,7 +83,7 @@ export async function POST(request: Request) {
       return supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: 'https://app.theringsmethod.com/create-password',
+          emailRedirectTo: finalRedirectTo,
           data: {
             source: 'gohighlevel_30day_challenge',
             challenge_type: '30_day_challenge',
