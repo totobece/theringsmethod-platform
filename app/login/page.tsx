@@ -9,10 +9,11 @@ import { useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSignUpMode, setIsSignUpMode] = useState(false)
   const [acceptsTerms, setAcceptsTerms] = useState(false)
   const [acceptsPrivacy, setAcceptsPrivacy] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const { t } = useI18n()
   const searchParams = useSearchParams()
@@ -20,10 +21,24 @@ export default function LoginPage() {
   // Manejar errores de URL
   useEffect(() => {
     const error = searchParams.get('error')
+    const success = searchParams.get('success')
+    
     if (error === 'link_expired') {
       setErrorMessage(t('auth.linkExpired'))
     } else if (error === 'auth_error') {
       setErrorMessage(t('auth.authError'))
+    } else if (error === 'invalid_credentials') {
+      setErrorMessage(t('auth.invalidCredentials'))
+    } else if (error === 'invalid_data') {
+      setErrorMessage(t('auth.invalidData'))
+    } else if (error === 'password_too_short') {
+      setErrorMessage(t('auth.passwordTooShort'))
+    } else if (error === 'user_exists') {
+      setErrorMessage(t('auth.userExists'))
+    } else if (error === 'signup_failed') {
+      setErrorMessage(t('auth.signupFailed'))
+    } else if (success === 'signup_complete') {
+      setErrorMessage(t('auth.signupComplete'))
     }
   }, [searchParams, t])
 
@@ -31,29 +46,33 @@ export default function LoginPage() {
     setter(e.target.checked)
   }
 
-  const closeModal = () => setIsModalOpen(false)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!formRef.current) return
 
-  // Envía el formulario con la acción de signup
-  const handleSignupFromModal = () => {
-    if (acceptsTerms && acceptsPrivacy && formRef.current) {
-      // Cambia el formAction antes de enviar
-      formRef.current.setAttribute('action', '/login') // Next.js ignora action, pero lo dejamos por claridad
-      formRef.current.setAttribute('data-signup', 'true')
-      // Crea un input oculto para distinguir el submit
-      let hidden = formRef.current.querySelector('input[name="signup_intent"]') as HTMLInputElement | null
-      if (!hidden) {
-        hidden = document.createElement('input')
-        hidden.type = 'hidden'
-        hidden.name = 'signup_intent'
-        hidden.value = '1'
-        formRef.current.appendChild(hidden)
-      }
-      // Envía el formulario usando la acción de signup
-      const formData = new FormData(formRef.current);
-      signup(formData);
-      setIsModalOpen(false)
+    const formData = new FormData(formRef.current)
+    
+    // Validar que si es modo registro, se acepten los términos
+    if (isSignUpMode && (!acceptsTerms || !acceptsPrivacy)) {
+      setErrorMessage(t('auth.mustAcceptTerms'))
+      return
     }
-    // Si no acepta, puedes mostrar un error
+
+    setIsLoading(true)
+    setErrorMessage('')
+
+    try {
+      if (isSignUpMode) {
+        await signup(formData)
+      } else {
+        await login(formData)
+      }
+    } catch (error) {
+      console.error('Error during authentication:', error)
+      setErrorMessage(t('auth.authError'))
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -63,11 +82,11 @@ export default function LoginPage() {
         <LanguageSelector />
       </div>
       
-      <div className={`w-full max-w-xl m-auto px-2 pt-6 pb-12 ${isModalOpen ? 'blur-md' : ''}`}>
-        <div className="w-full space-y-10 p-8 rounded-2xl bg-cream border-2 border-gray-600 ">
+      <div className="w-full max-w-xl m-auto px-2 pt-6 pb-12">
+        <div className="w-full space-y-10 p-8 rounded-2xl bg-cream border-2 border-gray-600">
           <div>
-            <h1 className="text-black w/full font-medium text-3xl lg:text-5xl">
-              {t('auth.welcomeTitle').split('\\n').map((line, index) => (
+            <h1 className="text-black w-full font-medium text-3xl lg:text-5xl">
+              {isSignUpMode ? t('auth.createAccount') : t('auth.welcomeTitle').split('\\n').map((line, index) => (
                 <span key={index}>
                   {line}
                   {index === 0 && <br />}
@@ -80,10 +99,12 @@ export default function LoginPage() {
               </div>
             )}
           </div>
+          
           <form
             className="flex flex-col"
             autoComplete="off"
             ref={formRef}
+            onSubmit={handleSubmit}
           >
             <div className="flex flex-col">
               <label className="text-gray-600 text-xl font-medium" htmlFor="email">{t('auth.email')}:</label>
@@ -95,6 +116,7 @@ export default function LoginPage() {
                 className="block w-full my-4 px-16 py-3 bg-white border-white rounded-2xl text-xl shadow-sm text-gray-700 focus:border-white focus:ring focus:ring-white"
               />
             </div>
+            
             <div className="flex flex-col">
               <label className="text-gray-600 text-xl font-medium" htmlFor="password">{t('auth.password')}:</label>
               <input
@@ -102,28 +124,75 @@ export default function LoginPage() {
                 name="password"
                 type={showPassword ? 'text' : 'password'}
                 required
+                minLength={isSignUpMode ? 6 : undefined}
                 className="block w-full my-4 px-16 py-3 bg-white border-white rounded-2xl text-xl shadow-sm text-gray-700 focus:border-white focus:ring focus:ring-white"
               />
             </div>
+            
             <div className="cursor-pointer hover:underline py-6 flex justify-center" onClick={() => setShowPassword(!showPassword)}>
               <p className="text-md text-black">{showPassword ? t('auth.hidePassword') : t('auth.showPassword')}</p>
             </div>
-            <div className="justify-center flex w/full space-x-4 px-4">
+
+            {isSignUpMode && (
+              <div className="flex flex-col space-y-4 mb-6 px-4">
+                <label className="flex items-start">
+                  <input
+                    type="checkbox"
+                    checked={acceptsTerms}
+                    onChange={handleCheckboxChange(setAcceptsTerms)}
+                    className="mr-2 mt-1"
+                  />
+                  <span className="text-sm">
+                    {t('auth.acceptTerms')} <a href='/account/terms' target='_blank' className='px-1 hover:underline text-blue-600'>{t('auth.termsAndConditions')}</a>
+                  </span>
+                </label>
+                <label className="flex items-start">
+                  <input
+                    type="checkbox"
+                    checked={acceptsPrivacy}
+                    onChange={handleCheckboxChange(setAcceptsPrivacy)}
+                    className="mr-2 mt-1"
+                  />
+                  <span className="text-sm">
+                    {t('auth.acceptTerms')} <a href="/privacy-policy" target='_blank' className='hover:underline px-1 text-blue-600'>{t('auth.privacyPolicy')}</a>
+                  </span>
+                </label>
+              </div>
+            )}
+            
+            <div className="justify-center flex w-full space-x-4 px-4">
               <button
-                formAction={login}
-                className="relative bg-gray-600 transition px-6 text-xl inline-flex h-12 animate-shimmer items-center justify-center rounded-[40px] font-medium text-white"
+                type="submit"
+                disabled={isLoading || (isSignUpMode && (!acceptsTerms || !acceptsPrivacy))}
+                className="relative bg-gray-600 transition px-6 text-xl inline-flex h-12 animate-shimmer items-center justify-center rounded-[40px] font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {t('auth.login')}
+                {isLoading ? t('auth.loading') : (isSignUpMode ? t('auth.signUp') : t('auth.login'))}
               </button>
-             
             </div>
           </form>
+
+          {/* Toggle between login and signup */}
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUpMode(!isSignUpMode)
+                setErrorMessage('')
+                setAcceptsTerms(false)
+                setAcceptsPrivacy(false)
+              }}
+              className="text-gray-600 hover:text-gray-800 underline"
+            >
+              {isSignUpMode ? t('auth.alreadyHaveAccount') : t('auth.dontHaveAccount')}
+            </button>
+          </div>
+          
           <div className="flex justify-between">
             <div />
             <div className="flex flex-col md:w-auto mt-2">
               <Image
                 src={LogoDuo}
-                alt='saucotec-logo'
+                alt='theringsmethod-logo'
                 width={120}
                 height={150}
               />
@@ -131,46 +200,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
-          <div className="w-[350px] h-[350px] bg-cream rounded-2xl p-6 text-black relative">
-            <button className="absolute top-4 right-0 p-2 text-3xl" onClick={closeModal}>
-              &times;
-            </button>
-            <h2 className="text-2xl font-bold mb-14">{t('auth.termsAndConditions')}</h2>
-            <div className="flex flex-col space-y-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={acceptsTerms}
-                  onChange={handleCheckboxChange(setAcceptsTerms)}
-                  className="mr-2"
-                />
-                {t('auth.acceptTerms')} <a href='/account/terms' className='px-1 hover:underline'>{t('auth.termsAndConditions')}</a>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={acceptsPrivacy}
-                  onChange={handleCheckboxChange(setAcceptsPrivacy)}
-                  className="mr-2"
-                />
-                {t('auth.acceptTerms')} <a href="/privacypolicie" className='hover:underline px-1'>{t('auth.privacyPolicy')}</a>
-              </label>
-            </div>
-            <div className="absolute inset-x-28 bottom-4">
-              <button
-                type="button"
-                onClick={handleSignupFromModal}
-                className="relative bg-gray-600 transition px-6 text-xl inline-flex h-12 animate-shimmer items-center justify-center rounded-[40px] font-medium text-white"
-                disabled={!(acceptsTerms && acceptsPrivacy)}
-              >
-                {t('auth.signUp')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   )
 }
