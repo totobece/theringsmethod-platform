@@ -52,7 +52,15 @@ export async function GET(request: NextRequest) {
       
       if (!error) {
         console.log('OTP verification successful, redirecting to create-password');
-        return NextResponse.redirect(redirectTo.toString(), 302)
+        
+        // Crear respuesta de redirección y limpiar cookies problemáticas
+        const response = NextResponse.redirect(redirectTo.toString(), 302);
+        
+        // Limpiar cookies de Supabase que pueden ser muy grandes
+        response.cookies.delete('sb-shrswzchkqiobcikdfrn-auth-token');
+        response.cookies.delete('sb-shrswzchkqiobcikdfrn-auth-token-code-verifier');
+        
+        return response;
       } else {
         console.error('Error verifying OTP:', error);
         console.error('Error code:', error.code);
