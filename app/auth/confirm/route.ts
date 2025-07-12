@@ -53,14 +53,31 @@ export async function GET(request: NextRequest) {
       if (!error) {
         console.log('OTP verification successful, redirecting to create-password');
         
-        // Crear respuesta de redirección y limpiar cookies problemáticas
-        const response = NextResponse.redirect(redirectTo.toString(), 302);
+        // En lugar de redireccionar, devolver HTML que haga redirect via JavaScript
+        const redirectHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Redirecting...</title>
+          <script>
+            window.location.href = '${redirectTo.toString()}';
+          </script>
+        </head>
+        <body>
+          <p>Redirecting to create password page...</p>
+          <p>If you are not redirected automatically, <a href="${redirectTo.toString()}">click here</a>.</p>
+        </body>
+        </html>
+        `;
         
-        // Limpiar cookies de Supabase que pueden ser muy grandes
-        response.cookies.delete('sb-shrswzchkqiobcikdfrn-auth-token');
-        response.cookies.delete('sb-shrswzchkqiobcikdfrn-auth-token-code-verifier');
-        
-        return response;
+        return new Response(redirectHtml, {
+          status: 200,
+          headers: { 
+            'Content-Type': 'text/html',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          },
+        });
       } else {
         console.error('Error verifying OTP:', error);
         console.error('Error code:', error.code);
