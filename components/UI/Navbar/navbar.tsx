@@ -298,23 +298,25 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Logo - siempre a la derecha */}
-      <div className='flex items-center ml-auto lg:ml-4'>
-        <Link href="/" >
-          <Image
-            src={LogoDuo}
-            alt='logo-duo'
-            width={80}
-            height={30}
-            style={{ 
-              objectFit: 'contain',
-              width: 'auto',
-              height: '30px',
-              maxWidth: '80px'
-            }} 
-          />
-        </Link>
-      </div>
+      {/* Logo - siempre a la derecha, excepto en /account */}
+      {pathname !== '/account' && (
+        <div className='flex items-center ml-auto lg:ml-4'>
+          <Link href="/" >
+            <Image
+              src={LogoDuo}
+              alt='logo-duo'
+              width={80}
+              height={30}
+              style={{ 
+                objectFit: 'contain',
+                width: 'auto',
+                height: '30px',
+                maxWidth: '80px'
+              }} 
+            />
+          </Link>
+        </div>
+      )}
     </div>
   </nav>
   );
