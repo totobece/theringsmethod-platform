@@ -8,7 +8,7 @@ export default function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false);
 
   const languages = [
-    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'es', name: 'Español', flag: '🇦🇷' },
     { code: 'en', name: 'English', flag: '🇺🇸' }
   ];
 

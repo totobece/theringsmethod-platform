@@ -2,7 +2,11 @@
   "navbar": {
     "home": "Home",
     "explore": "Explore",
-    "search": "Search routines and meditations...",
+    "search": "Search routines and meditatio    "welcomeTitle": "Welcome to
+The Rings Method!",
+    "createAccount": "Create Your Account",
+    "continueAccepting": "By continuing, you agree to the terms and conditions of The Rings Method ®",
+    "successPasswordUpdated": "Success! Your password has been updated",..",
     "languageSelector": "Language"
   },
   "sidebar": {
@@ -39,7 +43,7 @@
     "locked": "Locked",
     "unlocked": "Unlocked",
     "noPreview": "No preview",
-    "exploreRingsMethod": "Explore The Rings Method",
+    "exploreRingsMethod": "Explore The Rings Method experience",
     "couldntFind": "Couldn't find",
     "trySearchAgain": "Try searching again using a different spelling or keyword",
     "minutes": "min",
@@ -76,7 +80,7 @@
       "locked": "Locked",
       "unlocked": "Unlocked"
     },
-    "moreRoutines": "Check all the workouts",
+    "moreRoutines": "Discover more routines to try!",
     "demoAvailable": "Demo available soon",
     "doItIndoor": "Do it Indoor"
   },
@@ -131,7 +135,7 @@
     "exercises": "Exercises",
     "proTip": "Pro Tip",
     "doItIndoor": "Do It Indoor",
-    "discoverMore": "Check all the workouts",
+    "discoverMore": "Discover more routines to try!",
     "demoAvailable": "Demo available soon",
     "routineLocked": "This routine is locked. Complete previous routines to unlock it.",
     "routineCompleted": "Routine completed successfully",

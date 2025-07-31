@@ -73,12 +73,11 @@ export default function Home() {
           <div className='md:pt-6 md:px-6'>
           <MainPlayRoutine />
           <div className={`max-w-full relative md:text-start text-start`}>
-      <h1 className='mt-12 mb-6 md:px-0 px-4 text-white font-light text-2xl md:text-3xl md:text-start text-center'>{t('common.featuringThisWeek')}</h1>
 
-      </div>
+      </div >
           </div>
           
-          <div className='md:pb-16 md:px-6 px-4'>
+          <div className='md:pb-16 md:px-6 px-4 mt-20 '>
           <WeekVideoSlider />
           </div>
           

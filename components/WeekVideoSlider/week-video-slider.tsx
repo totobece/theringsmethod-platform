@@ -89,7 +89,8 @@ export default function WeekVideoSlider() {
   useEffect(() => {
     const handleResize = () => {
       if (carouselRef.current) {
-        setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
+        const newWidth = carouselRef.current.scrollWidth - carouselRef.current.offsetWidth;
+        setWidth(Math.max(0, newWidth));
       }
     };
     handleResize();
@@ -99,7 +100,8 @@ export default function WeekVideoSlider() {
 
   useEffect(() => {
     if (carouselRef.current && !isLoading && currentWeekData.length > 0) {
-      setWidth(carouselRef.current.scrollWidth - carouselRef.current.offsetWidth);
+      const newWidth = carouselRef.current.scrollWidth - carouselRef.current.offsetWidth;
+      setWidth(Math.max(0, newWidth));
     }
   }, [isLoading, currentWeekData]);
 
@@ -150,25 +152,7 @@ export default function WeekVideoSlider() {
   }, []);
 
   const handleDragEnd = () => {
-    if (carouselRef.current) {
-      const scrollWidth = carouselRef.current.scrollWidth;
-      const offsetWidth = carouselRef.current.offsetWidth;
-      const scrollLeft = carouselRef.current.scrollLeft;
-
-      if (scrollLeft >= scrollWidth - offsetWidth - 100) {
-        controls.start({
-          x: 0,
-          transition: { duration: 0.5 }
-        });
-      }
-
-      if (scrollLeft <= 100) {
-        controls.start({
-          x: -(scrollWidth - offsetWidth),
-          transition: { duration: 0.5 }
-        });
-      }
-    }
+    // Permitir deslizamiento libre sin restricciones automáticas
   };
 
   return (
@@ -211,9 +195,9 @@ export default function WeekVideoSlider() {
                   const daysUntilUnlock = maxUnlockedDay ? Math.max(0, routineDay - maxUnlockedDay) : 999;
                   
                   return (
-                    <div key={dataItem.id + '-' + idx} className='flex flex-col justify-center min-w-[300px] max-w-[300px]'>
+                    <div key={dataItem.id + '-' + idx} className='flex flex-col justify-center min-w-[320px] max-w-[320px]'>
                       <motion.div whileHover={{ y: isUnlocked ? -10 : 0 }} className='justify-center flex'>
-                        <div className={`card rounded-xl boxshadow p-[20px] w-full min-h-[320px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
+                        <div className={`card rounded-xl boxshadow p-[12px] w-full min-h-[340px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
                           {/* Imagen de fondo */}
                           <div className="absolute inset-0 z-0">
                             <Image
@@ -238,21 +222,21 @@ export default function WeekVideoSlider() {
                             </div>
                             
                             {/* Imagen de preview en el centro O icono de candado */}
-                            <div className='flex-1 flex justify-center items-center mb-4'>
+                            <div className='flex-1 flex justify-center items-center mb-4 mx-1'>
                               {isUnlocked ? (
-                                <Link href={`/routine/${dataItem.id}`}>
+                                <Link href={`/routine/${dataItem.id}`} className="w-full">
                                   {(() => {
                                     const preview = findPreviewForRoutine(previewsData, dataItem);
                                     return preview ? (
                                       <Image
-                                        className='rounded-md'
+                                        className='rounded-md w-full'
                                         src={preview.url}
                                         alt={`Preview for ${translateRoutineData(dataItem, locale).title}`}
                                         sizes="100vw"
                                         style={{
                                           width: '100%',
                                           height: 'auto',
-                                          maxHeight: '200px',
+                                          maxHeight: '220px',
                                           objectFit: 'cover'
                                         }}
                                         width={16}
@@ -260,7 +244,7 @@ export default function WeekVideoSlider() {
                                         loading="lazy"
                                       />
                                     ) : (
-                                      <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
+                                      <div className="w-full h-36 bg-gray-600 rounded-md flex items-center justify-center">
                                         <span className="text-white text-sm">{t('common.noPreview')}</span>
                                       </div>
                                     );

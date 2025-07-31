@@ -234,9 +234,9 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
             )}
           </button>
         ) : (
-          <div className="bg-green-600 flex justify-center items-center rounded-[20px] h-12 w-[200px] text-xl">
-            <span className='text-white'>✓ Completada</span>
-          </div>
+            <div className="flex justify-center items-center rounded-[20px] h-12 w-[200px] text-xl" style={{ backgroundColor: '#1d9146' }}>
+              <span className='text-white'>✓ Completada</span>
+            </div>
         )}
       </div>
 

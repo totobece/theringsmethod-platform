@@ -183,25 +183,36 @@ const MainPlayRoutine = () => {
             </div>
             {/* Contenido por encima del fondo */}
             <div className="relative z-10 w-full h-full flex flex-col md:flex-row">
-            <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6'>
-              <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center md:mt-6'>
-                <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-light text-cream text-center mx-auto place-content-center">
-                  {translateRoutineData(currentRoutine, locale).duration}
-                </blockquote>
+              {/* Duración solo en mobile - pegada a la derecha */}
+              <div className='md:hidden absolute top-2 right-3 z-20'>
+                <div className='bg-gray-600 w-fit px-4 h-8 flex items-center place-content-center rounded-full place-items-center'>
+                  <blockquote className="my-auto capitalize text-sm items-center font-light text-cream text-center mx-auto place-content-center">
+                    {translateRoutineData(currentRoutine, locale).duration}
+                  </blockquote>
+                </div>
               </div>
-              <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left mx-auto pt-4 md:mt-4">
-                {translateRoutineData(currentRoutine, locale).title}
-              </blockquote>
-              <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mx-auto py-4 ">
-                {translateRoutineData(currentRoutine, locale).day}
-              </blockquote>
-              <div className='relative h-[95%] md:h-[30%] lg:h-[60%] place-content-center'>
-                {!isRoutinePage && (
-                  <div className="relative p-8">
-                    <Link href={`/routine/${currentRoutine.id}`}>
-                      <button
-                        className="bg-wine my-4 md:my-8re absolute bottom-0 start-0 flex justify-center items-center rounded-[20px] h-10 w-[150px] md:w-[200px] group text-xl transform transition duration-500 hover:scale-105"
-                      >
+              
+              <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6'>
+                {/* Duración solo en desktop */}
+                <div className='hidden md:flex bg-gray-600 w-fit px-4 h-8 items-center place-content-center rounded-full place-items-center md:mt-6'>
+                  <blockquote className="my-auto capitalize text-sm lg:text-base items-center font-light text-cream text-center mx-auto place-content-center">
+                    {translateRoutineData(currentRoutine, locale).duration}
+                  </blockquote>
+                </div>
+                
+                <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left mx-auto pt-8 md:mt-4">
+                  {translateRoutineData(currentRoutine, locale).title}
+                </blockquote>
+                <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mx-auto py-1 md:py-4">
+                  {translateRoutineData(currentRoutine, locale).day}
+                </blockquote>
+                <div className='relative h-[95%] md:h-[30%] lg:h-[60%] place-content-center mt-4'>
+                  {!isRoutinePage && (
+                    <div className="relative p-8">
+                      <Link href={`/routine/${currentRoutine.id}`}>
+                        <button
+                          className="bg-wine my-10 md:my-8re absolute bottom-0 start-0 flex justify-center items-center rounded-[20px] h-12 w-[190px] md:h-10 md:w-[200px] group text-xl transform transition duration-500 hover:scale-105"
+                        >
                         <span className='text-white text-base md:text-lg'>{t('common.startRoutine')}</span>
                         <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M0 0V16L13 8L0 0Z" fill="white" />

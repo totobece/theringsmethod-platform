@@ -182,9 +182,16 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                 </div>
                 {/* Contenido por encima del fondo */}
                 <div className="relative z-10 w-full h-full flex flex-col md:flex-row min-h-[200px] md:min-h-[250px]">
+                  {/* Duración solo en mobile - pegada a la derecha */}
+                  <div className='md:hidden absolute top-2 right-3 z-20'>
+                    <blockquote className="text-sm font-light text-white capitalize bg-gray-600 px-4 py-2 rounded-full">
+                      {translateRoutineData(post, locale).duration}
+                    </blockquote>
+                  </div>
+                  
                   <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6 flex flex-col justify-between h-full'>
-                    {/* Duración en la parte superior - sin fondo gris */}
-                    <div className='flex justify-start md:mt-6'>
+                    {/* Duración en desktop - en la parte superior */}
+                    <div className='hidden md:flex justify-start md:mt-6'>
                       <blockquote className="text-sm lg:text-base font-light text-white capitalize">
                         {translateRoutineData(post, locale).duration}
                       </blockquote>
@@ -195,7 +202,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                       <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left">
                         {translateRoutineData(post, locale).title}
                       </blockquote>
-                      <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mt-2">
+                      <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mt-1 md:mt-2">
                         {translateRoutineData(post, locale).day}
                       </blockquote>
                     </div>
@@ -230,7 +237,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
       )}
       {!isLoadingPost && (
         <>
-          <div className={`max-w-full mx-16 sm:px-6 relative text-left place-content-center `}>
+          <div className={`max-w-full mx-4 md:mx-16 sm:px-6 relative text-left place-content-center `}>
             <div className="max-w-full mx-auto flex relative">
               <div className="max-w-full container flex flex-col">
                 <div className="">
@@ -240,7 +247,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                       <div className="mb-8">
                         <Link href={`/video/${post.id}`}>
                           <button
-                            className="bg-wine flex justify-center items-center rounded-[20px] h-12 w-[180px] md:w-[220px] group text-xl transform transition duration-500 hover:scale-105"
+                            className="bg-wine flex justify-center items-center rounded-[20px] h-14 w-[200px] md:h-12 md:w-[220px] group text-xl transform transition duration-500 hover:scale-105"
                           >
                             <span className='text-white text-base md:text-lg'>{t('common.startRoutine')}</span>
                             <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -335,7 +342,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </>
       )}
-      <div className='justify-center items-center flex flex-col'>
+      <div className='justify-center items-center flex flex-col mt-16'>
         {/* Sección Do it Indoor con GIF */}
         {!isLoadingPost && post && (
           <div className="w-full max-w-4xl mx-auto px-4 md:px-16 mb-12 md:mb-16">
