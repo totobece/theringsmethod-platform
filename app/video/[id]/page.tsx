@@ -185,6 +185,9 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
             className='h-full w-full'
             data-testid="video-player"
             crossOrigin="anonymous"
+            controlsList="nodownload"
+            disablePictureInPicture
+            onContextMenu={(e) => e.preventDefault()}
             onError={(e) => {
               console.error('Error loading video:', e);
               setError('Error al cargar el video. Intenta nuevamente.');

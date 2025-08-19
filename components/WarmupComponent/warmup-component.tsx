@@ -2,129 +2,109 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Play, Clock, Music } from 'lucide-react';
+import { Play, Dumbbell } from 'lucide-react';
 import Image from 'next/image';
-import { useMediaDuration } from '@/hooks/useMediaDuration';
-import { useI18n } from '@/contexts/I18nContext';
-import { filterMeditationsByLanguage } from '@/utils/content-translation';
-import { getMeditationContent } from '@/utils/meditation-content';
 
-interface Meditation {
+interface WarmupVideo {
   id: string;
   title: string;
-  duration: string;
+  warmupNumber: number;
   url: string;
   fileName: string;
-  type: 'video' | 'audio';
+  size: number;
+  lastModified: string;
+  type: string;
 }
 
-interface MeditationsComponentProps {
+interface WarmupComponentProps {
   searchTerm?: string;
-  onMeditationClick?: (meditation: Meditation) => void;
+  onWarmupClick?: (warmup: WarmupVideo) => void;
   showTitle?: boolean;
   excludeId?: string;
 }
 
-const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
+const WarmupComponent: React.FC<WarmupComponentProps> = ({
   searchTerm = '',
-  onMeditationClick,
+  onWarmupClick,
   showTitle = true,
   excludeId
 }) => {
-  const [meditations, setMeditations] = useState<Meditation[]>([]);
+  const [warmups, setWarmups] = useState<WarmupVideo[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const { t, locale } = useI18n();
 
   useEffect(() => {
-    const fetchMeditations = async () => {
+    const fetchWarmups = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('/api/supabase/meditations');
+        const response = await fetch('/api/supabase/warmup-videos');
         
         if (!response.ok) {
-          throw new Error('Error fetching meditations');
+          throw new Error('Error fetching warmups');
         }
 
         const data = await response.json();
-        const allMeditations = data.meditations || [];
-        
-        // Filtrar meditaciones por idioma
-        const languageFilteredMeditations = filterMeditationsByLanguage(allMeditations, locale);
-        setMeditations(languageFilteredMeditations);
+        setWarmups(data.warmupVideos || []);
       } catch (err) {
-        console.error('Error fetching meditations:', err);
-        setError('Error loading meditations');
+        console.error('Error fetching warmups:', err);
+        setError('Error loading warmups');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMeditations();
-  }, [locale]); // Re-ejecutar cuando cambie el idioma
+    fetchWarmups();
+  }, []);
 
   const handleRetry = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await fetch('/api/supabase/meditations');
+      const response = await fetch('/api/supabase/warmup-videos');
       
       if (!response.ok) {
-        throw new Error('Error fetching meditations');
+        throw new Error('Error fetching warmups');
       }
 
       const data = await response.json();
-      const allMeditations = data.meditations || [];
-      
-      // Filtrar meditaciones por idioma
-      const languageFilteredMeditations = filterMeditationsByLanguage(allMeditations, locale);
-      setMeditations(languageFilteredMeditations);
+      setWarmups(data.warmupVideos || []);
     } catch (err) {
-      console.error('Error fetching meditations:', err);
-      setError('Error loading meditations');
+      console.error('Error fetching warmups:', err);
+      setError('Error loading warmups');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Filtrar meditaciones basado en el término de búsqueda y excluir ID si se especifica
-  const filteredMeditations = meditations.filter(meditation => {
-    const matchesSearch = meditation.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const notExcluded = !excludeId || meditation.id !== excludeId;
+  // Filtrar warmups basado en el término de búsqueda y excluir ID si se especifica
+  const filteredWarmups = warmups.filter(warmup => {
+    const matchesSearch = warmup.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         `warmup ${warmup.warmupNumber}`.toLowerCase().includes(searchTerm.toLowerCase());
+    const notExcluded = !excludeId || warmup.warmupNumber.toString() !== excludeId;
     
     return matchesSearch && notExcluded;
   });
 
-  // Mostrar todas las meditaciones filtradas (sin límite por maxItems)
-  const displayedMeditations = filteredMeditations;
+  const displayedWarmups = filteredWarmups;
 
-  const handleMeditationClick = (meditation: Meditation) => {
-    if (onMeditationClick) {
-      onMeditationClick(meditation);
+  const handleWarmupClick = (warmup: WarmupVideo) => {
+    if (onWarmupClick) {
+      onWarmupClick(warmup);
     } else {
-      // Comportamiento por defecto: navegar a la página individual de la meditación
-      // Codificar el ID para la URL
-      const encodedId = encodeURIComponent(meditation.id);
-      router.push(`/meditations/${encodedId}`);
+      // Navegar a la página individual del warmup usando el warmupNumber
+      router.push(`/warmups/${warmup.warmupNumber}`);
     }
   };
 
-  // Componente individual para cada card de meditación
-  const MeditationCard: React.FC<{ meditation: Meditation }> = ({ meditation }) => {
-    const realDuration = useMediaDuration(meditation.url, meditation.type);
-    // Priorizar la duración extraída del API sobre la duración real si es confiable
-    const displayDuration = meditation.duration !== 'N/A' ? meditation.duration : 
-                           (realDuration !== 'N/A' ? realDuration : meditation.duration);
-
-    // Obtener contenido personalizado de la meditación
-    const meditationContent = getMeditationContent(meditation.title, locale);
-    const displayTitle = meditationContent?.newTitle || meditation.title;
+  // Componente individual para cada card de warmup
+  const WarmupCard: React.FC<{ warmup: WarmupVideo }> = ({ warmup }) => {
+    const displayTitle = `Warmup #${warmup.warmupNumber}`;
 
     return (
       <div
-        key={meditation.id}
-        onClick={() => handleMeditationClick(meditation)}
+        key={warmup.id}
+        onClick={() => handleWarmupClick(warmup)}
         className="cursor-pointer group transform hover:scale-105 transition-all duration-300"
       >
         <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[280px] mb-5 items-center relative overflow-hidden">
@@ -160,8 +140,8 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
             {/* Información en la parte inferior */}
             <div className="flex items-center justify-center">
               <div className="flex items-center gap-1 text-gray-200">
-                <Clock className="w-4 h-4" />
-                <span className="text-sm">{displayDuration}</span>
+                <Dumbbell className="w-4 h-4" />
+                <span className="text-sm">Warmup Exercise</span>
               </div>
             </div>
           </div>
@@ -175,10 +155,10 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       <div className="w-full">
         {showTitle && (
           <h2 className="text-2xl font-bold text-white mb-6">
-            {t('meditations.title')}
+            Warmups
           </h2>
         )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
           {[...Array(8)].map((_, index) => (
             <div key={index} className="relative">
               <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[280px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
@@ -207,7 +187,7 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       <div className="w-full">
         {showTitle && (
           <h2 className="text-2xl font-bold text-white mb-6">
-            {t('meditations.title')}
+            Warmups
           </h2>
         )}
         <div className="text-center text-red-400 py-8">
@@ -216,27 +196,27 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
             onClick={handleRetry}
             className="mt-4 px-4 py-2 bg-wine hover:bg-red-700 rounded-lg transition-colors"
           >
-            Reintentar
+            Retry
           </button>
         </div>
       </div>
     );
   }
 
-  if (displayedMeditations.length === 0) {
+  if (displayedWarmups.length === 0) {
     return (
       <div className="w-full">
         {showTitle && (
           <h2 className="text-2xl font-bold text-white mb-6">
-            {t('meditations.title')}
+            Warmups
           </h2>
         )}
         <div className="text-center text-gray-400 py-8">
-          <Music className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+          <Dumbbell className="w-16 h-16 mx-auto mb-4 text-gray-600" />
           <p>
             {searchTerm ? 
-              t('meditations.noResultsFound', { searchTerm }) : 
-              t('meditations.noMeditations')
+              `No warmups found for "${searchTerm}"` : 
+              'No warmups available'
             }
           </p>
         </div>
@@ -248,17 +228,17 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     <div className="w-full">
       {showTitle && (
         <h2 className="text-2xl font-bold text-white mb-6">
-          {t('meditations.title')}
+          Warmups
         </h2>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {displayedMeditations.map((meditation) => (
-          <MeditationCard key={meditation.id} meditation={meditation} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
+        {displayedWarmups.map((warmup) => (
+          <WarmupCard key={warmup.id} warmup={warmup} />
         ))}
       </div>
     </div>
   );
 };
 
-export default MeditationsComponent;
+export default WarmupComponent;

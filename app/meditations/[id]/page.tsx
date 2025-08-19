@@ -6,6 +6,8 @@ import Navbar from '@/components/UI/Navbar/navbar';
 import MoreVideos from '@/components/MoreVideosRecommendation/more-videos-recommendation';
 import MeditationsComponent from '@/components/MeditationsComponent/meditations-component';
 import Footer from '@/components/UI/Footer/footer';
+import { getMeditationContent } from '@/utils/meditation-content';
+import { useI18n } from '@/contexts/I18nContext';
 
 interface Meditation {
   id: string;
@@ -26,6 +28,7 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { locale } = useI18n();
 
   // Resolver params asíncrono
   useEffect(() => {
@@ -173,6 +176,11 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
     );
   }
 
+  // Obtener contenido personalizado de la meditación
+  const meditationContent = meditation ? getMeditationContent(meditation.title, locale) : null;
+  const displayTitle = meditationContent?.newTitle || meditation?.title || '';
+  const displayDescription = meditationContent?.description || '';
+
   return (
     <div className="min-h-screen bg-gray-700 text-white">
       <Navbar />
@@ -180,7 +188,14 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Título de la meditación */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{meditation.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{displayTitle}</h1>
+          {displayDescription && (
+            <div className="max-w-4xl mx-auto mb-6">
+              <p className="text-gray-300 text-base leading-relaxed">
+                {displayDescription}
+              </p>
+            </div>
+          )}
           <p className="text-gray-400 text-lg">
             {meditation.type === 'video' ? 'Video' : 'Audio'} · {displayDuration}
           </p>
@@ -198,6 +213,9 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
                 muted
                 playsInline
                 preload="auto"
+                controlsList="nodownload"
+                disablePictureInPicture
+                onContextMenu={(e) => e.preventDefault()}
                 className="absolute top-0 left-0 w-full h-full object-contain"
                 onLoadedData={(e) => {
                   // Intentar reproducir cuando los datos están cargados
@@ -230,6 +248,8 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
                     controls
                     autoPlay
                     preload="auto"
+                    controlsList="nodownload"
+                    onContextMenu={(e) => e.preventDefault()}
                     className="w-full max-w-md"
                     onLoadedData={(e) => {
                       // Intentar reproducir cuando los datos están cargados

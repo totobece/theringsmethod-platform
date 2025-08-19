@@ -211,7 +211,7 @@ const MainPlayRoutine = () => {
                     <div className="relative p-8">
                       <Link href={`/routine/${currentRoutine.id}`}>
                         <button
-                          className="bg-wine my-10 md:my-8re absolute bottom-0 start-0 flex justify-center items-center rounded-[20px] h-12 w-[190px] md:h-10 md:w-[200px] group text-xl transform transition duration-500 hover:scale-105"
+                          className="bg-wine my-4 md:my-14 absolute bottom-0 start-0 flex justify-center items-center rounded-[20px] h-12 w-[190px] md:h-10 md:w-[200px] group text-xl transform transition duration-500 hover:scale-105"
                         >
                         <span className='text-white text-base md:text-lg'>{t('common.startRoutine')}</span>
                         <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">

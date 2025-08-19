@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Play, Pause, Volume2, Download, ArrowLeft } from 'lucide-react';
+import { Play, Pause, Volume2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import MeditationsComponent from '@/components/MeditationsComponent/meditations-component';
 import MoreVideosRecommendation from '@/components/MoreVideosRecommendation/more-videos-recommendation';
@@ -267,18 +267,6 @@ export default function MeditationPage() {
                 onChange={handleVolumeChange}
                 className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
               />
-            </div>
-
-            {/* Download Button */}
-            <div className="mt-6 text-center">
-              <a
-                href={meditation.url}
-                download={meditation.name}
-                className="inline-flex items-center px-4 py-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Descargar meditación
-              </a>
             </div>
           </div>
         </div>

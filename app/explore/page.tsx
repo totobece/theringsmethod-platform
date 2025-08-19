@@ -3,6 +3,7 @@ import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import ExploreVideoSlider from "@/components/ExploreVideos/explore-videos"
 import MeditationsComponent from "@/components/MeditationsComponent/meditations-component"
+import WarmupComponent from "@/components/WarmupComponent/warmup-component"
 import Navbar from "@/components/UI/Navbar/navbar"
 import Footer from "@/components/UI/Footer/footer"
 import TrialBanner from '@/components/TrialBanner/trial-banner'
@@ -17,7 +18,7 @@ interface TrialStatus {
   redirect?: string
 }
 
-type FilterType = 'routines' | 'meditations'
+type FilterType = 'routines' | 'meditations' | 'warmups'
 
 // Componente separado que usa useSearchParams
 function ExploreContent() {
@@ -134,10 +135,10 @@ function ExploreContent() {
           <div className="container mx-auto px-4 pt-8 pb-6">
             {/* Filter Tabs - Centrado */}
             <div className="flex justify-center mb-8">
-              <div className="flex space-x-1 bg-gray-600 rounded-lg p-1 max-w-md">
+              <div className="flex space-x-1 bg-gray-600 rounded-lg p-1 max-w-lg">
                 <button
                   onClick={() => setActiveFilter('routines')}
-                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                  className={`px-4 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
                     activeFilter === 'routines'
                       ? 'bg-gray-700 text-white shadow-lg'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -147,13 +148,23 @@ function ExploreContent() {
                 </button>
                 <button
                   onClick={() => setActiveFilter('meditations')}
-                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                  className={`px-4 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
                     activeFilter === 'meditations'
                       ? 'bg-gray-700 text-white shadow-lg'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                 >
                   <span className="font-medium">{t('explore.meditations')}</span>
+                </button>
+                <button
+                  onClick={() => setActiveFilter('warmups')}
+                  className={`px-4 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                    activeFilter === 'warmups'
+                      ? 'bg-gray-700 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                  }`}
+                >
+                  <span className="font-medium">Warmups</span>
                 </button>
               </div>
             </div>
@@ -163,8 +174,10 @@ function ExploreContent() {
           <div className="container mx-auto px-4 pb-8">
             {activeFilter === 'routines' ? (
               <ExploreVideoSlider searchTerm={searchTerm} />
-            ) : (
+            ) : activeFilter === 'meditations' ? (
               <MeditationsComponent searchTerm={searchTerm} />
+            ) : (
+              <WarmupComponent searchTerm={searchTerm} />
             )}
           </div>
 

@@ -101,7 +101,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
         
         return (
           <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
-            <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[400px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
+            <div className={`card rounded-xl boxshadow p-[16px] max-w-full min-h-[300px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
               {/* Imagen de fondo */}
               <div className="absolute inset-0 z-0">
                 <Image
@@ -119,14 +119,14 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
               {/* Contenido por encima del fondo */}
               <div className="relative z-10 h-full flex flex-col">
                 {/* Duración en la parte superior */}
-                <div className='flex justify-start mb-4'>
+                <div className='flex justify-start mb-3'>
                   <div className='bg-gray-600 bg-opacity-80 w-fit px-3 py-1 flex items-center rounded-full'>
                     <blockquote className="text-sm font-light text-cream text-center">{dataItem.duration}</blockquote>
                   </div>
                 </div>
                 
                 {/* Imagen de preview en el centro O icono de candado */}
-                <div className='flex-1 flex justify-center items-center mb-4'>
+                <div className='flex-1 flex justify-center items-center mb-3'>
                   {isUnlocked ? (
                     <Link href={`/routine/${dataItem.id}`}>
                       {preview ? (
@@ -138,7 +138,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                           style={{
                             width: '100%',
                             height: 'auto',
-                            maxHeight: '280px',
+                            maxHeight: '180px',
                             objectFit: 'cover'
                           }}
                           width={16}
@@ -146,7 +146,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-48 bg-gray-600 rounded-md flex items-center justify-center">
+                        <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
                           <span className="text-white text-sm">{t('common.noPreview')}</span>
                         </div>
                       )}
@@ -155,7 +155,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                     <div className="flex flex-col items-center text-white">
                       {/* Icono de candado */}
                       <svg 
-                        className="w-12 h-12 mb-3" 
+                        className="w-10 h-10 mb-2" 
                         fill="currentColor" 
                         viewBox="0 0 24 24"
                       >
@@ -178,10 +178,10 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                 
                 {/* Título y día en la parte inferior */}
                 <div className={`mt-auto ${!isUnlocked ? 'text-center' : 'text-right'}`}>
-                  <blockquote className={`text-lg lg:text-xl font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
+                  <blockquote className={`text-base lg:text-lg font-medium text-cream mb-0.5 ${!isUnlocked ? 'opacity-75' : ''}`}>
                     {translateRoutineData(dataItem, locale).title}
                   </blockquote>
-                  <blockquote className={`text-base font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
+                  <blockquote className={`text-sm font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
                     {translateRoutineData(dataItem, locale).day}
                   </blockquote>
                 </div>
