@@ -135,10 +135,10 @@ function ExploreContent() {
           <div className="container mx-auto px-4 pt-8 pb-6">
             {/* Filter Tabs - Centrado */}
             <div className="flex justify-center mb-8">
-              <div className="flex space-x-1 bg-gray-600 rounded-lg p-1 max-w-lg">
+              <div className="flex space-x-1 bg-gray-600 rounded-lg p-1 max-w-md">
                 <button
                   onClick={() => setActiveFilter('routines')}
-                  className={`px-4 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
                     activeFilter === 'routines'
                       ? 'bg-gray-700 text-white shadow-lg'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -148,7 +148,7 @@ function ExploreContent() {
                 </button>
                 <button
                   onClick={() => setActiveFilter('meditations')}
-                  className={`px-4 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
                     activeFilter === 'meditations'
                       ? 'bg-gray-700 text-white shadow-lg'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
@@ -158,13 +158,13 @@ function ExploreContent() {
                 </button>
                 <button
                   onClick={() => setActiveFilter('warmups')}
-                  className={`px-4 py-3 rounded-md transition-all duration-200 flex-1 justify-center ${
+                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
                     activeFilter === 'warmups'
                       ? 'bg-gray-700 text-white shadow-lg'
                       : 'text-gray-400 hover:text-white hover:bg-gray-700'
                   }`}
                 >
-                  <span className="font-medium">Warmups</span>
+                  <span className="font-medium">Warm Ups</span>
                 </button>
               </div>
             </div>

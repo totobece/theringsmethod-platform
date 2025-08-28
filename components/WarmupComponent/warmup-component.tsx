@@ -99,7 +99,7 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
 
   // Componente individual para cada card de warmup
   const WarmupCard: React.FC<{ warmup: WarmupVideo }> = ({ warmup }) => {
-    const displayTitle = `Warmup #${warmup.warmupNumber}`;
+    const displayTitle = `#${warmup.warmupNumber} Warm Up`;
 
     return (
       <div
@@ -107,7 +107,7 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
         onClick={() => handleWarmupClick(warmup)}
         className="cursor-pointer group transform hover:scale-105 transition-all duration-300"
       >
-        <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[280px] mb-5 items-center relative overflow-hidden">
+        <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden">
           {/* Imagen de fondo */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -122,26 +122,18 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 rounded-xl" />
 
           {/* Contenido */}
-          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-4">
+          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-3">
             {/* Título centrado y más compacto */}
-            <div className="mb-6">
+            <div className="mb-4">
               <h3 className="text-white font-bold text-lg leading-tight line-clamp-2">
                 {displayTitle}
               </h3>
             </div>
 
             {/* Botón de play centrado */}
-            <div className="flex justify-center mb-6">
+            <div className="flex justify-center">
               <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:bg-wine/80 transition-all duration-300">
                 <Play className="w-6 h-6 text-white fill-white" />
-              </div>
-            </div>
-
-            {/* Información en la parte inferior */}
-            <div className="flex items-center justify-center">
-              <div className="flex items-center gap-1 text-gray-200">
-                <Dumbbell className="w-4 h-4" />
-                <span className="text-sm">Warmup Exercise</span>
               </div>
             </div>
           </div>
@@ -154,14 +146,23 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
     return (
       <div className="w-full">
         {showTitle && (
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Warmups
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <Image
+              src="/logos entrada en calor.png"
+              alt="Warm Ups"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+            <h2 className="text-2xl font-bold text-white">
+              Warm Ups
+            </h2>
+          </div>
         )}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
           {[...Array(8)].map((_, index) => (
             <div key={index} className="relative">
-              <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[280px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
+              <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
                 {/* Simular la estructura de la card real */}
                 <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-4">
                   {/* Título simulado */}
@@ -186,9 +187,18 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
     return (
       <div className="w-full">
         {showTitle && (
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Warmups
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <Image
+              src="/logos entrada en calor.png"
+              alt="Warm Ups"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+            <h2 className="text-2xl font-bold text-white">
+              Warm Ups
+            </h2>
+          </div>
         )}
         <div className="text-center text-red-400 py-8">
           <p>{error}</p>
@@ -207,9 +217,18 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
     return (
       <div className="w-full">
         {showTitle && (
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Warmups
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <Image
+              src="/logos entrada en calor.png"
+              alt="Warm Ups"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+            <h2 className="text-2xl font-bold text-white">
+              Warm Ups
+            </h2>
+          </div>
         )}
         <div className="text-center text-gray-400 py-8">
           <Dumbbell className="w-16 h-16 mx-auto mb-4 text-gray-600" />
@@ -227,9 +246,18 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
   return (
     <div className="w-full">
       {showTitle && (
-        <h2 className="text-2xl font-bold text-white mb-6">
-          Warmups
-        </h2>
+        <div className="flex items-center gap-3 mb-6">
+          <Image
+            src="/logos entrada en calor.png"
+            alt="Warm Ups"
+            width={32}
+            height={32}
+            className="object-contain"
+          />
+          <h2 className="text-2xl font-bold text-white">
+            Warm Ups
+          </h2>
+        </div>
       )}
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">

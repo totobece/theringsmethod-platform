@@ -40,8 +40,8 @@ export async function GET() {
       const warmupNumber = match ? parseInt(match[1]) : 0;
 
       return {
-        id: file.name,
-        title: file.name.replace(/\.(mp4|mov|avi)$/i, ''),
+        id: warmupNumber.toString(),
+        title: `#${warmupNumber} Warm Up`,
         warmupNumber,
         url: data.publicUrl,
         fileName: file.name,
