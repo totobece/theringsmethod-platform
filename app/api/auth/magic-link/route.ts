@@ -45,7 +45,6 @@ export async function POST(request: Request) {
     // Determinar la URL de redirección basada en el host del request
     const host = request.headers.get("host");
     const forwardedHost = request.headers.get("x-forwarded-host");
-    const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
 
     let baseUrl: string;
     if (host && host.includes("theringsmethod.com")) {

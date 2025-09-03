@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
   // Determinar la URL base para redirección
   const host = request.headers.get("host") || "";
   const forwardedHost = request.headers.get("x-forwarded-host") || "";
-  const forwardedProto = request.headers.get("x-forwarded-proto") || "https";
 
   let baseUrl = "https://app.theringsmethod.com";
   if (host.includes("theringsmethod.com")) {
