@@ -26,10 +26,11 @@ export async function GET(request: NextRequest) {
 
   let baseUrl = "https://app.theringsmethod.com";
   if (host.includes("theringsmethod.com")) {
-    const protocol = forwardedProto === "http" ? "http" : "https";
-    baseUrl = `${protocol}://${host}`;
+    // Always use HTTPS for theringsmethod.com in production
+    baseUrl = `https://${host}`;
   } else if (forwardedHost.includes("theringsmethod.com")) {
-    baseUrl = `${forwardedProto}://${forwardedHost}`;
+    // Always use HTTPS for theringsmethod.com domains
+    baseUrl = `https://${forwardedHost}`;
   } else if (host.includes("localhost") || host.includes("127.0.0.1")) {
     baseUrl = `http://${host}`;
   }
