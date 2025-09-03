@@ -293,19 +293,13 @@ export default function ResetPasswordPage() {
                     {t("auth.emailSentSuccess")}
                   </h3>
                   <p className="text-green-600">
-                    We&apos;ve sent password reset instructions to{" "}
-                    <strong>{email}</strong>
+                    {t("auth.emailSentSuccessDesc")} <strong>{email}</strong>
                   </p>
                 </div>
 
                 <div className="text-gray-600">
-                  <p>
-                    Please check your email and click the reset link to
-                    continue.
-                  </p>
-                  <p className="text-sm mt-2">
-                    Don&apos;t see the email? Check your spam folder.
-                  </p>
+                  <p>{t("auth.checkEmailAndClick")}</p>
+                  <p className="text-sm mt-2">{t("auth.dontSeeEmail")}</p>
                 </div>
 
                 <div className="flex flex-col items-center space-y-4">
@@ -317,7 +311,7 @@ export default function ResetPasswordPage() {
                     }}
                     className="text-gray-600 hover:text-gray-800 hover:underline"
                   >
-                    Try with a different email
+                    {t("auth.tryDifferentEmail")}
                   </button>
 
                   <a
@@ -348,7 +342,7 @@ export default function ResetPasswordPage() {
               {t("auth.setNewPassword")}
             </h1>
             <p className="text-gray-600 text-lg">
-              Enter your new password below
+              {t("auth.enterNewPasswordBelow")}
             </p>
           </div>
 
@@ -456,14 +450,12 @@ export default function ResetPasswordPage() {
                   {t("auth.successPasswordUpdated")}
                 </h3>
                 <p className="text-green-600">
-                  Your password has been successfully updated.
+                  {t("auth.passwordSuccessfullyUpdated")}
                 </p>
               </div>
 
               <div className="text-gray-600">
-                <p>
-                  You will be redirected to the login page in a few seconds...
-                </p>
+                <p>{t("auth.redirectingToLogin")}</p>
               </div>
 
               <div className="flex justify-center">

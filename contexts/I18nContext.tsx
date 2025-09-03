@@ -64,6 +64,16 @@ const fallbackTranslations: Record<Locale, TranslationData> = {
       errorOccurredUpdating: "An error occurred while updating the password",
       passwordResetSuccess:
         "Password reset successfully! You can now login with your new password.",
+      emailSentSuccessDesc: "We've sent password reset instructions to",
+      checkEmailAndClick:
+        "Please check your email and click the reset link to continue.",
+      dontSeeEmail: "Don't see the email? Check your spam folder.",
+      tryDifferentEmail: "Try with a different email",
+      enterNewPasswordBelow: "Enter your new password below",
+      passwordSuccessfullyUpdated:
+        "Your password has been successfully updated.",
+      redirectingToLogin:
+        "You will be redirected to the login page in a few seconds...",
     },
   },
   es: {
@@ -113,6 +123,17 @@ const fallbackTranslations: Record<Locale, TranslationData> = {
       errorOccurredUpdating: "Ocurrió un error al actualizar la contraseña",
       passwordResetSuccess:
         "¡Contraseña restablecida exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.",
+      emailSentSuccessDesc:
+        "Hemos enviado instrucciones de restablecimiento de contraseña a",
+      checkEmailAndClick:
+        "Por favor revisa tu correo electrónico y haz clic en el enlace de restablecimiento para continuar.",
+      dontSeeEmail: "¿No ves el correo? Revisa tu carpeta de spam.",
+      tryDifferentEmail: "Probar con un correo diferente",
+      enterNewPasswordBelow: "Ingresa tu nueva contraseña a continuación",
+      passwordSuccessfullyUpdated:
+        "Tu contraseña ha sido actualizada exitosamente.",
+      redirectingToLogin:
+        "Serás redirigido a la página de inicio de sesión en unos segundos...",
     },
   },
 };

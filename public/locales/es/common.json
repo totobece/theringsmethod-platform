@@ -112,7 +112,7 @@
     "accept": "Acepto",
     "welcomeTitle": "¡Bienvenido a\\nThe Rings Method!",
     "createAccount": "Crear Tu Cuenta",
-    "continueAccepting": "Continuando, estas aceptando los terminos y condiciones de The Rings Method®. Ante cualquier duda mandar email a info@theringsmethod.com",
+    "continueAccepting": "Continuando, estas aceptando los términos y condiciones de The Rings Method®. Ante cualquier duda mandar email a info@theringsmethod.com",
     "successPasswordUpdated": "¡Éxito! Tu contraseña ha sido actualizada",
     "successPasswordChanged": "¡Éxito! Tu contraseña ha sido cambiada",
     "loading": "Cargando...",
@@ -130,7 +130,14 @@
     "errorOccurredReset": "Ocurrió un error al restablecer tu contraseña, por favor intenta en unos segundos",
     "errorOccurredUpdating": "Ocurrió un error al actualizar la contraseña",
     "errorPasswordRequirements": "La contraseña debe tener al menos 6 caracteres, contener al menos una letra mayúscula y al menos un dígito.",
-    "passwordResetSuccess": "¡Contraseña restablecida exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña."
+    "passwordResetSuccess": "¡Contraseña restablecida exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña.",
+    "emailSentSuccessDesc": "Hemos enviado instrucciones de restablecimiento de contraseña a",
+    "checkEmailAndClick": "Por favor revisa tu correo electrónico y haz clic en el enlace de restablecimiento para continuar.",
+    "dontSeeEmail": "¿No ves el correo? Revisa tu carpeta de spam.",
+    "tryDifferentEmail": "Probar con un correo diferente",
+    "enterNewPasswordBelow": "Ingresa tu nueva contraseña a continuación",
+    "passwordSuccessfullyUpdated": "Tu contraseña ha sido actualizada exitosamente.",
+    "redirectingToLogin": "Serás redirigido a la página de inicio de sesión en unos segundos..."
   },
   "routines": {
     "areasImprove": "Áreas que Mejorarás",

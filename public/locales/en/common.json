@@ -130,7 +130,14 @@
     "errorOccurredReset": "An error occurred during reset your password, please try in a few seconds",
     "errorOccurredUpdating": "An error occurred while updating the password",
     "errorPasswordRequirements": "Password must be at least 6 characters, contain at least one uppercase letter, and at least one digit.",
-    "passwordResetSuccess": "Password reset successfully! You can now login with your new password."
+    "passwordResetSuccess": "Password reset successfully! You can now login with your new password.",
+    "emailSentSuccessDesc": "We've sent password reset instructions to",
+    "checkEmailAndClick": "Please check your email and click the reset link to continue.",
+    "dontSeeEmail": "Don't see the email? Check your spam folder.",
+    "tryDifferentEmail": "Try with a different email",
+    "enterNewPasswordBelow": "Enter your new password below",
+    "passwordSuccessfullyUpdated": "Your password has been successfully updated.",
+    "redirectingToLogin": "You will be redirected to the login page in a few seconds..."
   },
   "routines": {
     "areasImprove": "Areas You'll Improve",
