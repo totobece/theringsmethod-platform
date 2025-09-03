@@ -97,6 +97,12 @@
     "setNewPassword": "Establece una nueva contraseña",
     "setPasswordForUser": "¡Establece una contraseña para tu usuario!",
     "forgotPassword": "¿Olvidaste tu contraseña?",
+    "requestPasswordReset": "Solicitar Restablecimiento de Contraseña",
+    "enterEmailForReset": "Ingresa tu dirección de correo electrónico",
+    "sendResetLink": "Enviar Enlace de Restablecimiento",
+    "emailSentSuccess": "Revisa tu correo para las instrucciones de restablecimiento",
+    "returnToLogin": "Volver al Login",
+    "enterEmailAndNewPassword": "Ingresa tu email y nueva contraseña",
     "signOut": "Cerrar Sesión",
     "linkExpired": "El enlace de verificación ha expirado o ya fue usado. Por favor, solicita un nuevo enlace.",
     "authError": "Ocurrió un error durante la autenticación. Por favor, intenta de nuevo.",
@@ -123,7 +129,8 @@
     "errorPasswordsNotMatch": "Las contraseñas no coinciden",
     "errorOccurredReset": "Ocurrió un error al restablecer tu contraseña, por favor intenta en unos segundos",
     "errorOccurredUpdating": "Ocurrió un error al actualizar la contraseña",
-    "errorPasswordRequirements": "La contraseña debe tener al menos 6 caracteres, contener al menos una letra mayúscula y al menos un dígito."
+    "errorPasswordRequirements": "La contraseña debe tener al menos 6 caracteres, contener al menos una letra mayúscula y al menos un dígito.",
+    "passwordResetSuccess": "¡Contraseña restablecida exitosamente! Ahora puedes iniciar sesión con tu nueva contraseña."
   },
   "routines": {
     "areasImprove": "Áreas que Mejorarás",
