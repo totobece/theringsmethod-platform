@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "cp -r locales/* public/locales/",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "sync-translations": "cp -r locales/* public/locales/"
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",

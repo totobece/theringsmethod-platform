@@ -29,10 +29,14 @@ export default function ResetPasswordPage() {
     const checkVerificationAndSession = async () => {
       const verified = searchParams.get("verified");
       const errorParam = searchParams.get("error");
+      const tokenHash = searchParams.get("token_hash");
+      const type = searchParams.get("type");
 
       console.log("🔵 Reset password page loaded");
       console.log("🔵 Verified param:", verified);
       console.log("🔵 Error param:", errorParam);
+      console.log("🔵 Token hash:", tokenHash ? "Present" : "None");
+      console.log("🔵 Type:", type);
 
       // Handle error parameters
       if (errorParam) {
@@ -49,6 +53,47 @@ export default function ResetPasswordPage() {
         }
         setStep("request");
         return;
+      }
+
+      // If user came directly with token parameters, verify them
+      if (tokenHash && type === "recovery" && !verified) {
+        console.log("🔵 Direct token access, verifying token...");
+        try {
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: "recovery",
+          });
+
+          if (error) {
+            console.error("❌ Direct token verification error:", error);
+            if (error.code === "otp_expired") {
+              setError(t("auth.linkExpired"));
+            } else {
+              setError(t("auth.authError"));
+            }
+            setStep("request");
+            return;
+          }
+
+          if (data.session) {
+            console.log("✅ Direct token verification successful");
+            setStep("reset");
+            return;
+          } else {
+            console.log("⚠️ Token verified but no session created");
+            setError("Session error. Please request a new reset link.");
+            setStep("request");
+            return;
+          }
+        } catch (err) {
+          console.error(
+            "❌ Unexpected error during direct token verification:",
+            err,
+          );
+          setError(t("auth.authError"));
+          setStep("request");
+          return;
+        }
       }
 
       // If verified=true, user came from successful token verification
@@ -101,7 +146,7 @@ export default function ResetPasswordPage() {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
         email,
         {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${window.location.origin}/auth/reset-password`,
         },
       );
 

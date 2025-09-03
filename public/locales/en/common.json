@@ -97,6 +97,12 @@
     "setNewPassword": "Set a new password",
     "setPasswordForUser": "Set a password for your user!",
     "forgotPassword": "Forgot your password?",
+    "requestPasswordReset": "Request Password Reset",
+    "enterEmailForReset": "Enter your email address",
+    "sendResetLink": "Send Reset Link",
+    "emailSentSuccess": "Check your email for reset instructions",
+    "returnToLogin": "Return to Login",
+    "enterEmailAndNewPassword": "Enter your email and new password",
     "signOut": "Sign Out",
     "linkExpired": "The verification link has expired or was already used. Please request a new link.",
     "authError": "An error occurred during authentication. Please try again.",
@@ -123,7 +129,8 @@
     "errorPasswordsNotMatch": "Passwords do not match",
     "errorOccurredReset": "An error occurred during reset your password, please try in a few seconds",
     "errorOccurredUpdating": "An error occurred while updating the password",
-    "errorPasswordRequirements": "Password must be at least 6 characters, contain at least one uppercase letter, and at least one digit."
+    "errorPasswordRequirements": "Password must be at least 6 characters, contain at least one uppercase letter, and at least one digit.",
+    "passwordResetSuccess": "Password reset successfully! You can now login with your new password."
   },
   "routines": {
     "areasImprove": "Areas You'll Improve",
