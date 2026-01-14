@@ -34,6 +34,8 @@ export default function LoginPage() {
       setErrorMessage(t("auth.userExists"));
     } else if (error === "signup_failed") {
       setErrorMessage(t("auth.signupFailed"));
+    } else if (error === "timeout") {
+      setErrorMessage("La conexión ha tardado demasiado. Por favor, intenta de nuevo.");
     } else if (success === "signup_complete") {
       setErrorMessage(t("auth.signupComplete"));
     } else if (success === "password_reset") {
@@ -50,12 +52,21 @@ export default function LoginPage() {
     setIsLoading(true);
     setErrorMessage("");
 
+    // Timeout en el cliente también
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+      setErrorMessage("La conexión está tardando demasiado. Por favor, recarga la página e intenta de nuevo.");
+    }, 15000); // 15 segundos
+
     try {
       await login(formData);
+      clearTimeout(timeout);
     } catch (error) {
+      clearTimeout(timeout);
       console.error("Error during authentication:", error);
       setErrorMessage(t("auth.authError"));
     } finally {
+      clearTimeout(timeout);
       setIsLoading(false);
     }
   };
@@ -71,7 +82,7 @@ export default function LoginPage() {
         <div className="w-full space-y-10 p-8 rounded-2xl bg-darkgrad border-2 border-gray-600">
           <div>
             <h1 className="text-white w-full font-medium text-3xl lg:text-5xl">
-              {t("auth.welcomeTitle")
+              {(t("auth.welcomeTitle") || "¡Bienvenido a\\nThe Rings Method!")
                 .split("\\n")
                 .map((line, index) => (
                   <span key={index}>

@@ -3,7 +3,23 @@ import { NextResponse, type NextRequest } from "next/server";
 import { extractDayNumberFromString } from "@/utils/progress-logic";
 
 export async function updateSession(request: NextRequest) {
-  console.log(`🚀 Middleware called for: ${request.nextUrl.pathname}`);
+  // SPAM BLOCKER: Fast exit for known spam patterns to save resources
+  const path = request.nextUrl.pathname.toLowerCase();
+  const spamKeywords = [
+    "goldluck",
+    "commodity",
+    "casino",
+    "slot",
+    "bet",
+    "poker",
+    "virtuals",
+    "crypto",
+  ];
+
+  if (spamKeywords.some((keyword) => path.includes(keyword))) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
+
 
   let response = NextResponse.next({
     request: {
@@ -20,8 +36,9 @@ export async function updateSession(request: NextRequest) {
   response.headers.set("Expires", "0");
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "https://shrswzchkqiobcikdfrn.supabase.co",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNocnN3emNoa3Fpb2JjaWtkZnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5NjU3MDYsImV4cCI6MjA1MjU0MTcwNn0.3w5scY6pFfv2_CmuJX2PR8UB7Ib-YZXZa8Gq5WPuWx8",
+
     {
       cookies: {
         get(name: string) {
@@ -70,8 +87,30 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Check if the route needs routine access protection
+  // Check if the route needs admin protection
   const url = request.nextUrl.clone();
+  const isAdminRoute = url.pathname.startsWith("/admin");
+
+  if (isAdminRoute) {
+    if (!user) {
+      // Redirect to login if not authenticated
+      url.pathname = "/login";
+      url.searchParams.set("error", "auth_required");
+      return NextResponse.redirect(url);
+    }
+
+    // Check if user has admin role
+    if (user.user_metadata?.role !== "admin") {
+      console.warn(`❌ Acceso denegado a ruta admin para: ${user.email}`);
+      url.pathname = "/";
+      url.searchParams.set("error", "access_denied");
+      return NextResponse.redirect(url);
+    }
+
+    console.log(`✅ Acceso admin permitido para: ${user.email}`);
+  }
+
+  // Check if the route needs routine access protection
   const isProtectedRoute =
     url.pathname.startsWith("/routine/") || url.pathname.startsWith("/video/");
 

@@ -14,7 +14,16 @@ export async function checkUserTrialStatusClient(): Promise<TrialStatus> {
   
   try {
     // Usar getUser() para obtener el usuario actual
-    const { data: { user }, error } = await supabase.auth.getUser()
+    let { data: { user }, error } = await supabase.auth.getUser()
+    
+    // Si no hay usuario, reintentar una vez después de un pequeño delay
+    // Esto maneja el caso donde la cookie de sesión aún no está sincronizada después del login
+    if ((error || !user)) {
+      await new Promise(resolve => setTimeout(resolve, 100))
+      const retry = await supabase.auth.getUser()
+      user = retry.data.user
+      error = retry.error
+    }
     
     if (error || !user) {
       return { isValid: false, user: null, redirect: '/login' }

@@ -2,7 +2,11 @@
   "navbar": {
     "home": "Home",
     "explore": "Explore",
-    "search": "Search routines and meditations...",
+    "search": "Search routines and meditatio    "welcomeTitle": "Welcome to
+The Rings Method!",
+    "createAccount": "Create Your Account",
+    "continueAccepting": "By continuing, you agree to the terms and conditions of The Rings Method ®",
+    "successPasswordUpdated": "Success! Your password has been updated",..",
     "languageSelector": "Language"
   },
   "sidebar": {
@@ -21,7 +25,6 @@
     "socialMedia": {
       "instagram": "Instagram",
       "facebook": "Facebook",
-      "youtube": "YouTube",
       "tiktok": "TikTok"
     }
   },
@@ -40,7 +43,7 @@
     "locked": "Locked",
     "unlocked": "Unlocked",
     "noPreview": "No preview",
-    "exploreRingsMethod": "Explore The Rings Method",
+    "exploreRingsMethod": "Explore The Rings Method experience",
     "couldntFind": "Couldn't find",
     "trySearchAgain": "Try searching again using a different spelling or keyword",
     "minutes": "min",
@@ -77,7 +80,7 @@
       "locked": "Locked",
       "unlocked": "Unlocked"
     },
-    "moreRoutines": "Check all the workouts",
+    "moreRoutines": "Discover more routines to try!",
     "demoAvailable": "Demo available soon",
     "doItIndoor": "Do it Indoor"
   },
@@ -98,12 +101,6 @@
     "setNewPassword": "Set a new password",
     "setPasswordForUser": "Set a password for your user!",
     "forgotPassword": "Forgot your password?",
-    "requestPasswordReset": "Request Password Reset",
-    "enterEmailForReset": "Enter your email address",
-    "sendResetLink": "Send Reset Link",
-    "emailSentSuccess": "Check your email for reset instructions",
-    "returnToLogin": "Return to Login",
-    "enterEmailAndNewPassword": "Enter your email and new password",
     "signOut": "Sign Out",
     "linkExpired": "The verification link has expired or was already used. Please request a new link.",
     "authError": "An error occurred during authentication. Please try again.",
@@ -113,7 +110,7 @@
     "accept": "Accept",
     "welcomeTitle": "Welcome to\\nThe Rings Method!",
     "createAccount": "Create Your Account",
-    "continueAccepting": "By continuing, you agree to the terms and conditions of The Rings Method®. If you have any questions, please email info@theringsmethod.com",
+    "continueAccepting": "By continuing, you agree to the terms and conditions of The Rings Method®.",
     "successPasswordUpdated": "Success! Your password has been updated",
     "successPasswordChanged": "Success! Your password has been changed",
     "loading": "Loading...",
@@ -130,15 +127,7 @@
     "errorPasswordsNotMatch": "Passwords do not match",
     "errorOccurredReset": "An error occurred during reset your password, please try in a few seconds",
     "errorOccurredUpdating": "An error occurred while updating the password",
-    "errorPasswordRequirements": "Password must be at least 6 characters, contain at least one uppercase letter, and at least one digit.",
-    "passwordResetSuccess": "Password reset successfully! You can now login with your new password.",
-    "emailSentSuccessDesc": "We've sent password reset instructions to",
-    "checkEmailAndClick": "Please check your email and click the reset link to continue.",
-    "dontSeeEmail": "Don't see the email? Check your spam folder.",
-    "tryDifferentEmail": "Try with a different email",
-    "enterNewPasswordBelow": "Enter your new password below",
-    "passwordSuccessfullyUpdated": "Your password has been successfully updated.",
-    "redirectingToLogin": "You will be redirected to the login page in a few seconds..."
+    "errorPasswordRequirements": "Password must be at least 6 characters, contain at least one uppercase letter, and at least one digit."
   },
   "routines": {
     "areasImprove": "Areas You'll Improve",
@@ -146,7 +135,7 @@
     "exercises": "Exercises",
     "proTip": "Pro Tip",
     "doItIndoor": "Do It Indoor",
-    "discoverMore": "Check all the workouts",
+    "discoverMore": "Discover more routines to try!",
     "demoAvailable": "Demo available soon",
     "routineLocked": "This routine is locked. Complete previous routines to unlock it.",
     "routineCompleted": "Routine completed successfully",

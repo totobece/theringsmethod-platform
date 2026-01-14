@@ -54,6 +54,9 @@ const fallbackTranslations: Record<Locale, TranslationData> = {
       updatePassword: "Update Password",
       successPasswordUpdated: "Success! Your password has been updated",
       loading: "Loading...",
+      welcomeTitle: "Welcome to\\nThe Rings Method!",
+      invalidCredentials: "Invalid email or password. Please try again.",
+      continueAccepting: "By continuing, you accept our Terms of Service and Privacy Policy",
       linkExpired:
         "The verification link has expired or was already used. Please request a new link.",
       authError: "An error occurred during authentication. Please try again.",
@@ -112,6 +115,9 @@ const fallbackTranslations: Record<Locale, TranslationData> = {
       updatePassword: "Actualizar Contraseña",
       successPasswordUpdated: "¡Éxito! Tu contraseña ha sido actualizada",
       loading: "Cargando...",
+      welcomeTitle: "¡Bienvenido a\\nThe Rings Method!",
+      invalidCredentials: "Email o contraseña inválidos. Por favor, intenta de nuevo.",
+      continueAccepting: "Al continuar, aceptas nuestros Términos de Servicio y Política de Privacidad",
       linkExpired:
         "El enlace de verificación ha expirado o ya fue usado. Por favor, solicita un nuevo enlace.",
       authError:

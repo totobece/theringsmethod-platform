@@ -2,17 +2,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 
-// Inicializa el cliente de Supabase.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Las variables de entorno SUPABASE_URL y SUPABASE_ANON_KEY deben estar definidas.');
-}
-
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
 export async function GET(request: Request) {
+  // Inicializa el cliente de Supabase dentro de la función para evitar errores en build
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.json({ error: 'Configuración de Supabase no encontrada' }, { status: 500 });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
   try {
     const bucketName = 'gifs'; // Tu bucket de gifs de Supabase
     const { searchParams } = new URL(request.url);

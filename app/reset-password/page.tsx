@@ -1,6 +1,6 @@
 "use client";
 import { createClient } from "@/utils/supabase/client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Navbar from "@/components/UI/Navbar/navbar";
 import Footer from "@/components/UI/Footer/footer";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,6 +11,9 @@ export default function ResetPasswordPage() {
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Ref para evitar múltiples verificaciones del token
+  const isVerifying = useRef(false);
 
   // Step 1: Request reset email
   const [step, setStep] = useState<"request" | "reset">("request");
@@ -27,6 +30,12 @@ export default function ResetPasswordPage() {
   // Check if user came from reset email or has verified session
   useEffect(() => {
     const checkVerificationAndSession = async () => {
+      // Evitar múltiples ejecuciones
+      if (isVerifying.current) {
+        return;
+      }
+      isVerifying.current = true;
+
       const verified = searchParams.get("verified");
       const errorParam = searchParams.get("error");
       const tokenHash = searchParams.get("token_hash");
@@ -55,47 +64,6 @@ export default function ResetPasswordPage() {
         return;
       }
 
-      // If user came directly with token parameters, verify them
-      if (tokenHash && type === "recovery" && !verified) {
-        console.log("🔵 Direct token access, verifying token...");
-        try {
-          const { data, error } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: "recovery",
-          });
-
-          if (error) {
-            console.error("❌ Direct token verification error:", error);
-            if (error.code === "otp_expired") {
-              setError(t("auth.linkExpired"));
-            } else {
-              setError(t("auth.authError"));
-            }
-            setStep("request");
-            return;
-          }
-
-          if (data.session) {
-            console.log("✅ Direct token verification successful");
-            setStep("reset");
-            return;
-          } else {
-            console.log("⚠️ Token verified but no session created");
-            setError("Session error. Please request a new reset link.");
-            setStep("request");
-            return;
-          }
-        } catch (err) {
-          console.error(
-            "❌ Unexpected error during direct token verification:",
-            err,
-          );
-          setError(t("auth.authError"));
-          setStep("request");
-          return;
-        }
-      }
-
       // If verified=true, user came from successful token verification
       if (verified === "true") {
         console.log("🔵 User verified via reset link, checking session...");
@@ -111,21 +79,30 @@ export default function ResetPasswordPage() {
           setError("Session expired. Please request a new reset link.");
           setStep("request");
         }
-      } else {
-        // No verified param, check if user has an existing session
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        console.log(
-          "🔵 Checking existing session:",
-          session ? "Present" : "None",
-        );
+        return;
+      }
 
-        if (session) {
-          setStep("reset");
-        } else {
-          setStep("request");
-        }
+      // Si hay token_hash directo (viene del email), redirigir al endpoint del servidor
+      if (tokenHash && type === "recovery") {
+        console.log("🔵 Direct token access, redirecting to server endpoint...");
+        // Redirigir al endpoint del servidor que maneja la verificación correctamente
+        window.location.href = `/auth/reset-password?token_hash=${tokenHash}&type=${type}`;
+        return;
+      }
+
+      // No verified param, check if user has an existing session
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log(
+        "🔵 Checking existing session:",
+        session ? "Present" : "None",
+      );
+
+      if (session) {
+        setStep("reset");
+      } else {
+        setStep("request");
       }
     };
 

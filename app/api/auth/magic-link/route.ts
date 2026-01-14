@@ -81,131 +81,122 @@ export async function POST(request: Request) {
 
     console.log("🔵 Enviando magic link a email:", email);
 
-    const supabase = await createClient();
+    // Return success immediately to avoid timeouts (Fire and Forget)
+    // We process the logic in the background
+    (async () => {
+      try {
+        console.log("🔵 (Async) Enviando magic link a email:", email);
+        const supabase = await createClient();
 
-    // Intenta enviar magic link; si no existe usuario, primero registrarlo y reenviar
-    const sendMagicLink = () => {
-      console.log("🔵 Ejecutando sendMagicLink...");
-      return supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: finalRedirectTo,
-          data: {
-            source: "gohighlevel_30day_challenge",
-            challenge_type: "30_day_challenge",
-            created_via: "magic_link",
-            trial_start_date: new Date().toISOString(),
-            trial_end_date: new Date(
-              Date.now() + 30 * 24 * 60 * 60 * 1000,
-            ).toISOString(), // 30 días
-          },
-        },
-      });
-    };
-
-    // primer intento
-    console.log("🔵 Primer intento de envío...");
-    let { data, error } = await sendMagicLink();
-
-    if (
-      error?.message?.includes("User not found") ||
-      error?.code === "user_not_found"
-    ) {
-      console.log("🔵 Usuario no encontrado, creando nuevo usuario...");
-      // crear usuario para luego usar plantilla de Magic Link
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
-          email,
-          password: crypto.randomUUID(), // temporary password that won't be used
-          options: {
-            data: {
-              source: "gohighlevel_30day_challenge",
-              challenge_type: "30_day_challenge",
-              created_via: "magic_link",
-              trial_start_date: new Date().toISOString(),
-              trial_end_date: new Date(
-                Date.now() + 30 * 24 * 60 * 60 * 1000,
-              ).toISOString(),
+        // Intenta enviar magic link; si no existe usuario, primero registrarlo y reenviar
+        const sendMagicLink = () => {
+          console.log("🔵 (Async) Ejecutando sendMagicLink...");
+          return supabase.auth.signInWithOtp({
+            email,
+            options: {
+              emailRedirectTo: finalRedirectTo,
+              data: {
+                source: "gohighlevel_30day_challenge",
+                challenge_type: "30_day_challenge",
+                created_via: "magic_link",
+                trial_start_date: new Date().toISOString(),
+                trial_end_date: new Date(
+                  Date.now() + 30 * 24 * 60 * 60 * 1000,
+                ).toISOString(), // 30 días
+              },
             },
-          },
-        });
+          });
+        };
 
-      console.log("🔵 Resultado de signUp:", signUpData);
-      console.log("🔵 Error de signUp:", signUpError);
+        // primer intento
+        console.log("🔵 (Async) Primer intento de envío...");
+        let { data, error } = await sendMagicLink();
 
-      if (signUpError) {
-        console.error("❌ Error creando usuario:", signUpError);
-        return new Response(
-          JSON.stringify({
-            error: `Database error saving new user`,
-            received: parsedBody,
-          }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
-      }
-
-      // Crear progreso inicial manualmente como fallback
-      // en caso de que el trigger no haya funcionado
-      if (signUpData?.user?.id) {
-        try {
-          console.log(
-            "🔵 Creando progreso inicial manualmente para usuario:",
-            signUpData.user.id,
-          );
-          const { error: progressError } = await supabase
-            .from("user_progress")
-            .insert({
-              user_id: signUpData.user.id,
-              routine_day: 1,
-              unlocked_at: new Date().toISOString(),
-              completed_at: null,
+        if (
+          error?.message?.includes("User not found") ||
+          error?.code === "user_not_found"
+        ) {
+          console.log("🔵 (Async) Usuario no encontrado, creando nuevo usuario...");
+          // crear usuario para luego usar plantilla de Magic Link
+          const { data: signUpData, error: signUpError } =
+            await supabase.auth.signUp({
+              email,
+              password: crypto.randomUUID(), // temporary password that won't be used
+              options: {
+                data: {
+                  source: "gohighlevel_30day_challenge",
+                  challenge_type: "30_day_challenge",
+                  created_via: "magic_link",
+                  trial_start_date: new Date().toISOString(),
+                  trial_end_date: new Date(
+                    Date.now() + 30 * 24 * 60 * 60 * 1000,
+                  ).toISOString(),
+                },
+              },
             });
 
-          if (progressError && !progressError.message?.includes("duplicate")) {
-            console.log(
-              "⚠️ No se pudo crear progreso inicial (puede que el trigger ya lo haya hecho):",
-              progressError,
-            );
-          } else {
-            console.log("✅ Progreso inicial creado manualmente");
+          console.log("🔵 (Async) Resultado de signUp:", signUpData);
+          console.log("🔵 (Async) Error de signUp:", signUpError);
+
+          if (signUpError) {
+            console.error("❌ (Async) Error creando usuario:", signUpError);
+            return;
           }
-        } catch (err) {
-          console.log(
-            "⚠️ Error intentando crear progreso inicial manual:",
-            err,
-          );
-          // No es crítico, continuamos
+
+          // Crear progreso inicial manualmente como fallback
+          // en caso de que el trigger no haya funcionado
+          if (signUpData?.user?.id) {
+            try {
+              console.log(
+                "🔵 (Async) Creando progreso inicial manualmente para usuario:",
+                signUpData.user.id,
+              );
+              const { error: progressError } = await supabase
+                .from("user_progress")
+                .insert({
+                  user_id: signUpData.user.id,
+                  routine_day: 1,
+                  unlocked_at: new Date().toISOString(),
+                  completed_at: null,
+                });
+
+              if (progressError && !progressError.message?.includes("duplicate")) {
+                console.log(
+                  "⚠️ (Async) No se pudo crear progreso inicial (puede que el trigger ya lo haya hecho):",
+                  progressError,
+                );
+              } else {
+                console.log("✅ (Async) Progreso inicial creado manualmente");
+              }
+            } catch (err) {
+              console.log(
+                "⚠️ (Async) Error intentando crear progreso inicial manual:",
+                err,
+              );
+              // No es crítico, continuamos
+            }
+          }
+
+          // Esperar un poco antes del segundo intento
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          console.log("🔵 (Async) Segundo intento de envío...");
+          ({ data, error } = await sendMagicLink());
         }
+
+        console.log("🔵 (Async) Resultado de Supabase signInWithOtp:");
+        console.log("🔵 (Async) Data:", JSON.stringify(data, null, 2));
+        console.log("🔵 (Async) Error:", error);
+
+        if (error) {
+          console.error("❌ (Async) Error enviando magic link:", error.message);
+        } else {
+          console.log("✅ (Async) Magic link enviado exitosamente a:", email);
+        }
+      } catch (err) {
+        console.error("❌ (Async) Error inesperado en proceso background:", err);
       }
+    })();
 
-      // Esperar un poco antes del segundo intento
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("🔵 Segundo intento de envío...");
-      ({ data, error } = await sendMagicLink());
-    }
-
-    console.log("🔵 Resultado de Supabase signInWithOtp:");
-    console.log("🔵 Data:", JSON.stringify(data, null, 2));
-    console.log("🔵 Error:", error);
-
-    if (error) {
-      console.error("❌ Error enviando magic link:", error.message);
-      return new Response(
-        JSON.stringify({
-          error: error.message,
-          received: parsedBody,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
-
-    console.log("✅ Magic link enviado exitosamente a:", email);
 
     return new Response(
       JSON.stringify({

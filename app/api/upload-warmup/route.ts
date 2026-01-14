@@ -1,12 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // Usa la service role key, no la anon key
-);
-
 export async function POST(request: NextRequest) {
+  // Inicializa el cliente de Supabase dentro de la función para evitar errores en build
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return NextResponse.json({ error: 'Configuración de Supabase no encontrada' }, { status: 500 });
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
