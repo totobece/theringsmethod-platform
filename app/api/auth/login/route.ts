@@ -4,7 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    console.log("[LOGIN API] 1. Request received");
+    const body = await request.json();
+    console.log("[LOGIN API] 2. Body parsed:", body?.email);
+    const { email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -13,7 +16,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    console.log("[LOGIN API] 3. Creating Supabase client...");
     const cookieStore = await cookies();
+    console.log("[LOGIN API] 4. Got cookie store");
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -34,11 +39,13 @@ export async function POST(request: NextRequest) {
         },
       }
     );
+    console.log("[LOGIN API] 5. Supabase client created, calling signInWithPassword...");
 
     const { error } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
+    console.log("[LOGIN API] 6. signInWithPassword returned", error ? `error: ${error.message}` : "success");
 
     if (error) {
       console.error("[LOGIN API] Auth error:", error.message);
