@@ -193,12 +193,11 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
       {/* Reproductor de video */}
       {videoUrl && !isLoading && (
         <div className="max-w-full mx-auto flex justify-center items-center h-full">
-          <video 
-            controls 
-            autoPlay 
+          <video
+            controls
+            autoPlay
             className='h-full w-full'
             data-testid="video-player"
-            crossOrigin="anonymous"
             controlsList="nodownload"
             disablePictureInPicture
             onContextMenu={(e) => e.preventDefault()}
@@ -263,9 +262,9 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
       {/* Meditaciones Section */}
       <div className="mt-16 mb-8 px-4 md:px-6">
         <h2 className="text-2xl md:text-3xl font-medium text-white text-center mb-8">
-          {locale === 'es' ? 'Relájate con nuestras meditaciones' : 'Relax with our meditations'}
+          {locale === 'es' ? 'Entrenamiento Mental' : 'Mental Training'}
         </h2>
-        <MeditationsComponent showTitle={false} />
+        <MeditationsComponent showTitle={false} variant="minimal" />
       </div>
 
       <div className='justify-center items-center flex flex-col'>

@@ -76,7 +76,6 @@ export default function MeditationPage() {
   useEffect(() => {
     if (meditation && meditation.url) {
       const audioElement = new Audio();
-      audioElement.crossOrigin = 'anonymous'; // Agregar para evitar problemas de CORS
       audioElement.preload = 'metadata';
       setAudio(audioElement);
 

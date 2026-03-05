@@ -107,9 +107,19 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
         onClick={() => handleWarmupClick(warmup)}
         className="cursor-pointer group"
       >
-        <div className="bg-trm-black border border-pink rounded-[20px] p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden brightness-[0.7] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300">
+        <div className="border border-pink rounded-[20px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden bg-black brightness-[0.85] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/warmup-bg.png"
+              alt=""
+              fill
+              className="object-cover"
+            />
+          </div>
+
           {/* Contenido */}
-          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-3">
+          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-6 min-h-[200px]">
             {/* Título centrado y más compacto */}
             <div className="mb-4">
               <h3 className="text-white font-bold text-lg leading-tight line-clamp-2">

@@ -61,6 +61,15 @@ body {
   border-radius: 10px;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Prevenir descarga de videos y audios - Ocultar botones de descarga */
 video::-webkit-media-controls-download-button {
   display: none !important;

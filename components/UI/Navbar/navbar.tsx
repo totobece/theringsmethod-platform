@@ -311,7 +311,7 @@ export default function Navbar() {
         </div>
 
         {/* Language Pills in drawer */}
-        <div className="mt-5">
+        <div className="mt-5 w-fit">
           <LanguageSelector />
         </div>
       </div>

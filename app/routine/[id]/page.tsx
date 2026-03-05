@@ -325,8 +325,8 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
         </>
       )}
       <div className='justify-center items-center flex flex-col mt-16'>
-        {/* Sección Do it Indoor con GIF */}
-        {!isLoadingPost && post && (
+        {/* Sección Do it Indoor con GIF - hide for Mobility days (6, 12, 18, 24) */}
+        {!isLoadingPost && post && ![6, 12, 18, 24].includes(routineDay) && (
           <div className="w-full max-w-4xl mx-auto px-4 md:px-16 mb-12 md:mb-16">
             <div className="text-center mb-8">
               <h2 className='text-white text-pretty font-medium text-2xl md:text-4xl'>
@@ -355,9 +355,9 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                 <div className="relative max-w-md md:max-w-lg lg:max-w-xl">
                   <div className="w-full h-64 md:h-80 bg-trm-bg border border-pink rounded-[20px] flex items-center justify-center">
                     <div className="text-center text-white">
-                      <svg 
-                        className="w-16 h-16 mx-auto mb-4 text-pink opacity-60" 
-                        fill="currentColor" 
+                      <svg
+                        className="w-16 h-16 mx-auto mb-4 text-pink opacity-60"
+                        fill="currentColor"
                         viewBox="0 0 24 24"
                       >
                         <path d="M8 5v14l11-7z"/>

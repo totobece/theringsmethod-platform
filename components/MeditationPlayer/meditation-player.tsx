@@ -32,10 +32,13 @@ const AUDIO: AudioUrls[] = [
   { es: '', en: '' },
 ];
 
-const MEDITATION_COUNT = 6;
+// Meditations 5 & 6 are Spanish-only
+const MEDITATION_COUNT_EN = 4;
+const MEDITATION_COUNT_ES = 6;
 
 export default function MeditationPlayer() {
   const { t, locale } = useI18n();
+  const meditationCount = locale === 'es' ? MEDITATION_COUNT_ES : MEDITATION_COUNT_EN;
   const audioRef = useRef<HTMLAudioElement>(null);
   const [selectedIdx, setSelectedIdx] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -70,11 +73,22 @@ export default function MeditationPlayer() {
     }
   };
 
-  // Handle locale change — update audio source
+  // Handle locale change — update audio source or reset if out of range
   useEffect(() => {
     if (selectedIdx < 0) return;
     const audio = audioRef.current;
     if (!audio) return;
+
+    // Reset selection if current meditation is not available in new locale
+    if (selectedIdx >= meditationCount) {
+      audio.pause();
+      audio.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentTime(0);
+      setDuration(0);
+      setSelectedIdx(-1);
+      return;
+    }
 
     const wasPlaying = !audio.paused;
     const curTime = audio.currentTime;
@@ -244,7 +258,7 @@ export default function MeditationPlayer() {
 
             {/* LIST */}
             <div className="trm4-list">
-              {Array.from({ length: MEDITATION_COUNT }, (_, idx) => (
+              {Array.from({ length: meditationCount }, (_, idx) => (
                 <div
                   key={idx}
                   className={`trm4-card ${selectedIdx === idx ? 'trm4-active' : ''}`}

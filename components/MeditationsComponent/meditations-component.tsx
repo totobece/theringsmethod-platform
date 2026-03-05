@@ -23,13 +23,15 @@ interface MeditationsComponentProps {
   onMeditationClick?: (meditation: Meditation) => void;
   showTitle?: boolean;
   excludeId?: string;
+  variant?: 'default' | 'minimal';
 }
 
 const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
   searchTerm = '',
   onMeditationClick,
   showTitle = true,
-  excludeId
+  excludeId,
+  variant = 'default'
 }) => {
   const [meditations, setMeditations] = useState<Meditation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -113,21 +115,26 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     return (
       <div
         onClick={() => handleMeditationClick(meditation)}
-        className="cursor-pointer group"
+        className={`cursor-pointer group ${variant === 'minimal' ? 'flex-shrink-0 w-[200px] md:w-auto' : ''}`}
       >
-        <div className="bg-trm-black border border-pink rounded-[20px] overflow-hidden relative min-h-[200px] brightness-[0.7] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300">
+        <div
+          className={`border border-pink rounded-[20px] overflow-hidden relative min-h-[200px] bg-black hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300 ${
+            variant === 'minimal' ? 'brightness-[0.85] hover:brightness-100' : 'brightness-[0.7] hover:brightness-100'
+          }`}
+        >
           {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="/images/smaller rectangle.png"
-              alt="Card Background"
+              src="/images/meditation-bg.png"
+              alt=""
               fill
               className="object-cover"
             />
           </div>
-
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+          {/* Gradient Overlay - only for default variant */}
+          {variant !== 'minimal' && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+          )}
 
           {/* Content */}
           <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-4 py-6 min-h-[200px]">
@@ -216,11 +223,19 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     <div className="w-full">
       {showTitle && <MeditationSectionTitle />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        {displayedMeditations.map((meditation) => (
-          <MeditationCard key={meditation.id} meditation={meditation} />
-        ))}
-      </div>
+      {variant === 'minimal' ? (
+        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0 scrollbar-hide">
+          {displayedMeditations.map((meditation) => (
+            <MeditationCard key={meditation.id} meditation={meditation} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {displayedMeditations.map((meditation) => (
+            <MeditationCard key={meditation.id} meditation={meditation} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
