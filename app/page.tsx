@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '@/components/UI/Navbar/navbar';
 import MainPlayRoutine from '@/components/MainPlayRoutine/main-play-routine';
 import WeekVideoSlider from '@/components/WeekVideoSlider/week-video-slider';
-import MeditationsComponent from '@/components/MeditationsComponent/meditations-component';
+import MeditationPlayer from '@/components/MeditationPlayer/meditation-player';
 import { checkUserTrialStatusClient } from "@/utils/trial-check-client";
 import { useRouter } from 'next/navigation'
 import Footer from '@/components/UI/Footer/footer';
@@ -76,7 +76,7 @@ export default function Home() {
 
             {/* Meditations Section */}
             <div className="max-w-[1400px] mx-auto px-5 md:px-6 py-8">
-              <MeditationsComponent />
+              <MeditationPlayer />
             </div>
 
             {/* Explore Section */}

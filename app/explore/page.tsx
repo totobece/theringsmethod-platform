@@ -2,7 +2,8 @@
 import { useEffect, useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import ExploreVideoSlider from "@/components/ExploreVideos/explore-videos"
-import MeditationsComponent from "@/components/MeditationsComponent/meditations-component"
+// Hidden: meditation section moved to home page player
+// import MeditationsComponent from "@/components/MeditationsComponent/meditations-component"
 import WarmupComponent from "@/components/WarmupComponent/warmup-component"
 import Navbar from "@/components/UI/Navbar/navbar"
 import Footer from "@/components/UI/Footer/footer"
@@ -18,7 +19,7 @@ interface TrialStatus {
   redirect?: string
 }
 
-type FilterType = 'routines' | 'meditations' | 'warmups'
+type FilterType = 'routines' | 'warmups'
 
 // Componente separado que usa useSearchParams
 function ExploreContent() {
@@ -146,6 +147,7 @@ function ExploreContent() {
                 >
                   <span className="font-medium">{t('explore.routines')}</span>
                 </button>
+                {/* Hidden: meditation tab moved to home page player
                 <button
                   onClick={() => setActiveFilter('meditations')}
                   className={`px-6 py-3 rounded-full transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
@@ -156,6 +158,7 @@ function ExploreContent() {
                 >
                   <span className="font-medium">{t('explore.meditations')}</span>
                 </button>
+                */}
                 <button
                   onClick={() => setActiveFilter('warmups')}
                   className={`px-6 py-3 rounded-full transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
@@ -174,8 +177,6 @@ function ExploreContent() {
           <div className="container mx-auto px-4 pb-8">
             {activeFilter === 'routines' ? (
               <ExploreVideoSlider searchTerm={searchTerm} />
-            ) : activeFilter === 'meditations' ? (
-              <MeditationsComponent searchTerm={searchTerm} />
             ) : (
               <WarmupComponent searchTerm={searchTerm} />
             )}
