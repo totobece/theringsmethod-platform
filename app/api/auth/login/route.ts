@@ -4,10 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("[LOGIN API] 1. Request received");
-    const body = await request.json();
-    console.log("[LOGIN API] 2. Body parsed:", body?.email);
-    const { email, password } = body;
+    const { email, password } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -16,9 +13,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("[LOGIN API] 3. Creating Supabase client...");
     const cookieStore = await cookies();
-    console.log("[LOGIN API] 4. Got cookie store");
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -33,19 +28,24 @@ export async function POST(request: NextRequest) {
                 cookieStore.set(name, value, options)
               );
             } catch (error) {
-              console.error("[LOGIN API] Error setting session cookies:", error);
+              // Expected in some edge cases with cookies API
             }
           },
         },
       }
     );
-    console.log("[LOGIN API] 5. Supabase client created, calling signInWithPassword...");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    // Add timeout to prevent hanging if Supabase is slow
+    const authPromise = supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password,
     });
-    console.log("[LOGIN API] 6. signInWithPassword returned", error ? `error: ${error.message}` : "success");
+
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Auth timeout")), 10000)
+    );
+
+    const { error } = await Promise.race([authPromise, timeoutPromise]);
 
     if (error) {
       console.error("[LOGIN API] Auth error:", error.message);
@@ -57,7 +57,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error("[LOGIN API] Unexpected error:", err);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    if (message === "Auth timeout") {
+      console.error("[LOGIN API] Supabase auth timed out");
+      return NextResponse.json({ error: "timeout" }, { status: 504 });
+    }
+    console.error("[LOGIN API] Unexpected error:", message);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }

@@ -70,6 +70,8 @@ export default function LoginPage() {
         const data = await response.json().catch(() => ({}));
         if (data.error === "invalid_credentials") {
           setErrorMessage(t("auth.invalidCredentials"));
+        } else if (data.error === "timeout") {
+          setErrorMessage(t("auth.timeout"));
         } else {
           setErrorMessage(t("auth.authError"));
         }
