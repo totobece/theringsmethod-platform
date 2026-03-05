@@ -113,6 +113,8 @@
     "accept": "Acepto",
     "welcomeTitle": "¡Bienvenido a\\nThe Rings Method!",
     "createAccount": "Crear Tu Cuenta",
+    "loginWithGoogle": "Continuar con Google",
+    "orContinueWith": "o continuar con",
     "continueAccepting": "Continuando, estas aceptando los términos y condiciones de The Rings Method®. Ante cualquier duda mandar email a info@theringsmethod.com",
     "successPasswordUpdated": "¡Éxito! Tu contraseña ha sido actualizada",
     "successPasswordChanged": "¡Éxito! Tu contraseña ha sido cambiada",

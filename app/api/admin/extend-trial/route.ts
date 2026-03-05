@@ -5,7 +5,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 export async function POST(request: NextRequest) {
   try {
     console.log('🔵 [ADMIN API] Inicio de petición extend-trial')
-    
+
     // Cliente normal para verificar el admin actual
     const supabase = await createClient()
 
@@ -72,93 +72,74 @@ export async function POST(request: NextRequest) {
     })
     console.log('🔵 [ADMIN API] Cliente admin creado')
 
-    // 4. Buscar al usuario target por email usando admin API con paginación
-    console.log('🔵 [ADMIN API] Iniciando búsqueda de usuarios...')
-    
-    let targetUser = null
-    let page = 1
-    const perPage = 1000
-    
-    while (!targetUser) {
-      const { data: { users }, error: listError } = await adminClient.auth.admin.listUsers({
-        page,
-        perPage
-      })
+    // 4. Buscar al usuario por email usando GoTrue Admin API directamente
+    console.log('🔵 [ADMIN API] Buscando usuario por email via GoTrue API...')
 
-      console.log(`🔵 [ADMIN API] Página ${page}: ${users?.length || 0} usuarios`)
+    const gotrueResponse = await fetch(
+      `${supabaseUrl}/auth/v1/admin/users?page=1&per_page=1000`,
+      {
+        headers: {
+          'Authorization': `Bearer ${supabaseServiceKey}`,
+          'apikey': supabaseServiceKey,
+        },
+      }
+    )
 
-      if (listError) {
-        console.error('Error listando usuarios:', listError)
-        return NextResponse.json(
-          { error: 'Error al buscar usuario' },
-          { status: 500 }
+    if (!gotrueResponse.ok) {
+      console.error('❌ Error en GoTrue API:', gotrueResponse.status)
+      return NextResponse.json(
+        { error: 'Error al buscar usuario' },
+        { status: 500 }
+      )
+    }
+
+    const gotrueData = await gotrueResponse.json()
+    const users = gotrueData.users || gotrueData
+
+    const targetUser = Array.isArray(users)
+      ? users.find((u: { email?: string }) => u.email?.toLowerCase() === normalizedEmail)
+      : null
+
+    if (!targetUser) {
+      // Fallback: paginate if user not found in first page
+      let foundUser = null
+      let page = 2
+      const totalPages = Math.ceil((gotrueData.total || 0) / 1000)
+
+      while (!foundUser && page <= totalPages) {
+        const pageResponse = await fetch(
+          `${supabaseUrl}/auth/v1/admin/users?page=${page}&per_page=1000`,
+          {
+            headers: {
+              'Authorization': `Bearer ${supabaseServiceKey}`,
+              'apikey': supabaseServiceKey,
+            },
+          }
         )
+        if (!pageResponse.ok) break
+        const pageData = await pageResponse.json()
+        const pageUsers = pageData.users || pageData
+        if (Array.isArray(pageUsers)) {
+          foundUser = pageUsers.find((u: { email?: string }) => u.email?.toLowerCase() === normalizedEmail)
+        }
+        if (!pageUsers || pageUsers.length < 1000) break
+        page++
       }
 
-      targetUser = users?.find(u => u.email?.toLowerCase() === normalizedEmail)
-
-      if (targetUser) {
-        console.log('🔵 [ADMIN API] Usuario encontrado en página', page)
-        break
-      }
-
-      // Si no hay más usuarios, salir
-      if (!users || users.length < perPage) {
-        console.log('🔵 [ADMIN API] No hay más páginas. Usuario no encontrado.')
+      if (!foundUser) {
+        console.log('🔵 [ADMIN API] Usuario no encontrado.')
         return NextResponse.json(
           { error: `Usuario con email ${email} no encontrado` },
           { status: 404 }
         )
       }
 
-      page++
+      // Use the found user from pagination
+      return await updateUserTrial(foundUser, adminClient, additionalDays, adminUser.email!)
     }
 
-    // 5. Calcular nueva fecha de trial
-    const currentMetadata = targetUser.user_metadata || {}
-    const currentTrialEndDate = currentMetadata.trial_end_date 
-      ? new Date(currentMetadata.trial_end_date)
-      : new Date()
-
-    // Si el trial ya expiró, usar fecha actual como base
-    const baseDate = currentTrialEndDate > new Date() ? currentTrialEndDate : new Date()
-    
-    const newTrialEndDate = new Date(baseDate)
-    newTrialEndDate.setDate(newTrialEndDate.getDate() + additionalDays)
-
-    // 6. Actualizar user_metadata con cliente admin
-    const { error: updateError } = await adminClient.auth.admin.updateUserById(
-      targetUser.id,
-      {
-        user_metadata: {
-          ...currentMetadata,
-          trial_end_date: newTrialEndDate.toISOString(),
-        }
-      }
-    )
-
-    if (updateError) {
-      console.error('Error actualizando usuario:', updateError)
-      return NextResponse.json(
-        { error: 'Error al actualizar trial del usuario' },
-        { status: 500 }
-      )
-    }
-
-    // 7. Log de la acción
-    console.log(`✅ Trial extendido por admin ${adminUser.email}:`)
-    console.log(`   - Usuario: ${targetUser.email}`)
-    console.log(`   - Días agregados: ${additionalDays}`)
-    console.log(`   - Nueva fecha de expiración: ${newTrialEndDate.toISOString()}`)
-
-    return NextResponse.json({
-      success: true,
-      message: 'Trial extendido exitosamente',
-      user: targetUser.email,
-      additionalDays,
-      newTrialEndDate: newTrialEndDate.toISOString(),
-      previousTrialEndDate: currentMetadata.trial_end_date || null,
-    })
+    console.log('🔵 [ADMIN API] Usuario encontrado:', targetUser.email)
+    return await updateUserTrial(targetUser, adminClient, additionalDays, adminUser.email!)
 
   } catch (error) {
     console.error('Error en extend-trial API:', error)
@@ -167,4 +148,57 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+async function updateUserTrial(
+  targetUser: { id: string; email?: string; user_metadata?: Record<string, unknown> },
+  adminClient: { auth: { admin: { updateUserById: (id: string, attrs: { user_metadata: Record<string, unknown> }) => Promise<{ error: Error | null }> } } },
+  additionalDays: number,
+  adminEmail: string
+) {
+  // 5. Calcular nueva fecha de trial
+  const currentMetadata = targetUser.user_metadata || {}
+  const currentTrialEndDate = currentMetadata.trial_end_date
+    ? new Date(currentMetadata.trial_end_date as string)
+    : new Date()
+
+  // Si el trial ya expiró, usar fecha actual como base
+  const baseDate = currentTrialEndDate > new Date() ? currentTrialEndDate : new Date()
+
+  const newTrialEndDate = new Date(baseDate)
+  newTrialEndDate.setDate(newTrialEndDate.getDate() + additionalDays)
+
+  // 6. Actualizar user_metadata con cliente admin
+  const { error: updateError } = await adminClient.auth.admin.updateUserById(
+    targetUser.id,
+    {
+      user_metadata: {
+        ...currentMetadata,
+        trial_end_date: newTrialEndDate.toISOString(),
+      }
+    }
+  )
+
+  if (updateError) {
+    console.error('Error actualizando usuario:', updateError)
+    return NextResponse.json(
+      { error: 'Error al actualizar trial del usuario' },
+      { status: 500 }
+    )
+  }
+
+  // 7. Log de la acción
+  console.log(`✅ Trial extendido por admin ${adminEmail}:`)
+  console.log(`   - Usuario: ${targetUser.email}`)
+  console.log(`   - Días agregados: ${additionalDays}`)
+  console.log(`   - Nueva fecha de expiración: ${newTrialEndDate.toISOString()}`)
+
+  return NextResponse.json({
+    success: true,
+    message: 'Trial extendido exitosamente',
+    user: targetUser.email,
+    additionalDays,
+    newTrialEndDate: newTrialEndDate.toISOString(),
+    previousTrialEndDate: (currentMetadata.trial_end_date as string) || null,
+  })
 }

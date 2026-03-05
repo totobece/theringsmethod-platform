@@ -20,6 +20,23 @@ export async function updateSession(request: NextRequest) {
     return new NextResponse("Not Found", { status: 404 });
   }
 
+  // PUBLIC ROUTES: Skip auth check for routes that don't need it
+  const publicRoutes = ["/login", "/reset-password", "/auth/", "/api/auth/", "/api/health"];
+  const isPublicRoute = publicRoutes.some((route) => path.startsWith(route));
+
+  // For public routes, return early without any request manipulation
+  // IMPORTANT: Do NOT use NextResponse.next({ request: { headers } }) for POST routes
+  // as it breaks body streaming in Next.js 15
+  if (isPublicRoute) {
+    const response = NextResponse.next();
+    response.headers.set(
+      "Cache-Control",
+      "no-cache, no-store, max-age=0, must-revalidate",
+    );
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+    return response;
+  }
 
   let response = NextResponse.next({
     request: {
@@ -40,6 +57,17 @@ export async function updateSession(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNocnN3emNoa3Fpb2JjaWtkZnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY5NjU3MDYsImV4cCI6MjA1MjU0MTcwNn0.3w5scY6pFfv2_CmuJX2PR8UB7Ib-YZXZa8Gq5WPuWx8",
 
     {
+      global: {
+        // Timeout de 8 segundos para evitar requests colgados en middleware
+        fetch: (url: string | URL | Request, options: RequestInit = {}) => {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 8000);
+          return fetch(url, {
+            ...options,
+            signal: controller.signal,
+          }).finally(() => clearTimeout(timeoutId));
+        },
+      },
       cookies: {
         get(name: string) {
           return request.cookies.get(name)?.value;
