@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
               cookiesToSet.forEach(({ name, value, options }) =>
                 cookieStore.set(name, value, options)
               );
-            } catch (error) {
+            } catch {
               // Expected in some edge cases with cookies API
             }
           },
