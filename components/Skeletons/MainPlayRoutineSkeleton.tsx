@@ -1,30 +1,21 @@
-export default function MainPlayRoutineSkeleton () {
-    return (
-        <div className="w-full items-start">
-            <div className="relative w-full min-h-[400px] md:min-h-[500px] flex flex-col md:flex-row p-6 border-[3px] border-gray-600 bg-gray-700 rounded-2xl md:rounded-3xl pt-4 mb-8 animate-pulse overflow-hidden">
-                <div className='relative w-[70%] md:pt-0 pt-3 pl-3 md:pl-6'>
-                    {/* Episode skeleton - más parecido al badge real */}
-                    <div className='bg-gray-600 w-fit px-4 h-8 rounded-full md:mt-10'></div>
-                    
-                    {/* Title skeleton - responsive como el real */}
-                    <div className="h-8 md:h-12 lg:h-14 bg-gray-600 rounded-md w-3/4 mt-4"></div>
-                    
-                    {/* Duration skeleton - responsive como el real */}
-                    <div className="h-8 md:h-10 lg:h-12 bg-gray-600 rounded-md w-2/4 my-4"></div>
-                    
-                    {/* Button skeleton */}
-                    <div className='relative h-[95%] mt-12'>
-                        <div className="relative">
-                            <div className="bg-wine h-10 w-[150px] md:w-[200px] rounded-[20px]"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                {/* Image skeleton */}
-                <div className="w-full flex justify-end mr-4 items-center mt-4">
-                    <div className="bg-gray-600 rounded-lg" style={{ width: '100%', height: '300px', maxWidth: '600px' }}></div>
-                </div>
-            </div>
-        </div>
-    );
+export default function MainPlayRoutineSkeleton() {
+  return (
+    <div className="bg-trm-black border border-pink/30 rounded-[20px] overflow-hidden min-h-[auto] md:min-h-[600px] flex flex-col md:flex-row animate-pulse">
+      {/* Left: Content area */}
+      <div className="flex-shrink-0 md:w-[35%] p-8 md:p-[30px_40px] flex flex-col justify-start">
+        {/* Badge skeleton */}
+        <div className="w-20 h-7 bg-trm-muted/20 rounded-full mb-10 md:mb-[200px]" />
+
+        {/* Title skeleton */}
+        <div className="h-10 md:h-14 bg-trm-muted/20 rounded-md w-3/4 mb-4" />
+        <div className="h-8 md:h-10 bg-trm-muted/20 rounded-md w-1/2 mb-8" />
+
+        {/* Button skeleton */}
+        <div className="h-12 w-[180px] bg-pink/20 rounded-full" />
+      </div>
+
+      {/* Right: Image area */}
+      <div className="flex-shrink-0 md:w-[65%] min-h-[300px] bg-trm-muted/10" />
+    </div>
+  );
 }

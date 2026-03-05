@@ -31,7 +31,6 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
   const [isLoadingPost, setIsLoadingPost] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isExerciseOpen, setIsExerciseOpen] = useState(false);
   const [isProTipOpen, setIsProTipOpen] = useState(false);
@@ -52,7 +51,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   }, [params]);
 
   // Debug en la consola del navegador cuando se renderiza el componente
-  console.log(`🔍 /routine/[${id}] Component render state:`, {
+  console.log(`/routine/[${id}] Component render state:`, {
     id,
     routineDay,
     hasAccess,
@@ -62,14 +61,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
     timestamp: new Date().toISOString()
   });
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,7 +82,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
         
         // Extract and set routine day
         const dayNumber = extractDayNumberFromString(postData.day);
-        console.log(`🔢 Extracted routine day: ${dayNumber} from "${postData.day}"`);
+        console.log(`Extracted routine day: ${dayNumber} from "${postData.day}"`);
         setRoutineDay(dayNumber);
 
         // Fetch preview específica para esta rutina
@@ -125,7 +117,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   // Check access when routine day is updated - solo redirigir si realmente no hay acceso después de cargar
   useEffect(() => {
     // Debug: log current state
-    console.log(`🔍 /routine/[${id}] Access Check Debug:`, {
+    console.log(`/routine/[${id}] Access Check Debug:`, {
       routineDay,
       hasAccess,
       isAccessLoading,
@@ -142,7 +134,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
     // 4. Definitivamente no hay acceso
     // 5. Y esperamos un poco para evitar redirects prematuros
     if (!isAccessLoading && !isLoadingPost && routineDay > 0 && !hasAccess) {
-      console.log(`🔒 FINAL DECISION: Routine Day ${routineDay} is locked, will redirect in 500ms`);
+      console.log(`FINAL DECISION: Routine Day ${routineDay} is locked, will redirect in 500ms`);
       
       // Agregar un pequeño delay para evitar redirects prematuros
       const redirectTimer = setTimeout(() => {
@@ -154,37 +146,27 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
   }, [hasAccess, isAccessLoading, isLoadingPost, routineDay, router, id, post?.title]);
 
   return (
-    <section className="relative bg-gray-700 to-99%">
+    <section className="relative bg-trm-black font-montserrat">
       
       <Navbar/>
 
-      {/* Hero personalizado de la rutina - igual a MainPlayRoutine */}
-      <div className="px-4 md:px-16">
+      {/* Hero personalizado de la rutina */}
+      <div className="px-4 md:px-16 pt-20">
         <section id="routine-hero" className='w-full relative animate-slidein'>
           <div className='mx-auto w-full items-start'>
             {isLoadingPost && (
               <MainPlayRoutineSkeleton />
             )}
             {error && (
-              <div className="text-red-600 p-4">Error: {error}</div>
+              <div className="text-pink p-4">Error: {error}</div>
             )}
             {!isLoadingPost && post && (
-              <div className="relative w-full min-h-[250px] md:min-h-[300px] flex flex-col md:flex-row p-6 border-[0px] border-gray-600 rounded-2xl md:rounded-3xl pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
-                {/* Imagen de fondo */}
-                <div className="absolute inset-0 z-0">
-                  <Image
-                    src={isMobile ? "/images/smaller rectangle.png" : "/images/RECTANGLE BIG.png"}
-                    alt="Background"
-                    fill
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-                {/* Contenido por encima del fondo */}
+              <div className="relative w-full min-h-[250px] md:min-h-[300px] flex flex-col md:flex-row p-6 bg-trm-black border border-pink rounded-[20px] pt-4 mb-8 overflow-hidden" data-aos="fade-up" data-aos-delay="400">
+                {/* Contenido */}
                 <div className="relative z-10 w-full h-full flex flex-col md:flex-row min-h-[200px] md:min-h-[250px]">
                   {/* Duración solo en mobile - pegada a la derecha */}
                   <div className='md:hidden absolute top-2 right-3 z-20'>
-                    <blockquote className="text-sm font-light text-white capitalize bg-gray-600 px-4 py-2 rounded-full">
+                    <blockquote className="text-sm font-light text-white capitalize bg-trm-bg px-4 py-2 rounded-full">
                       {translateRoutineData(post, locale).duration}
                     </blockquote>
                   </div>
@@ -192,17 +174,17 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                   <div className='relative w-[70%] md:pt-0 pt-2 pl-3 md:pl-6 flex flex-col justify-between h-full'>
                     {/* Duración en desktop - en la parte superior */}
                     <div className='hidden md:flex justify-start md:mt-6'>
-                      <blockquote className="text-sm lg:text-base font-light text-white capitalize">
+                      <blockquote className="text-sm lg:text-base font-light text-trm-muted capitalize">
                         {translateRoutineData(post, locale).duration}
                       </blockquote>
                     </div>
                     
                     {/* Título y día pegados al piso de la card */}
                     <div className="mb-2 md:mb-4">
-                      <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-cream text-left">
+                      <blockquote className="text-2xl md:text-4xl lg:text-5xl font-normal text-white text-left">
                         {translateRoutineData(post, locale).title}
                       </blockquote>
-                      <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-cream text-left mt-1 md:mt-2">
+                      <blockquote className="text-2xl md:text-3xl lg:text-4xl font-extralight text-trm-muted text-left mt-1 md:mt-2">
                         {translateRoutineData(post, locale).day}
                       </blockquote>
                     </div>
@@ -247,7 +229,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                       <div className="mb-8">
                         <Link href={`/video/${post.id}`}>
                           <button
-                            className="bg-wine flex justify-center items-center rounded-[20px] h-14 w-[200px] md:h-12 md:w-[220px] group text-xl transform transition duration-500 hover:scale-105"
+                            className="bg-gradient-to-r from-pink to-dark-red flex justify-center items-center rounded-full h-14 w-[200px] md:h-12 md:w-[220px] group text-xl transform transition duration-500 hover:scale-105"
                           >
                             <span className='text-white text-base md:text-lg'>{t('common.startRoutine')}</span>
                             <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -263,7 +245,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                         {/* Areas You'll Improve */}
                         <div className="space-y-4">
                           <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.areasImprove')}</h2>
-                          <div className="text-white text-base font-light leading-relaxed">
+                          <div className="text-trm-muted text-base font-light leading-relaxed">
                             {translateRoutineData(post, locale)['areas-improve']?.split('\n').map((line, index) => (
                               <div key={index} className="mb-2">{line}</div>
                             ))}
@@ -273,7 +255,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                         {/* Rings Height */}
                         <div className="space-y-4">
                           <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.ringsHeight')}</h2>
-                          <div className="text-white text-base font-light leading-relaxed">
+                          <div className="text-trm-muted text-base font-light leading-relaxed">
                             {translateRoutineData(post, locale)['rings-placement']?.split('\n').map((line, index) => (
                               <div key={index} className="mb-2">{line}</div>
                             ))}
@@ -286,7 +268,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                             <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.exercise')}</h2>
                             <button 
                               onClick={() => setIsExerciseOpen(!isExerciseOpen)}
-                              className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                              className="bg-trm-bg hover:bg-pink/20 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink/50"
                               aria-label="Toggle exercises"
                             >
                               <svg 
@@ -299,7 +281,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                             </button>
                           </div>
                           <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExerciseOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                            <div className="text-white text-base font-light leading-relaxed pt-2">
+                            <div className="text-trm-muted text-base font-light leading-relaxed pt-2">
                               {translateRoutineData(post, locale).exercise?.split('\n').map((line, index) => (
                                 <div key={index} className="mb-2">{line}</div>
                               ))}
@@ -313,7 +295,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                             <h2 className="text-white text-xl font-semibold">{t('dynamicContent.sections.proTip')}</h2>
                             <button 
                               onClick={() => setIsProTipOpen(!isProTipOpen)}
-                              className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                              className="bg-trm-bg hover:bg-pink/20 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink/50"
                               aria-label="Toggle pro tip"
                             >
                               <svg 
@@ -326,7 +308,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                             </button>
                           </div>
                           <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isProTipOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
-                            <div className="text-white text-base font-light leading-relaxed pt-2">
+                            <div className="text-trm-muted text-base font-light leading-relaxed pt-2">
                               {translateRoutineData(post, locale).pro_tip?.split('\n').map((line, index) => (
                                 <div key={index} className="mb-2">{line}</div>
                               ))}
@@ -359,7 +341,7 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                     alt={`Indoor exercise demonstration for ${post.title}`}
                     width={600}
                     height={400}
-                    className="rounded-lg shadow-lg"
+                    className="rounded-[20px] border border-pink shadow-lg"
                     style={{
                       width: '100%',
                       height: 'auto',
@@ -371,16 +353,16 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
                 </div>
               ) : (
                 <div className="relative max-w-md md:max-w-lg lg:max-w-xl">
-                  <div className="w-full h-64 md:h-80 bg-gray-600 rounded-lg flex items-center justify-center">
+                  <div className="w-full h-64 md:h-80 bg-trm-bg border border-pink rounded-[20px] flex items-center justify-center">
                     <div className="text-center text-white">
                       <svg 
-                        className="w-16 h-16 mx-auto mb-4 opacity-60" 
+                        className="w-16 h-16 mx-auto mb-4 text-pink opacity-60" 
                         fill="currentColor" 
                         viewBox="0 0 24 24"
                       >
                         <path d="M8 5v14l11-7z"/>
                       </svg>
-                      <p className="text-lg opacity-80">{t('dynamicContent.demoAvailable')}</p>
+                      <p className="text-lg text-trm-muted">{t('dynamicContent.demoAvailable')}</p>
                     </div>
                   </div>
                 </div>
@@ -394,5 +376,5 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
 <MoreVideos/>
 <Footer/>
 </section>
-);
+  );
 }

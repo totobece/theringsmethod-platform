@@ -7,6 +7,7 @@ import MeditationsComponent from '@/components/MeditationsComponent/meditations-
 import Footer from '@/components/UI/Footer/footer';
 import { useSpecificRoutineAccess } from '@/hooks/useRoutineAccess';
 import { extractDayNumberFromString } from '@/utils/progress-logic';
+import { useI18n } from '@/contexts/I18nContext';
 
 
 export interface ExploreVideosData {
@@ -33,6 +34,7 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
   const [routineDay, setRoutineDay] = useState<number>(1);
   const [id, setId] = useState<string | null>(null);
   const router = useRouter();
+  const { t, locale } = useI18n();
   
   const { hasAccess, isLoading: isAccessLoading, markAsCompleted, isCompleted } = useSpecificRoutineAccess(routineDay);
 
@@ -52,14 +54,20 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
   // Función para marcar como completada
   const handleFinishRoutine = async () => {
     if (isCompleted) {
-      setCompletionMessage('¡Esta rutina ya está completada!');
+      setCompletionMessage(
+        locale === 'es' ? 'Esta rutina ya esta completada!' : 'This routine is already completed!'
+      );
       return;
     }
 
     setIsCompleting(true);
     try {
       await markAsCompleted();
-      setCompletionMessage('¡Rutina completada! La siguiente rutina se desbloqueará en 24 horas.');
+      setCompletionMessage(
+        locale === 'es' 
+          ? 'Rutina completada! La siguiente rutina se desbloqueara en 24 horas.' 
+          : 'Routine completed! The next routine will unlock in 24 hours.'
+      );
       
       // Redirigir al home después de 2 segundos
       setTimeout(() => {
@@ -68,7 +76,9 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
       
     } catch (error) {
       console.error('Error completing routine:', error);
-      setCompletionMessage('Error al completar la rutina. Intenta nuevamente.');
+      setCompletionMessage(
+        locale === 'es' ? 'Error al completar la rutina. Intenta nuevamente.' : 'Error completing routine. Please try again.'
+      );
     } finally {
       setIsCompleting(false);
     }
@@ -86,7 +96,7 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
         const postJson = await postRes.json();
         
         if (!postRes.ok || !postJson.posts || postJson.posts.length === 0) {
-          throw new Error('No se encontró la rutina');
+          throw new Error(locale === 'es' ? 'No se encontro la rutina' : 'Routine not found');
         }
         
         const routinePost = postJson.posts[0];
@@ -106,7 +116,7 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
         
         // 3. Obtener todos los videos organizados por semana
         const videosRes = await fetch('/api/supabase/videos');
-        if (!videosRes.ok) throw new Error('No se pudieron obtener los videos');
+        if (!videosRes.ok) throw new Error(locale === 'es' ? 'No se pudieron obtener los videos' : 'Could not fetch videos');
         
         const { weekVideos } = await videosRes.json();
         
@@ -134,45 +144,49 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
         if (foundVideo) {
           setVideoUrl(foundVideo.url);
         } else {
-          setError(`No se encontró el video para el ${routinePost.day}`);
+          setError(
+            locale === 'es' 
+              ? `No se encontro el video para el ${routinePost.day}` 
+              : `Video not found for ${routinePost.day}`
+          );
         }
         
       } catch (error) {
         console.error('Error fetching video:', error);
-        setError('Ups! Ocurrió un error. Intenta nuevamente.');
+        setError(locale === 'es' ? 'Ups! Ocurrio un error. Intenta nuevamente.' : 'Oops! An error occurred. Please try again.');
       } finally {
         setIsLoading(false);
       }
     }
     
     fetchVideoAndPost();
-  }, [id]);
+  }, [id, locale]);
 
   // Check access when routine day is updated - solo redirigir si realmente no hay acceso después de cargar
   useEffect(() => {
     // Solo verificar y redirigir si ya terminó de cargar y definitivamente no hay acceso
     if (!isAccessLoading && !isLoading && routineDay > 0 && !hasAccess) {
-      console.log(`🔒 Video for Day ${routineDay} is locked, redirecting to explore`);
+      console.log(`Video for Day ${routineDay} is locked, redirecting to explore`);
       router.push(`/explore?error=routine-locked&day=${routineDay}`);
     }
   }, [hasAccess, isAccessLoading, isLoading, routineDay, router]);
 
   return (
-    <section className="relative bg-gray-700">
+    <section className="relative bg-trm-black font-montserrat">
       <Navbar/> 
 
       {/* Loading state */}
       {isLoading && (
-        <div className='max-w-full h-[400px] items-center flex justify-center'>
-          <p className='text-gray-600 text-2xl'>Cargando video...</p>
+        <div className='max-w-full h-[400px] items-center flex justify-center pt-20'>
+          <p className='text-trm-muted text-2xl'>{t('common.loading')}</p>
         </div>
       )}
 
       {/* Información de la rutina */}
       {post && !isLoading && (
-        <div className="max-w-full mx-auto text-center py-8">
+        <div className="max-w-full mx-auto text-center py-8 pt-24">
           <h1 className="text-3xl md:text-4xl font-semibold text-white mb-2">{post.title}</h1>
-          <p className="text-xl text-white">{post.day} • {post.duration}</p>
+          <p className="text-xl text-trm-muted">{post.day} &middot; {post.duration}</p>
         </div>
       )}
 
@@ -190,14 +204,14 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
             onContextMenu={(e) => e.preventDefault()}
             onError={(e) => {
               console.error('Error loading video:', e);
-              setError('Error al cargar el video. Intenta nuevamente.');
+              setError(locale === 'es' ? 'Error al cargar el video. Intenta nuevamente.' : 'Error loading video. Please try again.');
             }}
             onAbort={(e) => {
               console.warn('Video loading aborted:', e);
             }}
           >
             <source src={videoUrl} type="video/mp4" />
-            Tu navegador no soporta la reproducción de video.
+            {locale === 'es' ? 'Tu navegador no soporta la reproduccion de video.' : 'Your browser does not support video playback.'}
           </video>
         </div>
       )}
@@ -205,15 +219,15 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
       {/* Error state */}
       {error && !isLoading && (
         <div className='max-w-full h-[200px] items-center flex justify-center text-5xl'>
-          <p className='text-gray-300'>{error}</p>
+          <p className='text-trm-muted'>{error}</p>
         </div>
       )}
 
       {/* Botón "Finish Routine" y mensajes */}
       <div className="flex flex-col justify-center items-center mt-10 space-y-4">
         {completionMessage && (
-          <div className={`p-4 rounded-lg text-center max-w-md ${
-            completionMessage.includes('Error') ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+          <div className={`p-4 rounded-[20px] text-center max-w-md ${
+            completionMessage.includes('Error') ? 'bg-pink/20 text-pink' : 'bg-green-primary/20 text-green-primary'
           }`}>
             {completionMessage}
           </div>
@@ -223,12 +237,15 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
           <button
             onClick={handleFinishRoutine}
             disabled={isCompleting}
-            className={`bg-wine flex justify-center items-center rounded-[20px] h-12 w-[200px] text-xl transform transition duration-500 hover:scale-105 ${
+            className={`bg-gradient-to-r from-pink to-dark-red flex justify-center items-center rounded-full h-12 w-[200px] text-xl transform transition duration-500 hover:scale-105 ${
               isCompleting ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
             <span className='text-white'>
-              {isCompleting ? 'Completando...' : 'Finish Routine'}
+              {isCompleting 
+                ? (locale === 'es' ? 'Completando...' : 'Completing...') 
+                : (locale === 'es' ? 'Terminar Rutina' : 'Finish Routine')
+              }
             </span>
             {!isCompleting && (
               <svg className='ml-[10px]' width="13" height="16" viewBox="0 0 13 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -237,8 +254,8 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
             )}
           </button>
         ) : (
-            <div className="flex justify-center items-center rounded-[20px] h-12 w-[200px] text-xl" style={{ backgroundColor: '#1d9146' }}>
-              <span className='text-white'>✓ Completada</span>
+            <div className="flex justify-center items-center rounded-full h-12 w-[200px] text-xl bg-green-dark">
+              <span className='text-white'>{locale === 'es' ? 'Completada' : 'Completed'}</span>
             </div>
         )}
       </div>
@@ -246,14 +263,16 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
       {/* Meditaciones Section */}
       <div className="mt-16 mb-8 px-4 md:px-6">
         <h2 className="text-2xl md:text-3xl font-medium text-white text-center mb-8">
-          Relájate con nuestras meditaciones
+          {locale === 'es' ? 'Relájate con nuestras meditaciones' : 'Relax with our meditations'}
         </h2>
         <MeditationsComponent showTitle={false} />
       </div>
 
       <div className='justify-center items-center flex flex-col'>
           
-        <h1 className='mt-20 text-pretty text-center px-12 lg:px-20 font-medium text-3xl  md:text-5xl'>Discover more routines to try!</h1>
+        <h1 className='mt-20 text-pretty text-center px-12 lg:px-20 font-medium text-3xl md:text-5xl text-white'>
+          {locale === 'es' ? 'Descubre más rutinas para probar!' : 'Discover more routines to try!'}
+        </h1>
       
       
 
@@ -263,6 +282,3 @@ export default function VideoPlayer({ params }: { params: Promise<{ id: string }
     </section>
   );
 }
-
-// En la linea 36 con "montar" se refiere al proceso en el cual un componente es insertado en el DOM (Document Object Model) y se vuelve visible para el usuario. 
-//En el contexto de React, el montaje ocurre cuando un componente funcional o de clase es renderizado por primera vez.

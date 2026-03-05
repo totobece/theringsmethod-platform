@@ -177,17 +177,25 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
   // Sincronizar con localStorage
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale;
-    if (savedLocale && (savedLocale === "en" || savedLocale === "es")) {
-      setLocaleState(savedLocale);
-    } else {
-      setIsLoading(false); // Si no hay locale guardado, dejar de cargar
+    try {
+      const savedLocale = window.localStorage.getItem("locale") as Locale;
+      if (savedLocale && (savedLocale === "en" || savedLocale === "es")) {
+        setLocaleState(savedLocale);
+      } else {
+        setIsLoading(false); // Si no hay locale guardado, dejar de cargar
+      }
+    } catch {
+      setIsLoading(false);
     }
   }, []);
 
   const setLocale = (newLocale: Locale) => {
     setLocaleState(newLocale);
-    localStorage.setItem("locale", newLocale);
+    try {
+      window.localStorage.setItem("locale", newLocale);
+    } catch {
+      // localStorage not available
+    }
   };
 
   // Función de traducción mejorada

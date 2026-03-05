@@ -1,9 +1,7 @@
 'use client'
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import LogoDuo from '@/public/logo-blanco-trm.png';
 import { useI18n } from '@/contexts/I18nContext';
 
 const Sidebar = () => {
@@ -46,54 +44,36 @@ const Sidebar = () => {
   return (
     <div 
       style={{ width: "12.5%" }} 
-      className="fixed left-0 top-0 bg-gray-700 p-0 text-white hidden md:flex flex-col h-screen pt-24"
+      className="fixed left-0 top-16 bg-trm-black border-r border-pink/20 p-0 text-white hidden md:flex flex-col h-[calc(100vh-4rem)]"
     >
-      {/* Logo de The Rings Method - mismo tamaño y posición que en navbar */}
-      <div className="absolute top-0 left-0 h-24 flex items-center justify-start px-8">
-        <Link href="/">
-          <Image
-            src={LogoDuo}
-            alt='logo-duo'
-            width={120}
-            height={45}
-            style={{ 
-              objectFit: 'contain',
-              width: 'auto',
-              height: '45px',
-              maxWidth: '120px'
-            }} 
-          />
-        </Link>
-      </div>
-
       {/* Spacer dinámico para el TrialBanner */}
       <div 
         className="shrink-0"
         style={{ height: `${trialBannerHeight}px` }}
       ></div>
       
-      <h2 className="text-lg font-medium p-6">{t('sidebar.settings')}</h2>
+      <h2 className="text-lg font-medium p-6 text-trm-muted">{t('sidebar.settings')}</h2>
       <ul className="flex-1 space-y-0">
-        <li > 
+        <li> 
           <Link 
             href="/account" 
-            className={`block p-6 transition ${pathname === '/account' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+            className={`block p-6 transition ${pathname === '/account' ? 'bg-pink/10 text-pink border-r-2 border-pink' : 'hover:bg-white/5 text-white'}`}
           >
             {t('sidebar.account')}
           </Link>
         </li>
-        <li >
+        <li>
           <Link 
             href="/account/billing" 
-            className={`block p-6 transition ${pathname === '/account/billing' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+            className={`block p-6 transition ${pathname === '/account/billing' ? 'bg-pink/10 text-pink border-r-2 border-pink' : 'hover:bg-white/5 text-white'}`}
           >
             {t('sidebar.billing')}
           </Link>
         </li>
-        <li >
+        <li>
           <Link 
             href="/account/terms" 
-            className={`block p-6 transition ${pathname === '/account/terms' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+            className={`block p-6 transition ${pathname === '/account/terms' ? 'bg-pink/10 text-pink border-r-2 border-pink' : 'hover:bg-white/5 text-white'}`}
           >
             {t('sidebar.terms')}
           </Link>
@@ -101,7 +81,7 @@ const Sidebar = () => {
         <li>
           <Link 
             href="/account/support" 
-            className={`block p-6 transition ${pathname === '/account/support' ? 'bg-gray-600' : 'hover:bg-gray-600'}`}
+            className={`block p-6 transition ${pathname === '/account/support' ? 'bg-pink/10 text-pink border-r-2 border-pink' : 'hover:bg-white/5 text-white'}`}
           >
             {t('sidebar.support')}
           </Link>

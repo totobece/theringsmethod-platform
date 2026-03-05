@@ -44,7 +44,7 @@ export default function Home() {
 
   if (!trialStatus) {
     return (
-      <section className="bg-gray-700 min-h-screen flex items-center justify-center">
+      <section className="bg-trm-bg min-h-screen flex items-center justify-center font-montserrat">
         <div className="text-white text-lg">{t('common.loading')}</div>
       </section>
     )
@@ -56,46 +56,37 @@ export default function Home() {
   }
 
   const user = trialStatus.user
-  console.log('Trial status:', {
-    user: user?.email,
-    daysRemaining: trialStatus.daysRemaining
-  })
-
 
   return (
-    <section>
-    <TrialBanner daysRemaining={trialStatus.daysRemaining} />
-    <Navbar />
-    <main className='bg-gray-700 to-99% '>
-      
-      {user ? (
-        <>
-          <div className='md:pt-6 md:px-6'>
-          <MainPlayRoutine />
-          <div className={`max-w-full relative md:text-start text-start`}>
+    <section className="font-montserrat">
+      <TrialBanner daysRemaining={trialStatus.daysRemaining} />
+      <Navbar />
+      <main className="bg-trm-black min-h-screen pt-16">
+        {user ? (
+          <>
+            {/* Featured Workout Hero */}
+            <div className="max-w-[1400px] mx-auto px-5 md:px-6 pt-10">
+              <MainPlayRoutine />
+            </div>
 
-      </div >
-          </div>
-          
-          <div className='md:pb-16 md:px-6 px-4 mt-20 '>
-          <WeekVideoSlider />
-          </div>
-          
-          {/* Meditaciones Section */}
-          <div className="md:px-6 px-4 py-8">
-            <MeditationsComponent />
-          </div>
-          
-          <div>
-            <ExploreVideoSlider/>
-          </div>
-        </>
-      ) : null}
-    </main>
-    <Footer/>
+            {/* Week Section with Slider */}
+            <div className="max-w-[1400px] mx-auto px-5 md:px-6 mt-16 mb-10">
+              <WeekVideoSlider />
+            </div>
+
+            {/* Meditations Section */}
+            <div className="max-w-[1400px] mx-auto px-5 md:px-6 py-8">
+              <MeditationsComponent />
+            </div>
+
+            {/* Explore Section */}
+            <div>
+              <ExploreVideoSlider />
+            </div>
+          </>
+        ) : null}
+      </main>
+      <Footer />
     </section>
-
   );
 }
-
-

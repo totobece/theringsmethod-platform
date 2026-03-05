@@ -2,28 +2,20 @@ import React from "react";
 
 type LoaderProps = object;
 
-const WeekVideoSliderSkeleton: React.FC<LoaderProps> = () =>  {
-    return (
-        <div className="flex flex-col justify-center min-w-[300px] max-w-[300px]">
-            <div className="justify-center flex">
-                <div className="card rounded-xl boxshadow p-[20px] w-full min-h-[320px] mb-5 bg-gray-300 animate-pulse relative overflow-hidden">
-                    {/* Duración en la parte superior */}
-                    <div className="bg-gray-400 w-16 h-6 rounded-full mb-4 animate-pulse"></div>
-                    
-                    {/* Espacio para la imagen de preview en el centro */}
-                    <div className="flex-1 flex justify-center items-center mb-4">
-                        <div className="bg-gray-400 w-full h-32 rounded-md animate-pulse"></div>
-                    </div>
-                    
-                    {/* Título y día en la parte inferior */}
-                    <div className="mt-auto text-right">
-                        <div className="bg-gray-400 h-5 w-3/4 rounded mb-2 ml-auto animate-pulse"></div>
-                        <div className="bg-gray-400 h-4 w-1/2 rounded ml-auto animate-pulse"></div>
-                    </div>
-                </div>
-            </div>
+const WeekVideoSliderSkeleton: React.FC<LoaderProps> = () => {
+  return (
+    <div className="flex-shrink-0 min-w-[300px] md:min-w-[400px]">
+      <div className="bg-trm-black border border-pink/30 rounded-[20px] overflow-hidden h-[240px] animate-pulse">
+        <div className="w-full h-full bg-trm-muted/10 relative">
+          {/* Title skeleton centered */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%]">
+            <div className="h-6 bg-trm-muted/20 rounded-md mx-auto mb-2" />
+            <div className="h-4 bg-trm-muted/15 rounded-md mx-auto w-3/4" />
+          </div>
         </div>
-    );
-}
+      </div>
+    </div>
+  );
+};
 
 export default WeekVideoSliderSkeleton;

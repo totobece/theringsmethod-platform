@@ -14,7 +14,7 @@ export default function SignOut() {
   }
 
   return (
-    <button onClick={logout} className="relative font-light text-base md:text-xl bg-gray-600 transition px-4 md:px-6  inline-flex h-12 animate-shimmer items-center rounded-[40px] text-white">
+    <button onClick={logout} className="relative font-light text-base md:text-xl border border-pink/40 text-pink hover:bg-pink/10 transition px-4 md:px-6 inline-flex h-12 items-center rounded-full">
       {t('auth.signOut')}
     </button>
   )

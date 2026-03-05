@@ -42,8 +42,8 @@ export default function AccountPage() {
 
   if (!trialStatus) {
     return (
-      <section className="bg-cream min-h-screen flex items-center justify-center">
-        <div className="text-black text-lg">{t('common.loading')}</div>
+      <section className="bg-trm-black min-h-screen flex items-center justify-center">
+        <div className="text-white text-lg">{t('common.loading')}</div>
       </section>
     )
   }
@@ -57,7 +57,7 @@ export default function AccountPage() {
 
   return (
     
-    <section className="bg-cream max-w-full h-full min-h-screen flex flex-col overflow-y-auto">
+    <section className="bg-trm-black max-w-full h-full min-h-screen flex flex-col overflow-y-auto">
       <TrialBanner daysRemaining={trialStatus.daysRemaining} />
       <Navbar />
 
@@ -65,29 +65,28 @@ export default function AccountPage() {
 
           <Sidebar/>
 
-
         <div className="flex-1 md:ml-[12.5%] mx-auto pt-24 pb-12 px-8">
           <div className="space-y-14">
             <div>
-              <h1 className="text-black text-2xl lg:text-4xl">{t('common.userName')}</h1>
+              <h1 className="text-white text-2xl lg:text-4xl">{t('common.userName')}</h1>
             </div>
             <div>
-              <p className="text-gray-700 text-xl font-light">{t('common.email')}: {user?.email ?? t('common.guest')}</p>
-              <p className="text-gray-700 text-xl font-light mt-4">{t('common.joinedOn')}: {user?.created_at ?? t('common.guest')}</p>
+              <p className="text-trm-muted text-xl font-light">{t('common.email')}: <span className="text-white">{user?.email ?? t('common.guest')}</span></p>
+              <p className="text-trm-muted text-xl font-light mt-4">{t('common.joinedOn')}: <span className="text-white">{user?.created_at ?? t('common.guest')}</span></p>
               {trialStatus.daysRemaining && (
-                <p className="text-gray-700 text-xl font-light mt-4">
-                  {t('common.trialDaysRemaining')}: <span className="font-medium">{trialStatus.daysRemaining}</span>
+                <p className="text-trm-muted text-xl font-light mt-4">
+                  {t('common.trialDaysRemaining')}: <span className="font-medium text-pink">{trialStatus.daysRemaining}</span>
                 </p>
               )}
-              <p className="text-gray-700 text-xl font-light mt-4">{t('common.accountStatus')}: {user?.aud ?? t('common.guest')}</p>
+              <p className="text-trm-muted text-xl font-light mt-4">{t('common.accountStatus')}: <span className="text-white">{user?.aud ?? t('common.guest')}</span></p>
             </div>
             <div className="flex justify-start">
-              <a href="/new-password" className="relative font-light text-base md:text-xl bg-gray-600 transition px-2 md:px-6  inline-flex h-12 animate-shimmer items-center rounded-[40px] text-white">
+              <a href="/new-password" className="relative font-light text-base md:text-xl bg-gradient-to-r from-pink to-dark-red transition px-4 md:px-6 inline-flex h-12 items-center rounded-full text-white hover:opacity-80">
                 {t('common.changePassword')}
               </a>
             </div>
-            <div className="justify-start flex  text-sm">
-              {user ? <SignOut /> : <Link href="/login">{t('auth.login')}</Link>}
+            <div className="justify-start flex text-sm">
+              {user ? <SignOut /> : <Link href="/login" className="text-pink hover:underline">{t('auth.login')}</Link>}
             </div>
           </div>
         </div>

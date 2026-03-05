@@ -78,27 +78,17 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
           
           return (
             <div key={dataItem.id} className="justify-center w-full md:w-1/2 lg:w-1/3 xl:w-1/4 mb-6 px-3">
-              <div className={`card rounded-xl boxshadow p-[20px] max-w-full min-h-[320px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
-                {/* Imagen de fondo */}
-                <div className="absolute inset-0 z-0">
-                  <Image
-                    src="/images/smaller rectangle.png"
-                    alt="Card Background"
-                    fill
-                    className="object-cover rounded-xl"
-                    priority
-                  />
-                  {/* Overlay para rutinas bloqueadas */}
-                  {!isUnlocked && (
-                    <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
-                  )}
-                </div>
+              <div className={`bg-trm-black border border-pink rounded-[20px] p-[20px] max-w-full min-h-[320px] mb-5 items-center relative overflow-hidden brightness-[0.7] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300 ${!isUnlocked ? 'opacity-60' : ''}`}>
+                {/* Overlay para rutinas bloqueadas */}
+                {!isUnlocked && (
+                  <div className="absolute inset-0 bg-black/50 rounded-[20px] z-[1]"></div>
+                )}
                 {/* Contenido por encima del fondo */}
                 <div className="relative z-10 h-full flex flex-col">
                   {/* Duración en la parte superior */}
                   <div className='flex justify-start mb-4'>
-                    <div className='bg-gray-600 bg-opacity-80 w-fit px-3 py-1 flex items-center rounded-full'>
-                      <blockquote className="text-sm font-light text-cream text-center">{dataItem.duration}</blockquote>
+                    <div className='bg-trm-bg px-3 py-1 flex items-center rounded-full'>
+                      <blockquote className="text-sm font-light text-white text-center">{dataItem.duration}</blockquote>
                     </div>
                   </div>
                   
@@ -123,8 +113,8 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                             loading="lazy"
                           />
                         ) : (
-                          <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
-                            <span className="text-white text-sm">{t('common.noPreview')}</span>
+                          <div className="w-full h-32 bg-trm-bg rounded-md flex items-center justify-center">
+                            <span className="text-trm-muted text-sm">{t('common.noPreview')}</span>
                           </div>
                         )}
                       </Link>
@@ -132,7 +122,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                       <div className="flex flex-col items-center text-white">
                         {/* Icono de candado */}
                         <svg 
-                          className="w-8 h-8 mb-2" 
+                          className="w-8 h-8 mb-2 text-pink" 
                           fill="currentColor" 
                           viewBox="0 0 24 24"
                         >
@@ -142,7 +132,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                         {/* Texto de bloqueo */}
                         <div className="text-center">
                           <p className="text-xs font-medium mb-1">{t('common.locked')}</p>
-                          <p className="text-xs opacity-80">
+                          <p className="text-xs text-trm-muted">
                             {daysUntilUnlock === 0 
                               ? t('dynamicContent.unlocksTomorrow') 
                               : t('dynamicContent.unlocksIn', { count: daysUntilUnlock })
@@ -155,10 +145,10 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
                   
                   {/* Título y día en la parte inferior */}
                   <div className='mt-auto text-right'>
-                    <blockquote className={`text-base lg:text-lg font-medium text-cream mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
+                    <blockquote className={`text-base lg:text-lg font-medium text-white mb-1 ${!isUnlocked ? 'opacity-75' : ''}`}>
                       {dataItem.title}
                     </blockquote>
-                    <blockquote className={`text-sm font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
+                    <blockquote className={`text-sm font-light text-trm-muted ${!isUnlocked ? 'opacity-60' : ''}`}>
                       {dataItem.day}
                     </blockquote>
                   </div>
@@ -167,7 +157,7 @@ export default function VideoPlayer({ params: { id } = { id: undefined } }: { pa
             </div>
           );
         })}
-        {error && <p className='text-red-500 p-4'>Error: {error}</p>}
+        {error && <p className='text-pink p-4'>Error: {error}</p>}
       </div>
     </section>
   );

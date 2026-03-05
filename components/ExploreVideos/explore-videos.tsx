@@ -77,7 +77,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
   const currentData = filteredData.slice(startIndex, endIndex);
 
   return (
-    <section style={{ minHeight: '100vh' }} className='relative bg-none' >
+    <section style={{ minHeight: '100vh' }} className='relative' >
     <div className={`max-w-full sm:px-6 relative lg:text-start md:text-start text-center`}>
       <h1 className='pt-16 mx-3 md:mx-0 text-white font-normal text-3xl md:text-6xl'>{t('common.exploreRingsMethod')}</h1>
     </div>
@@ -101,27 +101,17 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
         
         return (
           <div key={dataItem.id} className="justify-center w-full md:w-1/3 lg:w-1/4 mb-6 px-4">
-            <div className={`card rounded-xl boxshadow p-[16px] max-w-full min-h-[300px] mb-5 items-center relative overflow-hidden ${!isUnlocked ? 'opacity-60' : ''}`}>
-              {/* Imagen de fondo */}
-              <div className="absolute inset-0 z-0">
-                <Image
-                  src="/images/smaller rectangle.png"
-                  alt="Card Background"
-                  fill
-                  className="object-cover rounded-xl"
-                  priority
-                />
-                {/* Overlay para rutinas bloqueadas */}
-                {!isUnlocked && (
-                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-xl"></div>
-                )}
-              </div>
+            <div className={`bg-trm-black border border-pink rounded-[20px] p-[16px] max-w-full min-h-[300px] mb-5 items-center relative overflow-hidden brightness-[0.7] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300 ${!isUnlocked ? 'opacity-60' : ''}`}>
+              {/* Overlay para rutinas bloqueadas */}
+              {!isUnlocked && (
+                <div className="absolute inset-0 bg-black/50 rounded-[20px] z-[1]"></div>
+              )}
               {/* Contenido por encima del fondo */}
               <div className="relative z-10 h-full flex flex-col">
                 {/* Duración en la parte superior */}
                 <div className='flex justify-start mb-3'>
-                  <div className='bg-gray-600 bg-opacity-80 w-fit px-3 py-1 flex items-center rounded-full'>
-                    <blockquote className="text-sm font-light text-cream text-center">{dataItem.duration}</blockquote>
+                  <div className='bg-trm-bg px-3 py-1 flex items-center rounded-full'>
+                    <blockquote className="text-sm font-light text-white text-center">{dataItem.duration}</blockquote>
                   </div>
                 </div>
                 
@@ -146,8 +136,8 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-32 bg-gray-600 rounded-md flex items-center justify-center">
-                          <span className="text-white text-sm">{t('common.noPreview')}</span>
+                        <div className="w-full h-32 bg-trm-bg rounded-md flex items-center justify-center">
+                          <span className="text-trm-muted text-sm">{t('common.noPreview')}</span>
                         </div>
                       )}
                     </Link>
@@ -155,7 +145,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                     <div className="flex flex-col items-center text-white">
                       {/* Icono de candado */}
                       <svg 
-                        className="w-10 h-10 mb-2" 
+                        className="w-10 h-10 mb-2 text-pink" 
                         fill="currentColor" 
                         viewBox="0 0 24 24"
                       >
@@ -165,7 +155,7 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                       {/* Texto de bloqueo */}
                       <div className="text-center">
                         <p className="text-sm font-medium mb-1">{t('common.locked')}</p>
-                        <p className="text-xs opacity-80">
+                        <p className="text-xs text-trm-muted">
                           {daysUntilUnlock === 0 
                             ? t('dynamicContent.unlocksTomorrow') 
                             : t('dynamicContent.unlocksIn', { count: daysUntilUnlock })
@@ -178,10 +168,10 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
                 
                 {/* Título y día en la parte inferior */}
                 <div className={`mt-auto ${!isUnlocked ? 'text-center' : 'text-right'}`}>
-                  <blockquote className={`text-base lg:text-lg font-medium text-cream mb-0.5 ${!isUnlocked ? 'opacity-75' : ''}`}>
+                  <blockquote className={`text-base lg:text-lg font-medium text-white mb-0.5 ${!isUnlocked ? 'opacity-75' : ''}`}>
                     {translateRoutineData(dataItem, locale).title}
                   </blockquote>
-                  <blockquote className={`text-sm font-light text-cream ${!isUnlocked ? 'opacity-60' : 'opacity-80'}`}>
+                  <blockquote className={`text-sm font-light text-trm-muted ${!isUnlocked ? 'opacity-60' : ''}`}>
                     {translateRoutineData(dataItem, locale).day}
                   </blockquote>
                 </div>
@@ -193,20 +183,24 @@ export default function ExploreVideoSlider({ searchTerm: propSearchTerm }: Explo
         
       {!isLoading && currentData.length === 0 && (
         <div>
-        <h1 className='text-2xl text-center text-gray-700'>{t('common.couldntFind')}: <span className='font-medium text-2xl text-gray-700'>&quot;{searchTerm}&quot; 
+        <h1 className='text-2xl text-center text-trm-muted'>{t('common.couldntFind')}: <span className='font-medium text-2xl text-white'>&quot;{searchTerm}&quot; 
         </span> </h1>
-        <h1 className='text-xl text-center text-gray-700'>{t('common.trySearchAgain')}</h1>
+        <h1 className='text-xl text-center text-trm-muted'>{t('common.trySearchAgain')}</h1>
         </div>
       )}
 
-      {error && <p>Error: {error}</p>}
+      {error && <p className="text-pink">Error: {error}</p>}
     </div>
 
     <div className="flex justify-center pb-8 pt-16">
       {Array.from({ length: totalPages }).map((_, index) => (
         <button
           key={index}
-          className={`mx-1 px-4 py-2 text-xl rounded-md text-white bg-gray-300  ${currentPage === index + 1 ? 'underline' : ''}`}
+          className={`mx-1 px-4 py-2 text-xl rounded-full text-white transition-all duration-200 ${
+            currentPage === index + 1 
+              ? 'bg-gradient-to-r from-pink to-dark-red' 
+              : 'bg-trm-bg hover:bg-pink/20'
+          }`}
           onClick={() => setCurrentPage(index + 1)}
         >
           {index + 1}

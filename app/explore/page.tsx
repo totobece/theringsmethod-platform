@@ -88,7 +88,7 @@ function ExploreContent() {
 
   if (!trialStatus) {
     return (
-      <main className="relative bg-gray-700 min-h-screen flex items-center justify-center">
+      <main className="relative bg-trm-black min-h-screen flex items-center justify-center font-montserrat">
         <div className="text-white text-lg">{t('common.loading')}</div>
       </main>
     )
@@ -100,10 +100,10 @@ function ExploreContent() {
   }
 
   return (
-    <main className="relative bg-gray-700">
+    <main className="relative bg-trm-black font-montserrat">
       {/* Locked Routine Notification */}
       {showLockedNotification && lockedRoutineInfo && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-pink text-white px-6 py-4 rounded-[20px] shadow-lg max-w-md w-full mx-4">
           <div className="flex items-center">
             <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -120,7 +120,7 @@ function ExploreContent() {
           </div>
           <button 
             onClick={() => setShowLockedNotification(false)}
-            className="absolute top-2 right-2 text-white hover:text-gray-200"
+            className="absolute top-2 right-2 text-white hover:text-white/70"
           >
             ×
           </button>
@@ -132,36 +132,36 @@ function ExploreContent() {
       {trialStatus.user && (
         <>
           {/* Filter Section */}
-          <div className="container mx-auto px-4 pt-8 pb-6">
+          <div className="container mx-auto px-4 pt-24 pb-6">
             {/* Filter Tabs - Centrado */}
             <div className="flex justify-center mb-8">
-              <div className="flex space-x-1 bg-gray-600 rounded-lg p-1 max-w-md">
+              <div className="flex space-x-1 bg-trm-black border border-pink rounded-full p-1 max-w-md">
                 <button
                   onClick={() => setActiveFilter('routines')}
-                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
+                  className={`px-6 py-3 rounded-full transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
                     activeFilter === 'routines'
-                      ? 'bg-gray-700 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                      ? 'bg-gradient-to-r from-pink to-dark-red text-white shadow-lg'
+                      : 'text-trm-muted hover:text-white'
                   }`}
                 >
                   <span className="font-medium">{t('explore.routines')}</span>
                 </button>
                 <button
                   onClick={() => setActiveFilter('meditations')}
-                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
+                  className={`px-6 py-3 rounded-full transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
                     activeFilter === 'meditations'
-                      ? 'bg-gray-700 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                      ? 'bg-gradient-to-r from-pink to-dark-red text-white shadow-lg'
+                      : 'text-trm-muted hover:text-white'
                   }`}
                 >
                   <span className="font-medium">{t('explore.meditations')}</span>
                 </button>
                 <button
                   onClick={() => setActiveFilter('warmups')}
-                  className={`px-6 py-3 rounded-md transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
+                  className={`px-6 py-3 rounded-full transition-all duration-200 flex-1 justify-center whitespace-nowrap ${
                     activeFilter === 'warmups'
-                      ? 'bg-gray-700 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-gray-700'
+                      ? 'bg-gradient-to-r from-pink to-dark-red text-white shadow-lg'
+                      : 'text-trm-muted hover:text-white'
                   }`}
                 >
                   <span className="font-medium">Warm Ups</span>
@@ -192,7 +192,7 @@ function ExploreContent() {
 export default function Explore() {
   return (
     <Suspense fallback={
-      <main className="relative bg-gray-700 min-h-screen flex items-center justify-center">
+      <main className="relative bg-trm-black min-h-screen flex items-center justify-center font-montserrat">
         <div className="text-white text-lg">Loading...</div>
       </main>
     }>

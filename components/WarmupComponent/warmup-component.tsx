@@ -105,22 +105,9 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
       <div
         key={warmup.id}
         onClick={() => handleWarmupClick(warmup)}
-        className="cursor-pointer group transform hover:scale-105 transition-all duration-300"
+        className="cursor-pointer group"
       >
-        <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden">
-          {/* Imagen de fondo */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/smaller rectangle.png"
-              alt="Card Background"
-              fill
-              className="object-cover rounded-xl"
-            />
-          </div>
-
-          {/* Overlay con gradiente */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 rounded-xl" />
-
+        <div className="bg-trm-black border border-pink rounded-[20px] p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden brightness-[0.7] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300">
           {/* Contenido */}
           <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-3">
             {/* Título centrado y más compacto */}
@@ -132,7 +119,7 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
 
             {/* Botón de play centrado */}
             <div className="flex justify-center">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:bg-wine/80 transition-all duration-300">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:bg-pink/80 transition-all duration-300">
                 <Play className="w-6 h-6 text-white fill-white" />
               </div>
             </div>
@@ -162,18 +149,18 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
           {[...Array(8)].map((_, index) => (
             <div key={index} className="relative">
-              <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
+              <div className="bg-trm-black border border-pink/20 rounded-[20px] p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden animate-pulse">
                 {/* Simular la estructura de la card real */}
                 <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-4">
                   {/* Título simulado */}
                   <div className="mb-6 w-full">
-                    <div className="h-5 bg-gray-500 rounded w-3/4 mx-auto mb-2"></div>
-                    <div className="h-4 bg-gray-500 rounded w-1/2 mx-auto"></div>
+                    <div className="h-5 bg-trm-bg rounded w-3/4 mx-auto mb-2"></div>
+                    <div className="h-4 bg-trm-bg rounded w-1/2 mx-auto"></div>
                   </div>
                   {/* Botón play simulado */}
-                  <div className="w-12 h-12 bg-gray-500 rounded-full mb-6"></div>
+                  <div className="w-12 h-12 bg-trm-bg rounded-full mb-6"></div>
                   {/* Duración simulada */}
-                  <div className="h-4 bg-gray-500 rounded w-16"></div>
+                  <div className="h-4 bg-trm-bg rounded w-16"></div>
                 </div>
               </div>
             </div>
@@ -200,11 +187,11 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
             </h2>
           </div>
         )}
-        <div className="text-center text-red-400 py-8">
+        <div className="text-center text-pink py-8">
           <p>{error}</p>
           <button 
             onClick={handleRetry}
-            className="mt-4 px-4 py-2 bg-wine hover:bg-red-700 rounded-lg transition-colors"
+            className="mt-4 px-4 py-2 bg-gradient-to-r from-pink to-dark-red hover:opacity-80 rounded-full transition-all"
           >
             Retry
           </button>
@@ -230,8 +217,8 @@ const WarmupComponent: React.FC<WarmupComponentProps> = ({
             </h2>
           </div>
         )}
-        <div className="text-center text-gray-400 py-8">
-          <Dumbbell className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+        <div className="text-center text-trm-muted py-8">
+          <Dumbbell className="w-16 h-16 mx-auto mb-4 text-trm-bg" />
           <p>
             {searchTerm ? 
               `No warmups found for "${searchTerm}"` : 

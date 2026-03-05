@@ -4,10 +4,10 @@ import Sidebar from "@/components/UI/Sidebar/sidebar";
 
 export default async function TermsPage() {
   return (
-    <section className="bg-cream max-w-full h-full min-h-screen flex flex-col ">
+    <section className="bg-trm-black max-w-full h-full min-h-screen flex flex-col ">
       <Navbar />
 
-      <div className="flex bg-cream flex-1"> 
+      <div className="flex flex-1"> 
           <Sidebar/>
 
         <div className="flex-1 md:ml-[12.5%] mx-auto px-8 pt-24 pb-12">
@@ -16,11 +16,11 @@ export default async function TermsPage() {
           </div>
           
           <div className="max-w-4xl mx-auto">
-            <div className="text-gray-700 space-y-6">
+            <div className="text-trm-muted space-y-6">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-black mb-2">THE RINGS METHOD® TERMS AND CONDITIONS OF SERVICE</h2>
-                <p className="text-lg font-medium">Effective Date: July 7, 2025</p>
-                <p className="text-lg font-bold mt-4">PLEASE READ THIS LEGAL DOCUMENT CAREFULLY. IT GOVERNS YOUR USE OF THE THE RINGS METHOD® WEBSITE, WEB APPLICATION, AND PRODUCTS.</p>
+                <h2 className="text-2xl font-bold text-white mb-2">THE RINGS METHOD® TERMS AND CONDITIONS OF SERVICE</h2>
+                <p className="text-lg font-medium text-trm-muted">Effective Date: July 7, 2025</p>
+                <p className="text-lg font-bold mt-4 text-white">PLEASE READ THIS LEGAL DOCUMENT CAREFULLY. IT GOVERNS YOUR USE OF THE THE RINGS METHOD® WEBSITE, WEB APPLICATION, AND PRODUCTS.</p>
               </div>
 
               <div className="space-y-4">
@@ -31,118 +31,118 @@ export default async function TermsPage() {
                 <p>If you do not wish to be bound by these Terms, you may not access or use the Service.</p>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">1. SAFETY WARNINGS AND MEDICAL & PHYSICAL ACTIVITY DISCLAIMER</h3>
-                <p className="font-bold mb-3">THIS SECTION IS CRUCIAL. YOUR USE OF THE SERVICE IMPLIES ACCEPTANCE OF THESE RISKS.</p>
+                <h3 className="text-xl font-bold text-white mb-4">1. SAFETY WARNINGS AND MEDICAL & PHYSICAL ACTIVITY DISCLAIMER</h3>
+                <p className="font-bold mb-3 text-white">THIS SECTION IS CRUCIAL. YOUR USE OF THE SERVICE IMPLIES ACCEPTANCE OF THESE RISKS.</p>
                 <ul className="space-y-3 list-disc list-inside ml-4">
-                  <li><strong>1.1. Nature of the Service.</strong> The Service offers health and fitness information and is designed for educational and entertainment purposes only. The content provided does not substitute for or replace professional medical advice, diagnosis, or treatment.</li>
-                  <li><strong>1.2. Mandatory Medical Consultation.</strong> You must consult your physician or another qualified health professional before starting this or any other exercise program to determine if it is right for your needs. This is especially important if you (or your family) have a history of high blood pressure or heart disease, or if you have ever experienced chest pain when exercising, smoke, have high cholesterol, are obese, or have a bone or joint problem that could be made worse by a change in physical activity. Do not use the Service if your doctor or healthcare provider advises against it.</li>
-                  <li><strong>1.3. Not Medical Advice.</strong> Nothing stated or posted on the Service is intended to be, and must not be taken to be, the practice of medicine or professional counseling care. The use of information provided through the Service is solely at your own risk.</li>
-                  <li><strong>1.4. Assumption of Risk.</strong> You understand and agree that any fitness and physical exercise program carries an inherent risk of physical injury, from minor injuries (strains, sprains) to serious injuries (joint damage, heart attack) and even death. By voluntarily participating in The Rings Method® programs, you knowingly and fully assume all known and unknown risks associated with these activities, even if caused in whole or in part by the action, inaction, or negligence of The Rings Method® or others.</li>
+                  <li><strong className="text-white">1.1. Nature of the Service.</strong> The Service offers health and fitness information and is designed for educational and entertainment purposes only. The content provided does not substitute for or replace professional medical advice, diagnosis, or treatment.</li>
+                  <li><strong className="text-white">1.2. Mandatory Medical Consultation.</strong> You must consult your physician or another qualified health professional before starting this or any other exercise program to determine if it is right for your needs. This is especially important if you (or your family) have a history of high blood pressure or heart disease, or if you have ever experienced chest pain when exercising, smoke, have high cholesterol, are obese, or have a bone or joint problem that could be made worse by a change in physical activity. Do not use the Service if your doctor or healthcare provider advises against it.</li>
+                  <li><strong className="text-white">1.3. Not Medical Advice.</strong> Nothing stated or posted on the Service is intended to be, and must not be taken to be, the practice of medicine or professional counseling care. The use of information provided through the Service is solely at your own risk.</li>
+                  <li><strong className="text-white">1.4. Assumption of Risk.</strong> You understand and agree that any fitness and physical exercise program carries an inherent risk of physical injury, from minor injuries (strains, sprains) to serious injuries (joint damage, heart attack) and even death. By voluntarily participating in The Rings Method® programs, you knowingly and fully assume all known and unknown risks associated with these activities, even if caused in whole or in part by the action, inaction, or negligence of The Rings Method® or others.</li>
                 </ul>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">2. RISKS ASSOCIATED WITH EQUIPMENT (GYMNASTIC RINGS)</h3>
+                <h3 className="text-xl font-bold text-white mb-4">2. RISKS ASSOCIATED WITH EQUIPMENT (GYMNASTIC RINGS)</h3>
                 <ul className="space-y-3 list-disc list-inside ml-4">
-                  <li><strong>2.1. User Responsibility.</strong> You are solely responsible for the proper installation, maintenance, and use of your gymnastic rings and all their components.</li>
-                  <li><strong>2.2. Mandatory Periodic Inspection.</strong> Before EACH training session, it is your responsibility to thoroughly inspect all equipment. Check for any fraying, loose stitches, tears, cracks, or any other signs of wear or damage to the rings, straps, and anchoring systems. If you detect any sign of damage, STOP USING THE EQUIPMENT IMMEDIATELY.</li>
-                  <li><strong>2.3. Use of Anchors (Doors, Walls, Ceilings, Bars).</strong> Our rings design may include accessories for anchoring to doors, walls, ceilings, bars, or other structures. The Rings Method® IS NOT RESPONSIBLE for the structural integrity of any anchor point you choose. It is your sole responsibility to ensure that the door, wall, ceiling, beam, bar, or any other structure is strong enough to withstand the forces generated during training. We are not liable for any damage to your property or for injuries resulting from the failure of the anchor point.</li>
-                  <li><strong>2.4. Load Limits and Materials.</strong> Although the rings are designed to withstand high loads, we recommend a maximum user weight of 200 kg to ensure an adequate safety margin. Despite high-quality standards, there is an inherent possibility of material failure. The Rings Method® disclaims all liability for injury, damage, or death that may result from a material failure.</li>
-                  <li><strong>2.5. Misuse Disclaimer.</strong> The Rings Method® is not liable for any injury, damage, or death resulting from the misuse of the gymnastic rings, including improper installation or incorrect exercise technique.</li>
+                  <li><strong className="text-white">2.1. User Responsibility.</strong> You are solely responsible for the proper installation, maintenance, and use of your gymnastic rings and all their components.</li>
+                  <li><strong className="text-white">2.2. Mandatory Periodic Inspection.</strong> Before EACH training session, it is your responsibility to thoroughly inspect all equipment. Check for any fraying, loose stitches, tears, cracks, or any other signs of wear or damage to the rings, straps, and anchoring systems. If you detect any sign of damage, STOP USING THE EQUIPMENT IMMEDIATELY.</li>
+                  <li><strong className="text-white">2.3. Use of Anchors (Doors, Walls, Ceilings, Bars).</strong> Our rings design may include accessories for anchoring to doors, walls, ceilings, bars, or other structures. The Rings Method® IS NOT RESPONSIBLE for the structural integrity of any anchor point you choose. It is your sole responsibility to ensure that the door, wall, ceiling, beam, bar, or any other structure is strong enough to withstand the forces generated during training. We are not liable for any damage to your property or for injuries resulting from the failure of the anchor point.</li>
+                  <li><strong className="text-white">2.4. Load Limits and Materials.</strong> Although the rings are designed to withstand high loads, we recommend a maximum user weight of 200 kg to ensure an adequate safety margin. Despite high-quality standards, there is an inherent possibility of material failure. The Rings Method® disclaims all liability for injury, damage, or death that may result from a material failure.</li>
+                  <li><strong className="text-white">2.5. Misuse Disclaimer.</strong> The Rings Method® is not liable for any injury, damage, or death resulting from the misuse of the gymnastic rings, including improper installation or incorrect exercise technique.</li>
                 </ul>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">3. ELIGIBILITY AND USE OF THE SERVICE</h3>
+                <h3 className="text-xl font-bold text-white mb-4">3. ELIGIBILITY AND USE OF THE SERVICE</h3>
                 <ul className="space-y-3 list-disc list-inside ml-4">
-                  <li><strong>3.1. Age Requirement.</strong> You must be at least 18 years old, or the age of legal majority in your jurisdiction of residence.</li>
-                  <li><strong>3.2. Account Creation.</strong> You agree to provide accurate information and are responsible for safeguarding your password. Sharing your account is strictly prohibited.</li>
-                  <li><strong>3.3. Personal Use.</strong> The Service is offered only for your personal, non-commercial use.</li>
+                  <li><strong className="text-white">3.1. Age Requirement.</strong> You must be at least 18 years old, or the age of legal majority in your jurisdiction of residence.</li>
+                  <li><strong className="text-white">3.2. Account Creation.</strong> You agree to provide accurate information and are responsible for safeguarding your password. Sharing your account is strictly prohibited.</li>
+                  <li><strong className="text-white">3.3. Personal Use.</strong> The Service is offered only for your personal, non-commercial use.</li>
                 </ul>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">4. LICENSE TO USE AND RESTRICTIONS</h3>
+                <h3 className="text-xl font-bold text-white mb-4">4. LICENSE TO USE AND RESTRICTIONS</h3>
                 <ul className="space-y-3 list-disc list-inside ml-4">
-                  <li><strong>4.1. License.</strong> We grant you a limited, non-transferable, non-exclusive, revocable license to access and use the Service through a compatible web browser for your personal, non-commercial purposes. This license does not grant you the right to download, reproduce, or distribute the content.</li>
-                  <li><strong>4.2. Restrictions.</strong> You will not reproduce, redistribute, sell, create derivative works from, decompile, reverse engineer, or disassemble the Service. You will not take any measures to interfere with or damage the Service.</li>
+                  <li><strong className="text-white">4.1. License.</strong> We grant you a limited, non-transferable, non-exclusive, revocable license to access and use the Service through a compatible web browser for your personal, non-commercial purposes. This license does not grant you the right to download, reproduce, or distribute the content.</li>
+                  <li><strong className="text-white">4.2. Restrictions.</strong> You will not reproduce, redistribute, sell, create derivative works from, decompile, reverse engineer, or disassemble the Service. You will not take any measures to interfere with or damage the Service.</li>
                 </ul>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">5. INTELLECTUAL PROPERTY</h3>
+                <h3 className="text-xl font-bold text-white mb-4">5. INTELLECTUAL PROPERTY</h3>
                 <p>The Service and its original content, features, and functionality are and will remain the exclusive property of BuAra Entertainment LLC and its licensors. The "The Rings Method®" trademark, logos, and all materials are protected by copyright, trademark, and other laws of the United States and foreign countries.</p>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">6. INDEMNIFICATION</h3>
+                <h3 className="text-xl font-bold text-white mb-4">6. INDEMNIFICATION</h3>
                 <p>You agree to defend, indemnify, and hold harmless BuAra Entertainment LLC, its directors, employees, partners, and agents, from and against any and all claims, damages, obligations, losses, liabilities, costs or debt, and expenses (including but not limited to attorney's fees), resulting from or arising out of: (i) your use and access of the Service and equipment; (ii) your violation of any of these Terms; (iii) any injury, death, or property damage caused by your activities; or (iv) third-party claims arising from your activities or your use of the Service.</p>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">7. LIMITATION OF LIABILITY</h3>
-                <p className="font-bold mb-3">TO THE FULLEST EXTENT PERMITTED BY LAW, BUARA ENTERTAINMENT LLC SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM:</p>
+                <h3 className="text-xl font-bold text-white mb-4">7. LIMITATION OF LIABILITY</h3>
+                <p className="font-bold mb-3 text-white">TO THE FULLEST EXTENT PERMITTED BY LAW, BUARA ENTERTAINMENT LLC SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION, LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, RESULTING FROM:</p>
                 <ul className="space-y-2 list-disc list-inside ml-4 mb-3">
                   <li>(I) YOUR ACCESS TO OR USE OF OR INABILITY TO ACCESS OR USE THE SERVICE OR EQUIPMENT;</li>
                   <li>(II) ANY FAILURE OF THE EQUIPMENT;</li>
                   <li>(III) ANY PROPERTY DAMAGE OR DAMAGE TO THIRD PARTIES CAUSED BY THE USER;</li>
                   <li>(IV) ANY PERSONAL INJURY, INCLUDING DEATH.</li>
                 </ul>
-                <p className="font-bold">THE TOTAL AGGREGATE LIABILITY OF BUARA ENTERTAINMENT LLC TO YOU FOR ALL CLAIMS SHALL NOT EXCEED THE AMOUNT YOU HAVE PAID US IN THE PAST 12 MONTHS.</p>
+                <p className="font-bold text-white">THE TOTAL AGGREGATE LIABILITY OF BUARA ENTERTAINMENT LLC TO YOU FOR ALL CLAIMS SHALL NOT EXCEED THE AMOUNT YOU HAVE PAID US IN THE PAST 12 MONTHS.</p>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">8. GOVERNING LAW AND DISPUTE RESOLUTION</h3>
+                <h3 className="text-xl font-bold text-white mb-4">8. GOVERNING LAW AND DISPUTE RESOLUTION</h3>
                 <ul className="space-y-3 list-disc list-inside ml-4">
-                  <li><strong>8.1. Governing Law.</strong> These Terms shall be governed and construed in accordance with the laws of the State of Florida, United States of America, without regard to its conflict of law provisions.</li>
-                  <li><strong>8.2. Mandatory Arbitration and Class Action Waiver.</strong> You and BuAra Entertainment LLC agree that the U.S. Federal Arbitration Act governs the interpretation and enforcement of this section. Any dispute, claim, or controversy arising out of these Terms shall be resolved exclusively through binding, individual arbitration, and not in a class, representative, or consolidated action. YOU AND BUARA ENTERTAINMENT LLC WAIVE THE RIGHT TO A JURY TRIAL OR TO PARTICIPATE IN A CLASS ACTION. The arbitration will be administered by the American Arbitration Association (AAA) under its "Consumer Arbitration Rules" and will be held in Miami, Florida, or by video conference if the parties so agree.</li>
+                  <li><strong className="text-white">8.1. Governing Law.</strong> These Terms shall be governed and construed in accordance with the laws of the State of Florida, United States of America, without regard to its conflict of law provisions.</li>
+                  <li><strong className="text-white">8.2. Mandatory Arbitration and Class Action Waiver.</strong> You and BuAra Entertainment LLC agree that the U.S. Federal Arbitration Act governs the interpretation and enforcement of this section. Any dispute, claim, or controversy arising out of these Terms shall be resolved exclusively through binding, individual arbitration, and not in a class, representative, or consolidated action. YOU AND BUARA ENTERTAINMENT LLC WAIVE THE RIGHT TO A JURY TRIAL OR TO PARTICIPATE IN A CLASS ACTION. The arbitration will be administered by the American Arbitration Association (AAA) under its "Consumer Arbitration Rules" and will be held in Miami, Florida, or by video conference if the parties so agree.</li>
                 </ul>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">9. COPYRIGHT INFRINGEMENT NOTICES (DMCA)</h3>
+                <h3 className="text-xl font-bold text-white mb-4">9. COPYRIGHT INFRINGEMENT NOTICES (DMCA)</h3>
                 <p>We respect the intellectual property rights of others. If you believe that any content on the Service infringes your copyright, please send a notice in accordance with the Digital Millennium Copyright Act (DMCA) to our copyright agent at legal@theringsmethod.com with the legally required information.</p>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">10. MODIFICATIONS TO THESE TERMS</h3>
+                <h3 className="text-xl font-bold text-white mb-4">10. MODIFICATIONS TO THESE TERMS</h3>
                 <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. Your continued use of the Service after such revisions become effective will signify your acceptance of the revised terms.</p>
               </div>
 
-              <hr className="border-gray-400" />
+              <hr className="border-pink/20" />
 
               <div>
-                <h3 className="text-xl font-bold text-black mb-4">11. CONTACT AND ELECTRONIC COMMUNICATIONS</h3>
+                <h3 className="text-xl font-bold text-white mb-4">11. CONTACT AND ELECTRONIC COMMUNICATIONS</h3>
                 <ul className="space-y-3 list-disc list-inside ml-4">
-                  <li><strong>11.1. Contact.</strong> If you have any questions about these Terms, please contact us:
+                  <li><strong className="text-white">11.1. Contact.</strong> If you have any questions about these Terms, please contact us:
                     <ul className="mt-2 ml-6 space-y-1">
-                      <li>• For support inquiries: help@theringsmethod.com</li>
-                      <li>• For legal notices: legal@theringsmethod.com</li>
-                      <li>• Mailing Address: BuAra Entertainment LLC, 3745 NE 171ST STREET UNIT 77, NORTH MIAMI BEACH, FL 33160, USA.</li>
+                      <li>For support inquiries: <span className="text-pink">help@theringsmethod.com</span></li>
+                      <li>For legal notices: <span className="text-pink">legal@theringsmethod.com</span></li>
+                      <li>Mailing Address: BuAra Entertainment LLC, 3745 NE 171ST STREET UNIT 77, NORTH MIAMI BEACH, FL 33160, USA.</li>
                     </ul>
                   </li>
-                  <li><strong>11.2. Electronic Communications.</strong> By using our Service, you consent to receive communications from us electronically, such as emails or notices posted on the website. You agree that all agreements, notices, disclosures, and other communications that we provide to you electronically satisfy any legal requirement that such communications be in writing.</li>
+                  <li><strong className="text-white">11.2. Electronic Communications.</strong> By using our Service, you consent to receive communications from us electronically, such as emails or notices posted on the website. You agree that all agreements, notices, disclosures, and other communications that we provide to you electronically satisfy any legal requirement that such communications be in writing.</li>
                 </ul>
               </div>
             </div>

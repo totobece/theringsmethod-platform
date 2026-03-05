@@ -14,7 +14,7 @@ function ContactForm() {
     return (
       <>
       <Navbar />
-      <div className="px-8 py-40 bg-gray-700 flex items-center justify-center h-full">
+      <div className="px-8 py-40 bg-trm-black flex items-center justify-center h-full">
         <p className="text-4xl text-center font-semibold text-white">
         {t('support.ticketSubmitted')} <br />{t('support.teamWillContact')}
         </p>
@@ -26,20 +26,20 @@ function ContactForm() {
 
 
   return (
-    <section id="contact" className="relative bg-cream">
+    <section id="contact" className="relative bg-trm-black">
      
-      <div className="relative flex flex-col justify-center  overflow-hidden pb-12 pt-12 ">
-        <div className="w-full bg-cream p-6 m-auto rounded-lg  lg:max-w-xl">
+      <div className="relative flex flex-col justify-center overflow-hidden pb-12 pt-12 ">
+        <div className="w-full bg-trm-black p-6 m-auto rounded-lg lg:max-w-xl">
           <div>
         
       </div>
-          <h1 className="text-gray-600 text-4xl lg:text-6xl">
+          <h1 className="text-white text-4xl lg:text-6xl">
             {t('support.contactWithSupport')}
           </h1>
           <form className="mt-6 text-left p-4 lg:p-6" onSubmit={handleSubmit}>
             <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-medium">{t('support.fullName')}</span>
+                      <span className="text-trm-muted text-xl font-medium">{t('support.fullName')}</span>
                       <input
                         type="text"
                         name="name"
@@ -48,17 +48,20 @@ function ContactForm() {
                         block
                         w-full
                         my-4
-                        px-16
+                        px-6
                         py-3
-                        bg-white
-                        border-white
-                        rounded-2xl
+                        bg-trm-bg
+                        border
+                        border-pink/20
+                        rounded-[20px]
                         text-xl
                         shadow-sm
-                        text-gray-700
-                        focus:border-white
+                        text-white
+                        placeholder-trm-muted
+                        focus:border-pink
                         focus:ring
-                        focus:ring-white
+                        focus:ring-pink/20
+                        focus:outline-none
                         "
                         
                       />
@@ -66,7 +69,7 @@ function ContactForm() {
                   </div>
                   <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-medium" >{t('support.email')}</span>
+                      <span className="text-trm-muted text-xl font-medium" >{t('support.email')}</span>
                       <input
                         name="email"
                         type="email"
@@ -75,17 +78,20 @@ function ContactForm() {
                         block
                         w-full
                         my-4
-                        px-16
+                        px-6
                         py-3
-                        bg-white
-                        border-white
+                        bg-trm-bg
+                        border
+                        border-pink/20
                         text-xl
-                        rounded-2xl
+                        rounded-[20px]
                         shadow-sm
-                        text-gray-700
-                        focus:border-white
+                        text-white
+                        placeholder-trm-muted
+                        focus:border-pink
                         focus:ring
-                        focus:ring-white
+                        focus:ring-pink/20
+                        focus:outline-none
                         "
                       
                         required
@@ -94,7 +100,7 @@ function ContactForm() {
                   </div>
                   <div className="mb-2">
                     <label>
-                      <span className="text-gray-600 text-xl font-medium" >{t('support.phoneNumber')}</span>
+                      <span className="text-trm-muted text-xl font-medium" >{t('support.phoneNumber')}</span>
                       <input
                         name="Numero"
                         type="text"
@@ -104,16 +110,19 @@ function ContactForm() {
                           w-full
                           text-xl
                           my-4
-                          px-16
+                          px-6
                           py-3
-                          bg-white
-                          border-white
-                          rounded-2xl
+                          bg-trm-bg
+                          border
+                          border-pink/20
+                          rounded-[20px]
                           shadow-sm
-                          text-gray-700
-                          focus:border-white
+                          text-white
+                          placeholder-trm-muted
+                          focus:border-pink
                           focus:ring
-                          focus:ring-white
+                          focus:ring-pink/20
+                          focus:outline-none
                         "
                       
                         required
@@ -122,7 +131,7 @@ function ContactForm() {
                   </div>
                     <div className="mb-2 ">
                       <label>
-                        <span className="text-gray-600 text-xl font-medium " >{t('support.yourMessage')}</span>
+                        <span className="text-trm-muted text-xl font-medium " >{t('support.yourMessage')}</span>
                         <textarea
                           name="message"
                 
@@ -131,16 +140,19 @@ function ContactForm() {
                           text-xl
                           w-full
                           my-4
-                          px-16
+                          px-6
                           py-3
-                          bg-white
-                          border-white
-                          rounded-2xl
+                          bg-trm-bg
+                          border
+                          border-pink/20
+                          rounded-[20px]
                           shadow-sm
-                          text-gray-700
-                          focus:border-white
+                          text-white
+                          placeholder-trm-muted
+                          focus:border-pink
                           focus:ring
-                          focus:ring-white
+                          focus:ring-pink/20
+                          focus:outline-none
                           "
                         
                         ></textarea>
@@ -152,7 +164,7 @@ function ContactForm() {
 
  
                 <button 
-                className="relative hover:-translate-x-[-12px] bg-gray-600 transition px-6 text-xl inline-flex h-12  animate-shimmer items-center justify-center rounded-[40px] font-medium text-white "
+                className="relative hover:opacity-80 bg-gradient-to-r from-pink to-dark-red transition px-6 text-xl inline-flex h-12 items-center justify-center rounded-full font-medium text-white"
                 type='submit'
                 disabled={state.submitting}
                 >

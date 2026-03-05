@@ -62,7 +62,7 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
           if (playPromise !== undefined) {
             playPromise
               .then(() => {
-                console.log('Autoplay funcionó correctamente');
+                console.log('Autoplay worked correctly');
                 setShowPlayPrompt(false);
                 // Si es video y se reproduce correctamente, desmutear
                 if (meditation.type === 'video') {
@@ -70,12 +70,12 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
                 }
               })
               .catch((error) => {
-                console.log('Autoplay fue bloqueado:', error.name);
+                console.log('Autoplay was blocked:', error.name);
                 setShowPlayPrompt(true);
               });
           }
         }
-      }, 800); // Delay más largo para dar tiempo a que se cargue completamente
+      }, 800);
 
       return () => clearTimeout(timer);
     }
@@ -93,7 +93,7 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
       mediaElement.play().then(() => {
         setShowPlayPrompt(false);
       }).catch((error) => {
-        console.error('Error al reproducir:', error);
+        console.error('Error playing:', error);
       });
     }
   };
@@ -123,31 +123,31 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
         const foundMeditation = meditations.find((m: Meditation) => m.id === decodedId);
         
         if (!foundMeditation) {
-          setError('Meditación no encontrada');
+          setError(locale === 'es' ? 'Meditación no encontrada' : 'Meditation not found');
           return;
         }
 
         setMeditation(foundMeditation);
       } catch (err) {
         console.error('Error fetching meditation:', err);
-        setError('Error al cargar la meditación');
+        setError(locale === 'es' ? 'Error al cargar la meditación' : 'Error loading meditation');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchMeditation();
-  }, [id]);
+  }, [id, locale]);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-700 text-white">
+      <div className="min-h-screen bg-trm-black text-white font-montserrat">
         <Navbar />
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
           <div className="animate-pulse">
-            <div className="w-full max-w-4xl mx-auto bg-gray-600 rounded-lg h-96 mb-8"></div>
-            <div className="h-8 bg-gray-600 rounded w-3/4 mx-auto mb-4"></div>
-            <div className="h-4 bg-gray-600 rounded w-1/2 mx-auto"></div>
+            <div className="w-full max-w-4xl mx-auto bg-trm-bg border border-pink/20 rounded-[20px] h-96 mb-8"></div>
+            <div className="h-8 bg-trm-bg rounded w-3/4 mx-auto mb-4"></div>
+            <div className="h-4 bg-trm-bg rounded w-1/2 mx-auto"></div>
           </div>
         </div>
         <Footer />
@@ -157,17 +157,17 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
 
   if (error || !meditation) {
     return (
-      <div className="min-h-screen bg-gray-700 text-white">
+      <div className="min-h-screen bg-trm-black text-white font-montserrat">
         <Navbar />
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">Error</h1>
-            <p className="text-red-400 mb-4">{error || 'Meditación no encontrada'}</p>
+            <p className="text-pink mb-4">{error || (locale === 'es' ? 'Meditación no encontrada' : 'Meditation not found')}</p>
             <button 
               onClick={() => router.back()}
-              className="bg-wine hover:bg-red-700 px-6 py-2 rounded-lg transition-colors"
+              className="bg-gradient-to-r from-pink to-dark-red hover:opacity-80 px-6 py-2 rounded-full transition-all"
             >
-              Volver
+              {locale === 'es' ? 'Volver' : 'Go Back'}
             </button>
           </div>
         </div>
@@ -182,28 +182,28 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
   const displayDescription = meditationContent?.description || '';
 
   return (
-    <div className="min-h-screen bg-gray-700 text-white">
+    <div className="min-h-screen bg-trm-black text-white font-montserrat">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
         {/* Título de la meditación */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{displayTitle}</h1>
           {displayDescription && (
             <div className="max-w-4xl mx-auto mb-6">
-              <p className="text-gray-300 text-base leading-relaxed">
+              <p className="text-trm-muted text-base leading-relaxed">
                 {displayDescription}
               </p>
             </div>
           )}
-          <p className="text-gray-400 text-lg">
-            {meditation.type === 'video' ? 'Video' : 'Audio'} · {displayDuration}
+          <p className="text-trm-muted text-lg">
+            {meditation.type === 'video' ? 'Video' : 'Audio'} &middot; {displayDuration}
           </p>
         </div>
 
         {/* Reproductor */}
         <div className="w-full max-w-4xl mx-auto mb-12">
-          <div className="relative w-full h-0 pb-[56.25%] bg-gray-600 rounded-lg overflow-hidden">
+          <div className="relative w-full h-0 pb-[56.25%] bg-trm-bg border border-pink rounded-[20px] overflow-hidden">
             {meditation.type === 'video' ? (
               <video
                 ref={videoRef}
@@ -221,7 +221,7 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
                   // Intentar reproducir cuando los datos están cargados
                   const video = e.target as HTMLVideoElement;
                   video.play().catch(() => {
-                    console.log('Autoplay bloqueado, el usuario deberá hacer clic para reproducir');
+                    console.log('Autoplay blocked, user will need to click to play');
                     setShowPlayPrompt(true);
                   });
                 }}
@@ -232,13 +232,13 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
                   setShowPlayPrompt(false);
                 }}
               >
-                Tu navegador no soporta el elemento de video.
+                {locale === 'es' ? 'Tu navegador no soporta el elemento de video.' : 'Your browser does not support the video element.'}
               </video>
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-wine to-gray-800">
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-pink/20 to-trm-bg">
                 <div className="text-center">
                   <div className="mb-6">
-                    <svg className="w-24 h-24 mx-auto text-white/80" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-24 h-24 mx-auto text-pink/80" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
                     </svg>
                   </div>
@@ -255,13 +255,13 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
                       // Intentar reproducir cuando los datos están cargados
                       const audio = e.target as HTMLAudioElement;
                       audio.play().catch(() => {
-                        console.log('Autoplay bloqueado, el usuario deberá hacer clic para reproducir');
+                        console.log('Autoplay blocked, user will need to click to play');
                         setShowPlayPrompt(true);
                       });
                     }}
                     onPlay={() => setShowPlayPrompt(false)}
                   >
-                    Tu navegador no soporta el elemento de audio.
+                    {locale === 'es' ? 'Tu navegador no soporta el elemento de audio.' : 'Your browser does not support the audio element.'}
                   </audio>
                 </div>
               </div>
@@ -272,7 +272,7 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
                 <button
                   onClick={handlePlayClick}
-                  className="bg-wine hover:bg-red-700 text-white rounded-full p-6 transition-all duration-300 hover:scale-110 shadow-lg"
+                  className="bg-gradient-to-r from-pink to-dark-red hover:opacity-80 text-white rounded-full p-6 transition-all duration-300 hover:scale-110 shadow-lg"
                 >
                   <svg className="w-12 h-12 text-white fill-white" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z"/>
@@ -294,7 +294,7 @@ export default function MeditationPlayer({ params }: { params: Promise<{ id: str
         {/* Título para las rutinas */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-white text-center">
-            Discover more routines to try!
+            {locale === 'es' ? 'Descubre más rutinas para probar!' : 'Discover more routines to try!'}
           </h2>
         </div>
 

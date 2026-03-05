@@ -42,15 +42,13 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
       try {
         setIsLoading(true);
         const response = await fetch('/api/supabase/meditations');
-        
+
         if (!response.ok) {
           throw new Error('Error fetching meditations');
         }
 
         const data = await response.json();
         const allMeditations = data.meditations || [];
-        
-        // Filtrar meditaciones por idioma
         const languageFilteredMeditations = filterMeditationsByLanguage(allMeditations, locale);
         setMeditations(languageFilteredMeditations);
       } catch (err) {
@@ -62,22 +60,20 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     };
 
     fetchMeditations();
-  }, [locale]); // Re-ejecutar cuando cambie el idioma
+  }, [locale]);
 
   const handleRetry = async () => {
     try {
       setIsLoading(true);
       setError(null);
       const response = await fetch('/api/supabase/meditations');
-      
+
       if (!response.ok) {
         throw new Error('Error fetching meditations');
       }
 
       const data = await response.json();
       const allMeditations = data.meditations || [];
-      
-      // Filtrar meditaciones por idioma
       const languageFilteredMeditations = filterMeditationsByLanguage(allMeditations, locale);
       setMeditations(languageFilteredMeditations);
     } catch (err) {
@@ -88,76 +84,63 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     }
   };
 
-  // Filtrar meditaciones basado en el término de búsqueda y excluir ID si se especifica
   const filteredMeditations = meditations.filter(meditation => {
     const matchesSearch = meditation.title.toLowerCase().includes(searchTerm.toLowerCase());
     const notExcluded = !excludeId || meditation.id !== excludeId;
-    
     return matchesSearch && notExcluded;
   });
 
-  // Mostrar todas las meditaciones filtradas (sin límite por maxItems)
   const displayedMeditations = filteredMeditations;
 
   const handleMeditationClick = (meditation: Meditation) => {
     if (onMeditationClick) {
       onMeditationClick(meditation);
     } else {
-      // Comportamiento por defecto: navegar a la página individual de la meditación
-      // Codificar el ID para la URL
       const encodedId = encodeURIComponent(meditation.id);
       router.push(`/meditations/${encodedId}`);
     }
   };
 
-  // Componente individual para cada card de meditación
+  // Individual meditation card sub-component
   const MeditationCard: React.FC<{ meditation: Meditation }> = ({ meditation }) => {
     const realDuration = useMediaDuration(meditation.url, meditation.type);
-    // Priorizar la duración extraída del API sobre la duración real si es confiable
-    const displayDuration = meditation.duration !== 'N/A' ? meditation.duration : 
-                           (realDuration !== 'N/A' ? realDuration : meditation.duration);
+    const displayDuration = meditation.duration !== 'N/A' ? meditation.duration :
+      (realDuration !== 'N/A' ? realDuration : meditation.duration);
 
-    // Obtener contenido personalizado de la meditación
     const meditationContent = getMeditationContent(meditation.title, locale);
     const displayTitle = meditationContent?.newTitle || meditation.title;
 
     return (
       <div
-        key={meditation.id}
         onClick={() => handleMeditationClick(meditation)}
-        className="cursor-pointer group transform hover:scale-105 transition-all duration-300"
+        className="cursor-pointer group"
       >
-        <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden">
-          {/* Imagen de fondo */}
+        <div className="bg-trm-black border border-pink rounded-[20px] overflow-hidden relative min-h-[200px] brightness-[0.7] hover:brightness-100 hover:scale-[1.01] hover:shadow-[0_8px_20px_rgba(255,107,157,0.15)] transition-all duration-300">
+          {/* Background Image */}
           <div className="absolute inset-0 z-0">
             <Image
               src="/images/smaller rectangle.png"
               alt="Card Background"
               fill
-              className="object-cover rounded-xl"
+              className="object-cover"
             />
           </div>
 
-          {/* Overlay con gradiente */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 rounded-xl" />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
 
-          {/* Contenido */}
-          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-3">
-            {/* Título centrado y más compacto */}
-            <div className="mb-4">
-              <h3 className="text-white font-bold text-lg leading-tight line-clamp-2">
-                {displayTitle}
-              </h3>
-            </div>
+          {/* Content */}
+          <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-4 py-6 min-h-[200px]">
+            <h3 className="text-white font-bold text-lg leading-tight line-clamp-2 mb-4">
+              {displayTitle}
+            </h3>
 
-            {/* Botón de play centrado */}
             <div className="flex justify-center mb-4">
-              <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:bg-wine/80 transition-all duration-300">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 group-hover:bg-pink/80 transition-all duration-300">
                 <Play className="w-6 h-6 text-white fill-white" />
               </div>
             </div>
 
-            {/* Información en la parte inferior */}
             <div className="flex items-center justify-center">
               <div className="flex items-center gap-1 text-gray-200">
                 <Clock className="w-4 h-4" />
@@ -170,39 +153,21 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     );
   };
 
+  // Loading state
   if (isLoading) {
     return (
       <div className="w-full">
         {showTitle && (
-          <div className="flex items-center gap-3 mb-6">
-            <Image
-              src="/logos meditacion (1).png"
-              alt="Meditations"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-            <h2 className="text-2xl font-bold text-white">
-              {t('meditations.title')}
-            </h2>
-          </div>
+          <MeditationSectionTitle />
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {[...Array(8)].map((_, index) => (
-            <div key={index} className="relative">
-              <div className="card rounded-xl boxshadow p-[16px] max-w-full min-h-[200px] mb-5 items-center relative overflow-hidden bg-gray-600 animate-pulse">
-                {/* Simular la estructura de la card real */}
-                <div className="relative z-20 flex flex-col h-full justify-center items-center text-center px-2 py-4">
-                  {/* Título simulado */}
-                  <div className="mb-6 w-full">
-                    <div className="h-5 bg-gray-500 rounded w-3/4 mx-auto mb-2"></div>
-                    <div className="h-4 bg-gray-500 rounded w-1/2 mx-auto"></div>
-                  </div>
-                  {/* Botón play simulado */}
-                  <div className="w-12 h-12 bg-gray-500 rounded-full mb-6"></div>
-                  {/* Duración simulada */}
-                  <div className="h-4 bg-gray-500 rounded w-16"></div>
-                </div>
+            <div key={index} className="bg-trm-black border border-pink/30 rounded-[20px] min-h-[200px] animate-pulse">
+              <div className="flex flex-col h-full justify-center items-center text-center px-4 py-6">
+                <div className="h-5 bg-trm-muted/20 rounded w-3/4 mx-auto mb-2" />
+                <div className="h-4 bg-trm-muted/20 rounded w-1/2 mx-auto mb-6" />
+                <div className="w-12 h-12 bg-trm-muted/20 rounded-full mb-6" />
+                <div className="h-4 bg-trm-muted/20 rounded w-16" />
               </div>
             </div>
           ))}
@@ -211,58 +176,34 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="w-full">
-        {showTitle && (
-          <div className="flex items-center gap-3 mb-6">
-            <Image
-              src="/logos meditacion (1).png"
-              alt="Meditations"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-            <h2 className="text-2xl font-bold text-white">
-              {t('meditations.title')}
-            </h2>
-          </div>
-        )}
+        {showTitle && <MeditationSectionTitle />}
         <div className="text-center text-red-400 py-8">
           <p>{error}</p>
-          <button 
+          <button
             onClick={handleRetry}
-            className="mt-4 px-4 py-2 bg-wine hover:bg-red-700 rounded-lg transition-colors"
+            className="mt-4 px-6 py-2 bg-gradient-to-r from-pink to-dark-red text-white rounded-full transition-all duration-300 hover:shadow-[0_6px_20px_rgba(255,107,157,0.25)]"
           >
-            Reintentar
+            {locale === 'es' ? 'Reintentar' : 'Retry'}
           </button>
         </div>
       </div>
     );
   }
 
+  // Empty state
   if (displayedMeditations.length === 0) {
     return (
       <div className="w-full">
-        {showTitle && (
-          <div className="flex items-center gap-3 mb-6">
-            <Image
-              src="/logos meditacion (1).png"
-              alt="Meditations"
-              width={32}
-              height={32}
-              className="object-contain"
-            />
-            <h2 className="text-2xl font-bold text-white">
-              {t('meditations.title')}
-            </h2>
-          </div>
-        )}
-        <div className="text-center text-gray-400 py-8">
-          <Music className="w-16 h-16 mx-auto mb-4 text-gray-600" />
+        {showTitle && <MeditationSectionTitle />}
+        <div className="text-center text-trm-muted py-8">
+          <Music className="w-16 h-16 mx-auto mb-4 text-trm-muted/50" />
           <p>
-            {searchTerm ? 
-              t('meditations.noResultsFound', { searchTerm }) : 
+            {searchTerm ?
+              t('meditations.noResultsFound', { searchTerm }) :
               t('meditations.noMeditations')
             }
           </p>
@@ -273,21 +214,8 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
 
   return (
     <div className="w-full">
-      {showTitle && (
-        <div className="flex items-center gap-3 mb-6">
-          <Image
-            src="/logos meditacion (1).png"
-            alt="Meditations"
-            width={32}
-            height={32}
-            className="object-contain"
-          />
-          <h2 className="text-2xl font-bold text-white">
-            {t('meditations.title')}
-          </h2>
-        </div>
-      )}
-      
+      {showTitle && <MeditationSectionTitle />}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {displayedMeditations.map((meditation) => (
           <MeditationCard key={meditation.id} meditation={meditation} />
@@ -296,5 +224,38 @@ const MeditationsComponent: React.FC<MeditationsComponentProps> = ({
     </div>
   );
 };
+
+// Meditation section title - new design centered with gradient container
+function MeditationSectionTitle() {
+  const { t } = useI18n();
+
+  return (
+    <div className="relative bg-trm-black border border-pink rounded-[20px] overflow-hidden mb-8 shadow-[0_0_60px_rgba(255,107,157,0.06)]">
+      {/* Radial gradient background */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 50%, rgba(255,107,157,0.18) 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 50%, rgba(139,38,53,0.15) 0%, transparent 55%),
+            radial-gradient(ellipse at 50% 0%, rgba(255,107,157,0.08) 0%, transparent 60%)
+          `,
+        }}
+      />
+
+      <div className="relative z-10 flex flex-col items-center text-center py-16 md:py-20 px-8">
+        <p className="text-[10px] font-bold tracking-[5px] uppercase text-pink mb-[18px]">
+          {t('meditations.eyebrow')}
+        </p>
+        <h2 className="text-[36px] md:text-[52px] font-extrabold tracking-[-2px] leading-tight uppercase text-white mb-[22px]">
+          {t('meditations.title')}
+        </h2>
+        <p className="text-[14px] text-[#aaa] leading-[1.7] mb-10 max-w-[480px]">
+          {t('meditations.description')}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 export default MeditationsComponent;

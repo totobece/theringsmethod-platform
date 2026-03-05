@@ -5,7 +5,7 @@ import Support from "@/components/SupportForm/support";
 
 export default async function SupportPage() {
   return (
-    <section className="bg-cream max-w-full h-full min-h-screen flex flex-col overflow-y-auto">
+    <section className="bg-trm-black max-w-full h-full min-h-screen flex flex-col overflow-y-auto">
       <Navbar />
 
       <div className="flex flex-1">

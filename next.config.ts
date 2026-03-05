@@ -1,3 +1,13 @@
+/**
+ * Fix for Node.js 25: it exposes a global `localStorage` object that lacks
+ * standard Web Storage API methods (getItem, setItem, removeItem).
+ * This breaks @supabase/auth-js which checks `globalThis.localStorage`
+ * and assumes the full API is available.
+ */
+if (typeof globalThis.localStorage === 'object' && typeof globalThis.localStorage.getItem !== 'function') {
+  delete (globalThis as Record<string, unknown>).localStorage;
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
@@ -19,6 +29,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+
   },
   // Configuración de headers para mejor caché y seguridad
   async headers() {

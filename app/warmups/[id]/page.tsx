@@ -74,18 +74,18 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
           if (playPromise !== undefined) {
             playPromise
               .then(() => {
-                console.log('Autoplay funcionó correctamente');
+                console.log('Autoplay worked correctly');
                 setShowPlayPrompt(false);
                 // Si se reproduce correctamente, desmutear
                 mediaElement.muted = false;
               })
               .catch((error) => {
-                console.log('Autoplay fue bloqueado:', error.name);
+                console.log('Autoplay was blocked:', error.name);
                 setShowPlayPrompt(true);
               });
           }
         }
-      }, 800); // Delay más largo para dar tiempo a que se cargue completamente
+      }, 800);
 
       return () => clearTimeout(timer);
     }
@@ -101,7 +101,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
       mediaElement.play().then(() => {
         setShowPlayPrompt(false);
       }).catch((error) => {
-        console.error('Error al reproducir:', error);
+        console.error('Error playing:', error);
       });
     }
   };
@@ -128,7 +128,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
         const foundWarmup = warmups.find((w: Warmup) => w.id === id);
         
         if (!foundWarmup) {
-          setError('Warmup no encontrado');
+          setError(locale === 'es' ? 'Warmup no encontrado' : 'Warmup not found');
           return;
         }
 
@@ -165,7 +165,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
         
       } catch (err) {
         console.error('Error fetching warmup:', err);
-        setError('Error al cargar el warmup');
+        setError(locale === 'es' ? 'Error al cargar el warmup' : 'Error loading warmup');
       } finally {
         setIsLoading(false);
       }
@@ -176,13 +176,13 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-700 text-white">
+      <div className="min-h-screen bg-trm-black text-white font-montserrat">
         <Navbar />
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
           <div className="animate-pulse">
-            <div className="w-full max-w-4xl mx-auto bg-gray-600 rounded-lg h-96 mb-8"></div>
-            <div className="h-8 bg-gray-600 rounded w-3/4 mx-auto mb-4"></div>
-            <div className="h-4 bg-gray-600 rounded w-1/2 mx-auto"></div>
+            <div className="w-full max-w-4xl mx-auto bg-trm-bg border border-pink/20 rounded-[20px] h-96 mb-8"></div>
+            <div className="h-8 bg-trm-bg rounded w-3/4 mx-auto mb-4"></div>
+            <div className="h-4 bg-trm-bg rounded w-1/2 mx-auto"></div>
           </div>
         </div>
         <Footer />
@@ -192,17 +192,17 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
 
   if (error || !warmup) {
     return (
-      <div className="min-h-screen bg-gray-700 text-white">
+      <div className="min-h-screen bg-trm-black text-white font-montserrat">
         <Navbar />
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4">Error</h1>
-            <p className="text-red-400 mb-4">{error || 'Warmup no encontrado'}</p>
+            <p className="text-pink mb-4">{error || (locale === 'es' ? 'Warmup no encontrado' : 'Warmup not found')}</p>
             <button 
               onClick={() => router.back()}
-              className="bg-wine hover:bg-red-700 px-6 py-2 rounded-lg transition-colors"
+              className="bg-gradient-to-r from-pink to-dark-red hover:opacity-80 px-6 py-2 rounded-full transition-all"
             >
-              Volver
+              {locale === 'es' ? 'Volver' : 'Go Back'}
             </button>
           </div>
         </div>
@@ -215,21 +215,21 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
   const displayTitle = `#${warmup.warmupNumber} Warm Up`;
 
   return (
-    <div className="min-h-screen bg-gray-700 text-white">
+    <div className="min-h-screen bg-trm-black text-white font-montserrat">
       <Navbar />
       
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 pt-24 max-w-7xl">
         {/* Título del warmup */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">{displayTitle}</h1>
-          <p className="text-gray-400 text-lg">
-            Video · {displayDuration}
+          <p className="text-trm-muted text-lg">
+            Video &middot; {displayDuration}
           </p>
         </div>
 
         {/* Reproductor */}
         <div className="w-full max-w-4xl mx-auto mb-12">
-          <div className="relative w-full h-0 pb-[56.25%] bg-gray-600 rounded-lg overflow-hidden">
+          <div className="relative w-full h-0 pb-[56.25%] bg-trm-bg border border-pink rounded-[20px] overflow-hidden">
             <video
               ref={videoRef}
               src={warmup.url}
@@ -246,7 +246,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                 // Intentar reproducir cuando los datos están cargados
                 const video = e.target as HTMLVideoElement;
                 video.play().catch(() => {
-                  console.log('Autoplay bloqueado, el usuario deberá hacer clic para reproducir');
+                  console.log('Autoplay blocked, user will need to click to play');
                   setShowPlayPrompt(true);
                 });
               }}
@@ -257,7 +257,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                 setShowPlayPrompt(false);
               }}
             >
-              Tu navegador no soporta el elemento de video.
+              {locale === 'es' ? 'Tu navegador no soporta el elemento de video.' : 'Your browser does not support the video element.'}
             </video>
 
             {/* Botón de play overlay cuando el autoplay está bloqueado */}
@@ -265,7 +265,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
                 <button
                   onClick={handlePlayClick}
-                  className="bg-wine hover:bg-red-700 text-white rounded-full p-6 transition-all duration-300 hover:scale-110 shadow-lg"
+                  className="bg-gradient-to-r from-pink to-dark-red hover:opacity-80 text-white rounded-full p-6 transition-all duration-300 hover:scale-110 shadow-lg"
                 >
                   <svg className="w-12 h-12 text-white fill-white" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z"/>
@@ -290,7 +290,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                       <h2 className="text-white text-xl font-semibold">
                         {locale === 'es' ? 'Áreas que mejorarás' : 'Areas You\'ll Improve'}
                       </h2>
-                      <div className="text-white text-base font-light leading-relaxed">
+                      <div className="text-trm-muted text-base font-light leading-relaxed">
                         {warmupData.areas.split('\n').map((line: string, index: number) => (
                           <div key={index} className="mb-2">{line}</div>
                         ))}
@@ -304,7 +304,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                       <h2 className="text-white text-xl font-semibold">
                         {locale === 'es' ? 'Altura de las anillas' : 'Rings Height'}
                       </h2>
-                      <div className="text-white text-base font-light leading-relaxed">
+                      <div className="text-trm-muted text-base font-light leading-relaxed">
                         {warmupData.rings_placement.split('\n').map((line: string, index: number) => (
                           <div key={index} className="mb-2">{line}</div>
                         ))}
@@ -321,7 +321,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                         </h2>
                         <button 
                           onClick={() => setIsExerciseOpen(!isExerciseOpen)}
-                          className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="bg-trm-bg hover:bg-pink/20 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink/50"
                           aria-label="Toggle exercises"
                         >
                           <svg 
@@ -334,7 +334,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                         </button>
                       </div>
                       <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isExerciseOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <div className="text-white text-base font-light leading-relaxed pt-2">
+                        <div className="text-trm-muted text-base font-light leading-relaxed pt-2">
                           {warmupData.exercise.split('\n').map((line: string, index: number) => (
                             <div key={index} className="mb-2">{line}</div>
                           ))}
@@ -352,7 +352,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                         </h2>
                         <button 
                           onClick={() => setIsProTipOpen(!isProTipOpen)}
-                          className="bg-gray-600 hover:bg-gray-700 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          className="bg-trm-bg hover:bg-pink/20 text-white rounded-full p-2 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-pink/50"
                           aria-label="Toggle pro tip"
                         >
                           <svg 
@@ -365,7 +365,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
                         </button>
                       </div>
                       <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isProTipOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                        <div className="text-white text-base font-light leading-relaxed pt-2">
+                        <div className="text-trm-muted text-base font-light leading-relaxed pt-2">
                           {warmupData.pro_tip.split('\n').map((line: string, index: number) => (
                             <div key={index} className="mb-2">{line}</div>
                           ))}
@@ -390,7 +390,7 @@ export default function WarmupPlayer({ params }: { params: Promise<{ id: string 
         {/* Título para las rutinas */}
         <div className="mb-6">
           <h2 className="text-2xl font-bold text-white text-center">
-            {locale === 'es' ? '¡Descubre más rutinas para probar!' : 'Discover more routines to try!'}
+            {locale === 'es' ? 'Descubre más rutinas para probar!' : 'Discover more routines to try!'}
           </h2>
         </div>
 

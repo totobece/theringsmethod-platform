@@ -3,9 +3,10 @@
 
 
 @theme {
+  /* Legacy colors (used in login, account, etc.) */
   --color-wine: #58011D;
   --color-white: #ffffff;
-  --color-cream : #EFEEE7;
+  --color-cream: #EFEEE7;
   --color-winedark: #320013;
   --color-darkwine: #3F1723;
   --color-darkerwine: #38101B;
@@ -17,7 +18,16 @@
   --color-gray-500: #63625D;
   --color-gray-600: #434343;
   --color-gray-700: #202020;
-  /* ... */
+
+  /* New design system colors */
+  --color-pink: #ff6b9d;
+  --color-dark-red: #8b2635;
+  --color-green-primary: #4CAF50;
+  --color-green-dark: #2E7D32;
+  --color-trm-black: #000000;
+  --color-trm-bg: #1a1a1a;
+  --color-trm-bg-alt: #111111;
+  --color-trm-muted: #888888;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -31,6 +41,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Montserrat font class for new design system pages */
+.font-montserrat {
+  font-family: var(--font-montserrat), 'Montserrat', sans-serif;
+}
+
+/* Custom scrollbar for workout grids (new design) */
+.trm-scrollbar::-webkit-scrollbar {
+  height: 2px;
+}
+.trm-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 107, 157, 0.1);
+  border-radius: 10px;
+}
+.trm-scrollbar::-webkit-scrollbar-thumb {
+  background: #ff6b9d;
+  border-radius: 10px;
 }
 
 /* Prevenir descarga de videos y audios - Ocultar botones de descarga */

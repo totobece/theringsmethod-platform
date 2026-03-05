@@ -156,16 +156,21 @@
     "unlocksTomorrow": "Unlocks tomorrow",
     "noRoutinesUnlocked": "No routines unlocked",
     "unlockMessage": "New routines unlock by completing previous ones. Next routine: Day {{day}}",
-    "loadingProgress": "Loading progress information..."
+    "loadingProgress": "Loading progress information...",
+    "noRoutinesAvailable": "No routines available for this week"
   },
   "meditations": {
-    "title": "Meditations",
+    "title": "Mental Training",
+    "eyebrow": "MEDITATIONS",
+    "description": "Guided meditation sessions to complement your physical training.",
     "selectMeditation": "Select a meditation",
     "playPause": "Play/Pause",
     "meditationCompleted": "Meditation completed",
     "backToMeditations": "Back to meditations",
     "back": "Back",
-    "browserNotSupport": "Your browser does not support the audio element."
+    "browserNotSupport": "Your browser does not support the audio element.",
+    "noMeditations": "No meditations available",
+    "noResultsFound": "No meditations found for \"{{searchTerm}}\""
   },
   "account": {
     "title": "My Account",
