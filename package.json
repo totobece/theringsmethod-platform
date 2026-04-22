@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "prebuild": "cp -r locales/* public/locales/",
+    "prebuild": "rm -rf .next && cp -r locales/* public/locales/",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

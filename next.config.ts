@@ -3,9 +3,9 @@
  * standard Web Storage API methods (getItem, setItem, removeItem).
  * This breaks @supabase/auth-js which checks `globalThis.localStorage`
  * and assumes the full API is available.
- * 
- * Build: 2026-04-22 - Force rebuild for Supabase env vars
  */
+
+// Force rebuild 2026-04-22-16:50 - fix Supabase env vars
 if (typeof globalThis.localStorage === 'object' && typeof globalThis.localStorage.getItem !== 'function') {
   delete (globalThis as Record<string, unknown>).localStorage;
 }
