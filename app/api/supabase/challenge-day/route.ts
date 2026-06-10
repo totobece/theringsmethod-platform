@@ -103,8 +103,8 @@ export async function POST(request: Request) {
       newChallengeDay += 1
     }
 
-    // Verificar si el challenge ha terminado (24 rutinas completadas)
-    if (newChallengeDay > 24) {
+    // Verificar si el challenge ha terminado (28 rutinas completadas)
+    if (newChallengeDay > 28) {
       console.log('🏁 Challenge completado! Reseteando...')
       newChallengeDay = 1
       newCalendarDay = 1
@@ -167,7 +167,7 @@ export async function POST(request: Request) {
       },
       newRoutine: newRoutine || null,
       skippedSunday: newWeekDay === 1 && currentState.week_day === 6,
-      challengeCompleted: newChallengeDay === 1 && currentState.challenge_day === 24,
+      challengeCompleted: newChallengeDay === 1 && currentState.challenge_day === 28,
       timestamp: new Date().toISOString()
     })
 

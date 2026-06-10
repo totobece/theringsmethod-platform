@@ -20,8 +20,8 @@ export async function GET(request: Request) {
     // Si se especifica un día, devolver solo esa preview
     if (day) {
       const dayNumber = parseInt(day);
-      if (isNaN(dayNumber) || dayNumber < 1 || dayNumber > 24) {
-        return NextResponse.json({ error: 'Day must be between 1 and 24' }, { status: 400 });
+      if (isNaN(dayNumber) || dayNumber < 1 || dayNumber > 28) {
+        return NextResponse.json({ error: 'Day must be between 1 and 28' }, { status: 400 });
       }
       
       const fileName = `V${dayNumber}.png`;

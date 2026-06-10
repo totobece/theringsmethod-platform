@@ -31,12 +31,12 @@ export const calculateUnlockedRoutines = (userMetadata: UserMetadata): { maxUnlo
   const daysSinceStart = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
   
   // El usuario puede acceder hasta el día que corresponde + día actual
-  // Mínimo día 1, máximo día 24
-  const maxUnlockedDay = Math.max(1, Math.min(daysSinceStart + 1, 24));
+  // Mínimo día 1, máximo día 28
+  const maxUnlockedDay = Math.max(1, Math.min(daysSinceStart + 1, 28));
   
   return {
     maxUnlockedDay,
-    totalDays: 24,
+    totalDays: 28,
     daysSinceStart: Math.max(0, daysSinceStart)
   };
 };

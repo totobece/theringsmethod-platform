@@ -54,6 +54,10 @@ const ROUTINE_TRANSLATIONS: Record<string, { en: string; es: string }> = {
   'Day 22': { en: 'Day 22', es: 'Día 22' },
   'Day 23': { en: 'Day 23', es: 'Día 23' },
   'Day 24': { en: 'Day 24', es: 'Día 24' },
+  'Day 25': { en: 'Day 25', es: 'Día 25' },
+  'Day 26': { en: 'Day 26', es: 'Día 26' },
+  'Day 27': { en: 'Day 27', es: 'Día 27' },
+  'Day 28': { en: 'Day 28', es: 'Día 28' },
 
   // Week patterns
   'Week 1': { en: 'Week 1', es: 'Semana 1' },
@@ -86,6 +90,10 @@ const ROUTINE_TRANSLATIONS: Record<string, { en: string; es: string }> = {
   'FULL BODY #22': { en: 'FULL BODY #22', es: 'CUERPO COMPLETO #22' },
   'UPPER BODY #23': { en: 'UPPER BODY #23', es: 'TREN SUPERIOR #23' },
   'MOBILITY #24': { en: 'MOBILITY #24', es: 'MOVILIDAD #24' },
+  'OUTDOOR #7': { en: 'OUTDOOR #7', es: 'OUTDOOR #7' },
+  'OUTDOOR #14': { en: 'OUTDOOR #14', es: 'OUTDOOR #14' },
+  'OUTDOOR #21': { en: 'OUTDOOR #21', es: 'OUTDOOR #21' },
+  'OUTDOOR #28': { en: 'OUTDOOR #28', es: 'OUTDOOR #28' },
 
   // Exercise names
   'Squat': { en: 'Squat', es: 'Sentadilla' },

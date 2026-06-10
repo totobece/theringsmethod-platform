@@ -100,7 +100,7 @@ export async function GET() {
       return new Response(JSON.stringify({
         maxUnlockedDay: 1,
         currentDay: 1,
-        totalRoutines: 24,
+        totalRoutines: 28,
         progress: [{
           routine_day: 1,
           completed_at: null,
@@ -145,17 +145,17 @@ export async function GET() {
 
     // Determinar el día actual (el día más bajo no completado o el siguiente día si todos están completos)
     const incompleteEntry = progress.find(p => p.completed_at === null);
-    const currentDay = incompleteEntry ? incompleteEntry.routine_day : Math.min(progress.length + 1, 24);
+    const currentDay = incompleteEntry ? incompleteEntry.routine_day : Math.min(progress.length + 1, 28);
 
     // Calcular estadísticas
     const completedCount = progress.filter(p => p.completed_at !== null).length;
-    const isCompleted = completedCount >= 24;
-    const completionPercentage = Math.round((completedCount / 24) * 100);
+    const isCompleted = completedCount >= 28;
+    const completionPercentage = Math.round((completedCount / 28) * 100);
 
     return new Response(JSON.stringify({
-      maxUnlockedDay: Math.min(maxUnlockedDay, 24),
-      currentDay: Math.min(currentDay, 24),
-      totalRoutines: 24,
+      maxUnlockedDay: Math.min(maxUnlockedDay, 28),
+      currentDay: Math.min(currentDay, 28),
+      totalRoutines: 28,
       progress: progress || [],
       isCompleted,
       completionPercentage
@@ -251,7 +251,7 @@ export async function POST(request: Request) {
       const nextDay = routineDay + 1;
       let nextUnlockTime = null;
       
-      if (nextDay <= 24) {
+      if (nextDay <= 28) {
         // Calcular medianoche del día siguiente en UTC
         const unlockTime = new Date(now);
         unlockTime.setUTCDate(unlockTime.getUTCDate() + 1); // Día siguiente en UTC
@@ -291,7 +291,7 @@ export async function POST(request: Request) {
         message: `Routine ${routineDay} completed successfully`,
         nextDay: nextDay <= 24 ? nextDay : null,
         nextDayUnlocksAt: nextUnlockTime,
-        challengeCompleted: nextDay > 24
+        challengeCompleted: nextDay > 28
       }), { 
         status: 200,
         headers: { 'Content-Type': 'application/json' }

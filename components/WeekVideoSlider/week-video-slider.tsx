@@ -33,13 +33,13 @@ export default function WeekVideoSlider() {
 
   const calculateCurrentWeek = (maxUnlockedDay: number): number => {
     if (maxUnlockedDay === 0) return 1;
-    const week = Math.floor((maxUnlockedDay - 1) / 6) + 1;
+    const week = Math.floor((maxUnlockedDay - 1) / 7) + 1;
     return Math.min(week, 4);
   };
 
   const getWeekRoutines = (allRoutines: WeekVideosData[], week: number): WeekVideosData[] => {
-    const startDay = (week - 1) * 6 + 1;
-    const endDay = week * 6;
+    const startDay = (week - 1) * 7 + 1;
+    const endDay = week * 7;
 
     return allRoutines.filter(routine => {
       const routineDay = extractDayNumberFromString(routine.day);

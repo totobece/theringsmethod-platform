@@ -325,8 +325,8 @@ export default function Post({ params }: { params: Promise<{ id: string }> }) {
         </>
       )}
       <div className='justify-center items-center flex flex-col mt-16'>
-        {/* Sección Do it Indoor con GIF - hide for Mobility days (6, 12, 18, 24) */}
-        {!isLoadingPost && post && ![6, 12, 18, 24].includes(routineDay) && (
+        {/* Sección Do it Indoor con GIF - hide for Mobility days (6, 13, 20, 27) */}
+        {!isLoadingPost && post && ![6, 13, 20, 27].includes(routineDay) && (
           <div className="w-full max-w-4xl mx-auto px-4 md:px-16 mb-12 md:mb-16">
             <div className="text-center mb-8">
               <h2 className='text-white text-pretty font-medium text-2xl md:text-4xl'>
