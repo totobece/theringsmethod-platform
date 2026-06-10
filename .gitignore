@@ -37,7 +37,9 @@ yarn-error.log*
 .vercel
 
 # supabase local state
-supabase/
+supabase/.temp
+supabase/config.toml
+supabase/.gitignore
 
 # typescript
 *.tsbuildinfo
