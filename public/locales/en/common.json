@@ -107,6 +107,7 @@
     "signOut": "Sign Out",
     "linkExpired": "The verification link has expired or was already used. Please request a new link.",
     "authError": "An error occurred during authentication. Please try again.",
+    "timeout": "The connection is taking too long. Please try again.",
     "termsAndConditions": "Terms and Conditions",
     "privacyPolicy": "Privacy Policy",
     "acceptTerms": "I accept",

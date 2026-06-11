@@ -107,6 +107,7 @@
     "signOut": "Cerrar Sesión",
     "linkExpired": "El enlace de verificación ha expirado o ya fue usado. Por favor, solicita un nuevo enlace.",
     "authError": "Ocurrió un error durante la autenticación. Por favor, intenta de nuevo.",
+    "timeout": "La conexión está tardando demasiado. Por favor, intenta de nuevo.",
     "termsAndConditions": "Términos y Condiciones",
     "privacyPolicy": "Política de Privacidad",
     "acceptTerms": "Acepto los",

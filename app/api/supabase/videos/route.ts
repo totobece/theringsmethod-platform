@@ -79,6 +79,23 @@ const getAllVideos = async (): Promise<WeekVideos[]> => {
       })
   );
 
+  // Agregar videos outdoor desde Cloudflare R2
+  const R2_BASE_URL = 'https://pub-d00242154e7944c59cd08e3d37f6e846.r2.dev';
+  const outdoorVideos: Record<string, Video[]> = {
+    week1: [{ name: 'VIDEO_7_OUTDOOR.mp4', url: `${R2_BASE_URL}/week1/VIDEO_7_OUTDOOR.mp4` }],
+    week2: [{ name: 'VIDEO_14_OUTDOOR.mp4', url: `${R2_BASE_URL}/week2/VIDEO_14_OUTDOOR.mp4` }],
+    week3: [{ name: 'VIDEO_21_OUTDOOR.mp4', url: `${R2_BASE_URL}/week3/VIDEO_21_OUTDOOR.mp4` }],
+    week4: [{ name: 'VIDEO_28_OUTDOOR.mp4', url: `${R2_BASE_URL}/week4/VIDEO_28_OUTDOOR.mp4` }],
+  };
+
+  // Agregar videos outdoor a cada semana
+  for (const weekData of weekVideos) {
+    const outdoor = outdoorVideos[weekData.week];
+    if (outdoor) {
+      weekData.videos.push(...outdoor);
+    }
+  }
+
   // Ordenar por semana (week1, week2, week3, week4)
   weekVideos.sort((a, b) => {
     const getWeekNumber = (weekName: string) => {
