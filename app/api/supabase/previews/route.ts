@@ -26,10 +26,12 @@ export async function GET(request: Request) {
       
       const fileName = `V${dayNumber}.png`;
       const publicUrl = supabase.storage.from(bucketName).getPublicUrl(fileName).data.publicUrl;
+      // Add cache-busting timestamp
+      const cacheBustUrl = `${publicUrl}?t=${Date.now()}`;
       
       return NextResponse.json({
         name: fileName,
-        url: publicUrl,
+        url: cacheBustUrl,
         day: dayNumber
       }, { status: 200 });
     }
@@ -58,10 +60,12 @@ export async function GET(request: Request) {
         const publicUrl = supabase.storage.from(bucketName).getPublicUrl(file.name).data.publicUrl;
         const dayMatch = file.name.match(/^V(\d+)\.png$/);
         const day = dayMatch ? parseInt(dayMatch[1]) : null;
+        // Add cache-busting timestamp
+        const cacheBustUrl = `${publicUrl}?t=${Date.now()}`;
         
         return {
           name: file.name,
-          url: publicUrl,
+          url: cacheBustUrl,
           day: day
         };
       })
